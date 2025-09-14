@@ -1,0 +1,32 @@
+/* App.css */
+.app-container {
+  min-height: 100vh;
+  padding: 2rem;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.app-container.dark {
+  background-color: #1e1e1e;
+  color: #ffffff;
+}
+
+.app-container.light {
+  background-color: #ffffff;
+  color: #000000;
+}
+
+.controls {
+  margin-bottom: 1rem;
+}
+
+select {
+  margin-left: 0.5rem;
+}
+
+button {
+  margin-left: 2rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  background: #ccc;
+  border: 1px solid #999;
+}

@@ -1,0 +1,68 @@
+//@version=5
+strategy("XAUUSD Strategy - Per Trade Success Display", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+
+// === אינדיקטורים ===
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+atr = ta.atr(14)
+vwapLine = ta.vwap
+
+// === תנאים לכניסה ===
+longCond = ta.crossover(macdLine, signalLine) and rsi > 50 and close > vwapLine
+shortCond = ta.crossunder(macdLine, signalLine) and rsi < 50 and close < vwapLine
+
+// === TP ו־SL לפי ATR ===
+longTP = close + atr * 2
+longSL = close - atr * 1.5
+shortTP = close - atr * 2
+shortSL = close + atr * 1.5
+
+// === משתנים לשמירת מצב ===
+var float tradeEntryPrice = na
+var bool inTrade = false
+var bool isLong = na
+var label tradeLabel = na
+
+// === כניסה לעסקה ===
+if longCond and not inTrade
+    strategy.entry("Long", strategy.long)
+    tradeEntryPrice := close
+    isLong := true
+    inTrade := true
+
+if shortCond and not inTrade
+    strategy.entry("Short", strategy.short)
+    tradeEntryPrice := close
+    isLong := false
+    inTrade := true
+
+// === יציאה וניתוח הצלחה ===
+tpReached = false
+slReached = false
+
+if inTrade
+    if isLong
+        tpReached := high >= longTP
+        slReached := low <= longSL
+        if tpReached or slReached
+            strategy.exit("Long TP/SL", from_entry="Long", limit=longTP, stop=longSL)
+    else
+        tpReached := low <= shortTP
+        slReached := high >= shortSL
+        if tpReached or slReached
+            strategy.exit("Short TP/SL", from_entry="Short", limit=shortTP, stop=shortSL)
+
+// === הצגת אחוז הצלחה לפי תוצאה ===
+if inTrade and (tpReached or slReached)
+    successPerc = tpReached ? 100 : 0
+    label.delete(tradeLabel)
+    tradeLabel := label.new(
+        x=bar_index,
+        y=high,
+        text="Success: " + str.tostring(successPerc, "#") + "%",
+        style=label.style_label_down,
+        color=tpReached ? color.green : color.red,
+        textcolor=color.white,
+        size=size.normal
+    )
+    inTrade := false

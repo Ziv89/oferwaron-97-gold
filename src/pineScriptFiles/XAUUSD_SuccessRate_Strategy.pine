@@ -1,0 +1,75 @@
+
+//@version=5
+indicator("XAUUSD 1min - Success Rate + TP/SL", overlay=true)
+
+rsi = ta.rsi(close, 14)
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+sqz = ta.ema(close - ta.sma(close, 10), 6) - ta.ema(close - ta.sma(close, 10), 13)
+atr = ta.atr(14)
+kde = 100 * ta.stdev(close, 10) / close
+rmi = ta.rsi(close, 6)
+rmiTrendUp = rmi > rmi[1]
+rmiTrendDown = rmi < rmi[1]
+lowKDE = kde < 7
+
+// תנאים לכניסה
+longCond = rsi < 40 and ta.crossover(macdLine, signalLine) and sqz > 0 and rmiTrendUp and lowKDE
+shortCond = rsi > 60 and ta.crossunder(macdLine, signalLine) and sqz < 0 and rmiTrendDown and lowKDE
+
+// יעדים
+tpMult = 1.3
+slMult = 0.8
+riskReward = tpMult / slMult
+
+var float entryPrice = na
+var label successLabel = na
+
+// פונקציית חישוב הצלחה
+calcSuccess(entry, dir) =>
+    tp = dir ? entry + atr * tpMult : entry - atr * tpMult
+    sl = dir ? entry - atr * slMult : entry + atr * slMult
+    maxLookahead = 20
+    hit = 0
+    for i = 1 to maxLookahead
+        high_ = high[i]
+        low_ = low[i]
+        if (dir and high_ >= tp)
+            hit := 1
+            break
+        else if (not dir and low_ <= tp)
+            hit := 1
+            break
+        if (dir and low_ <= sl)
+            break
+        else if (not dir and high_ >= sl)
+            break
+    hit
+
+// לולאה אחורה לחישוב אחוז הצלחה
+successPerc = 0.0
+trades = 0
+wins = 0
+for i = 20 to 200
+    testLong = longCond[i]
+    testShort = shortCond[i]
+    dir = testLong ? true : testShort ? false : na
+    if not na(dir)
+        trades += 1
+        wins += calcSuccess(close[i], dir)
+
+successPerc := trades > 0 ? (wins / trades) * 100 : na
+
+// צבעים
+getColor(p) =>
+    p >= 95 ? color.green :
+    p >= 90 ? color.blue :
+    p >= 80 ? color.orange : color.gray
+
+// הצגת אחוז הצלחה מעל הנר עם צבע
+if longCond or shortCond
+    label.delete(successLabel)
+    successLabel := label.new(bar_index, high + 3 * syminfo.mintick,
+        text = str.tostring(successPerc, "#.0") + "%",
+        style = label.style_label_down,
+        color = getColor(successPerc),
+        textcolor=color.white, size = size.large)

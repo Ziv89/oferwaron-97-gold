@@ -1,0 +1,60 @@
+
+//@version=5
+indicator("XAUUSD 1min - Success Rate Tracker", overlay=true)
+
+tpMult = input.float(1.3, "TP Multiplier")
+slMult = input.float(0.8, "SL Multiplier")
+showTable = input.bool(true, "Show Success Rate Table")
+
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+atr = ta.atr(14)
+
+// תנאי כניסה
+longCond = rsi < 40 and ta.crossover(macdLine, signalLine)
+shortCond = rsi > 60 and ta.crossunder(macdLine, signalLine)
+
+// משתנים
+var float entryPrice = na
+var float sl = na
+var float tp = na
+var int trades = 0
+var int wins = 0
+
+if (na(entryPrice))
+    if longCond
+        entryPrice := close
+        sl := close - slMult * atr
+        tp := close + tpMult * atr
+    else if shortCond
+        entryPrice := close
+        sl := close + slMult * atr
+        tp := close - tpMult * atr
+else
+    if longCond and high >= tp
+        wins += 1
+        trades += 1
+        entryPrice := na
+        label.new(bar_index, high, "WIN", style=label.style_label_down, color=color.green, textcolor=color.white)
+    else if longCond and low <= sl
+        trades += 1
+        entryPrice := na
+        label.new(bar_index, low, "LOSS", style=label.style_label_down, color=color.red, textcolor=color.white)
+
+    if shortCond and low <= tp
+        wins += 1
+        trades += 1
+        entryPrice := na
+        label.new(bar_index, low, "WIN", style=label.style_label_up, color=color.green, textcolor=color.white)
+    else if shortCond and high >= sl
+        trades += 1
+        entryPrice := na
+        label.new(bar_index, high, "LOSS", style=label.style_label_up, color=color.red, textcolor=color.white)
+
+successRate = trades > 0 ? (wins * 100.0) / trades : na
+
+// טבלה
+if showTable
+    var table stats = table.new(position.top_right, 2, 2)
+    table.cell(stats, 0, 0, "Success Rate", text_color=color.white, bgcolor=color.gray)
+    table.cell(stats, 0, 1, str.tostring(successRate, "#.00") + "%", text_color=color.green, bgcolor=color.black)

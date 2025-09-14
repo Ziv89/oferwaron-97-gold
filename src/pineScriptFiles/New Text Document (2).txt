@@ -1,0 +1,188 @@
+//@version=5
+// 2-Hour Timeframe
+strategy("OferWaron97%gold - version 5", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=1)
+profitAfterFees(netPct) => math.max(100000 * netPct / 100 * (netPct >= 0 ? 0.72 : 1.03), -30000)
+startDay = input.int  (1   , title="Start Day")
+startMonth = input.int(1   , title="Start Month")
+startYear = input.int(2022 , title="Start Year")
+daysRange = input.int(3000 , title="Number of Days to Include")
+startTime = timestamp("GMT+3", startYear, startMonth, startDay, 0, 0)
+endTime = startTime + daysRange * 24 * 60 * 60 * 1000
+float totalProfit = 0.0
+int totalTrades = 0
+int totalWins = 0
+int totalLosses = 0
+float totalWinAmount = 0.0
+float totalLossAmount = 0.0
+float peak = 0.0
+float maxDrawdown = 0.0
+var float maxConsecutiveLossAmount = 0.0
+var int maxConsecutiveLossCount = 0
+var float maxConsecutiveWinAmount = 0.0
+var int maxConsecutiveWinCount = 0
+if strategy.closedtrades > 0
+    float currentConsecutiveLossAmount = 0.0
+    int currentConsecutiveLossCount = 0
+    float currentConsecutiveWinAmount = 0.0
+    int currentConsecutiveWinCount = 0
+    for i = 0 to strategy.closedtrades - 1
+        int t = strategy.closedtrades.exit_time(i)
+        if t >= startTime and t < endTime
+            float entry = strategy.closedtrades.entry_price(i)
+            float exit = strategy.closedtrades.exit_price(i)
+            string id = strategy.closedtrades.entry_id(i)
+            bool isLong = id == "Long"
+            float points = isLong ? (exit - entry) : (entry - exit)
+            float netPct = (points / 2.450) * 10
+            float profit = profitAfterFees(netPct)
+            if profit > 0
+                currentConsecutiveLossAmount := 0.0
+                currentConsecutiveLossCount := 0
+            else
+                currentConsecutiveLossAmount += profit
+                currentConsecutiveLossCount += 1
+                if currentConsecutiveLossAmount < maxConsecutiveLossAmount
+                    maxConsecutiveLossAmount := currentConsecutiveLossAmount
+                    maxConsecutiveLossCount := currentConsecutiveLossCount
+            if profit > 0
+                currentConsecutiveWinAmount += profit
+                currentConsecutiveWinCount += 1
+                if currentConsecutiveWinAmount > maxConsecutiveWinAmount
+                    maxConsecutiveWinAmount := currentConsecutiveWinAmount
+                    maxConsecutiveWinCount := currentConsecutiveWinCount
+            else
+                currentConsecutiveWinAmount := 0.0
+                currentConsecutiveWinCount := 0
+            totalTrades += 1
+            if profit > 0
+                totalWins += 1
+                totalWinAmount += profit
+            else
+                totalLosses += 1
+                totalLossAmount += profit
+            float totalProfitRunning = totalWinAmount + totalLossAmount
+            peak := math.max(peak, totalProfitRunning)
+            float dd = peak - totalProfitRunning
+            maxDrawdown := math.max(maxDrawdown, dd)
+
+var table summaryTable = table.new(position.bottom_right, 1, 14, border_width=1)
+if totalTrades > 0
+    table.cell(summaryTable, 0, 0, "📅", bgcolor=color.black, text_color=color.white, text_size=size.small)
+    table.cell(summaryTable, 0, 1, "Trades: " + str.tostring(totalTrades), bgcolor=color.black, text_color=color.white, text_size=size.tiny)
+    table.cell(summaryTable, 0, 2, "Wins: " + str.tostring(totalWins) + " (" + str.tostring(totalWins * 100 / totalTrades, "#0.00") + "%)", bgcolor=color.black, text_color=color.rgb(0, 255, 8), text_size=size.tiny)
+    table.cell(summaryTable, 0, 3, "Losses: " + str.tostring(totalLosses) + " (" + str.tostring(totalLosses * 100 / totalTrades, "#0.00") + "%)", bgcolor=color.black, text_color=color.rgb(251, 255, 0), text_size=size.tiny)
+    table.cell(summaryTable, 0, 5, "Max Consecutive Losses: " + str.tostring(maxConsecutiveLossCount) + " trades", bgcolor=color.black, text_color=color.rgb(251, 255, 0), text_size=size.tiny)
+    table.cell(summaryTable, 0, 4, "Max Consecutive Wins: " + str.tostring(maxConsecutiveWinCount) + " trades", bgcolor=color.black, text_color=color.rgb(43, 255, 0), text_size=size.tiny)
+else
+    table.cell(summaryTable, 0, 1, "No trades", bgcolor=color.black, text_color=color.red, text_size=size.tiny)
+    for i = 1 to 5
+        table.cell(summaryTable, 0, i, "", bgcolor=color.black)
+
+
+macdFastLen = input.int(12, title="MACD Fast")
+macdSlowLen = input.int(26, title="MACD Slow")
+macdSignalLen = input.int(9, title="MACD Signal")
+rsiLen = input.int(24, title="RSI Length")
+ema21Len = input.int(21), ema50Len = input.int(50), ema100Len = input.int(100), ema200Len = input.int(200)
+atrLen = input.int(50, title="ATR Length")
+atrMultTP = input.float(50.0, title="TP Multiplier")
+atrAdjFactor = input.float(50.0, title="ATR Adjust Factor")
+stFactor = input.float(3.0, title="SuperTrend Factor")
+stPeriod = input.int(10, title="SuperTrend Period")
+stochLen = input.int(14, title="Stoch Length"), stochSmoothK = input.int(3, title="Smooth K")
+cciLen = input.int(20), rocLen = input.int(10), volAvgLen = input.int(20)
+rmiLen = input.int(14)
+[macdLine, signalLine, _] = ta.macd(close, macdFastLen, macdSlowLen, macdSignalLen)
+rsi = ta.rsi(close, rsiLen)
+ema21 = ta.ema(close, ema21Len)
+ema50 = ta.ema(close, ema50Len)
+ema100 = ta.ema(close, ema100Len)
+ema200 = ta.ema(close, ema200Len)
+atr = ta.atr(atrLen)
+adjustedATR = atr * atrAdjFactor
+[supertrend, dirTrend] = ta.supertrend(stFactor, stPeriod)
+k = ta.stoch(close, high, low, stochLen)
+d = ta.sma(k, stochSmoothK)
+delta = ta.change(close)
+rmiUp = math.max(delta, 0)
+rmiDown = math.max(-delta, 0)
+rmi = ta.rma(rmiUp, rmiLen) / (ta.rma(rmiUp, rmiLen) + ta.rma(rmiDown, rmiLen)) * 100
+vol = volume
+avgVol = ta.sma(vol, volAvgLen)
+highVol = vol > avgVol
+diffMACD = macdLine - signalLine
+roc = ta.roc(close, rocLen)
+cci = ta.cci(close, cciLen)
+supertrendScoreLong  = dirTrend < 0 ? 90 : 0
+otherScore = 0.0
+otherScore += macdLine > signalLine ? 1 : 0
+otherScore += close > ta.vwap ? 1 : 0
+otherScore += rmi > 50 ? 1 : 0
+otherScore += highVol and close > close[1] ? 1 : 0
+otherScore += k > d ? 1 : 0
+otherScore += atr > ta.sma(atr, 14) ? 1 : 0
+otherScore += ta.cum(close > close[1] ? volume : close < close[1] ? -volume : 0) > ta.cum(close[1] > close[2] ? volume[1] : close[1] < close[2] ? -volume[1] : 0) ? 1 : 0
+otherScore += rsi > 70 ? 1 : 0
+otherScore += diffMACD > 1 ? 1 : 0
+totalScoreLong  = supertrendScoreLong + otherScore
+percentLong  = math.min(math.max(math.round(totalScoreLong * 10) / 10, 4.5), 97)
+tpPts = adjustedATR * atrMultTP
+var int lastTradeBar = na
+canTrade = na(lastTradeBar) or (bar_index - lastTradeBar > 1)
+if strategy.closedtrades > 0
+    for i = math.max(0, strategy.closedtrades - 120) to strategy.closedtrades - 1
+        exitBar = strategy.closedtrades.exit_bar_index(i)
+        if not na(exitBar) and exitBar <= bar_index and (bar_index - exitBar) < 5000
+            dirID = strategy.closedtrades.entry_id(i)
+            entry = strategy.closedtrades.entry_price(i)
+            exit = strategy.closedtrades.exit_price(i)
+            isLong = dirID == "Long"
+            float points = isLong ? (exit - entry) : (entry - exit)
+            float netPct = (points / 2.450) * 10
+            float profitAfter = profitAfterFees(netPct)
+            labelColor = points >= 0 ? color.green : color.red
+            labelText = points >= 0 ? "WIN" : "Loss"
+            label.new(x=exitBar, y=exit, xloc=xloc.bar_index, text=labelText, style=label.style_label_up, color=labelColor, textcolor=color.white, size=size.small)
+var table hud = table.new(position.top_right, 1, 1, border_width=0)
+dirText = percentLong >= 97 ? "LONG" : "WAIT"
+successColor = percentLong >= 97 ? color.green :
+     percentLong >= 96 ? color.blue :
+     percentLong >= 95 ? color.yellow :
+     percentLong >= 94 ? color.orange :
+     color.red
+table.cell(hud, 0, 0, dirText + " | " + str.tostring(percentLong, "#.0") + "%", bgcolor=successColor, text_color=color.white, text_halign=text.align_center, text_size=size.huge)
+var bool alertSentForOpenTrade = false
+var bool alertSentForClosedTrade = false
+longTrigger = percentLong >= 97 and strategy.opentrades == 0 and canTrade
+longCross = longTrigger and not longTrigger[1]
+if longCross and not alertSentForOpenTrade
+    strategy.entry("Long", strategy.long)
+    lastTradeBar := bar_index
+    strategy.exit("Calculated exit", from_entry="Long", profit=10300, loss=1000)
+    alert("🔔 Long Entry Triggered", alert.freq_once_per_bar_close)
+    alertSentForOpenTrade := true
+    alertSentForClosedTrade := false  // Reset because a new trade started
+// Reset entry alert if no open trades
+if strategy.opentrades == 0
+    alertSentForOpenTrade := false
+tradeJustClosed = strategy.closedtrades > 0 and strategy.closedtrades.exit_bar_index(strategy.closedtrades - 1) == bar_index
+if tradeJustClosed and not alertSentForClosedTrade
+    float entryPrice = strategy.closedtrades.entry_price(strategy.closedtrades - 1)
+    float exitPrice  = strategy.closedtrades.exit_price(strategy.closedtrades - 1)
+    float netPoints  = strategy.closedtrades.entry_id(strategy.closedtrades - 1) == "Long" ? (exitPrice - entryPrice) : (entryPrice - exitPrice)
+    float netProfit  = profitAfterFees((netPoints / 2.450) * 10)
+    string direction = strategy.closedtrades.entry_id(strategy.closedtrades - 1)
+    string msg = "🔔 Trade Closed | Side: " + direction
+    alert(msg, alert.freq_once_per_bar_close)
+    alertSentForClosedTrade := true
+if strategy.closedtrades > 0
+    lastExitBar = strategy.closedtrades.exit_bar_index(strategy.closedtrades - 1)
+    if bar_index == lastExitBar
+        dirID = strategy.closedtrades.entry_id(strategy.closedtrades - 1)
+plotshape(strategy.opentrades.entry_id(0) == "Long" and bar_index == strategy.opentrades.entry_bar_index(0), location=location.belowbar, color=color.green, style=shape.circle, size=size.small)
+plotchar(strategy.position_size > 0 and strategy.opentrades.entry_id(0) == "Long" and (close - strategy.position_avg_price) >= 90 and (close[1] - strategy.position_avg_price) < 90, char='✔', location=location.abovebar, color=color.rgb(0, 255, 8), size=size.tiny)
+var table t = table.new(position.top_center, 3, 1, border_width=0)
+if bar_index == 1
+    table.cell(t, 0, 0, "OferWaron97%", bgcolor=color.rgb(10, 10, 10), text_color=color.white, text_size=size.huge)
+    table.cell(t, 1, 0, "gold", bgcolor=color.rgb(10, 10, 10), text_color=color.rgb(251, 255, 0), text_size=size.huge)
+    table.cell(t, 2, 0, " Strategy", bgcolor=color.rgb(10, 10, 10), text_color=color.white, text_size=size.huge)

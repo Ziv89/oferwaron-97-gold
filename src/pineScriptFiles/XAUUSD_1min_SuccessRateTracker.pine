@@ -1,0 +1,56 @@
+
+//@version=5
+indicator("XAUUSD 1min - Success Rate Tracker", overlay=true)
+
+// === Settings ===
+tpMult = 1.3
+slMult = 0.8
+riskReward = tpMult / slMult
+
+// === Indicators ===
+rsi = ta.rsi(close, 14)
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+atr = ta.atr(14)
+
+// === Entry Conditions ===
+longCond = rsi < 40 and ta.crossover(macdLine, signalLine)
+shortCond = rsi > 60 and ta.crossunder(macdLine, signalLine)
+
+// === Trade Tracking ===
+var float entryPrice = na
+var float sl = na
+var float tp = na
+var int wins = 0
+var int trades = 0
+var label successLabel = na
+
+if (longCond or shortCond)
+    entryPrice := close
+    sl := close - slMult * atr * (longCond ? 1 : -1)
+    tp := close + tpMult * atr * (longCond ? 1 : -1)
+    trades += 1
+
+    // Check win condition
+    won = (longCond and high >= tp) or (shortCond and low <= tp)
+    if won
+        wins += 1
+
+    // Success rate calculation
+    successPerc = trades > 0 ? (wins * 100.0 / trades) : na
+    clr = successPerc >= 95 ? color.green :
+          successPerc >= 90 ? color.blue :
+          successPerc >= 80 ? color.orange : color.gray
+    label.delete(successLabel)
+    successLabel := label.new(bar_index, high + 3 * syminfo.mintick,
+        str.tostring(successPerc, "#.0") + "%", 
+        style=label.style_label_down, 
+        color=clr, 
+        textcolor=color.white, 
+        size=size.large)
+
+// === Loss Labeling ===
+if not na(entryPrice)
+    loss = (longCond and low <= sl) or (shortCond and high >= sl)
+    if loss
+        label.new(bar_index, low, "LOSS", style=label.style_label_up, color=color.red, textcolor=color.white)
+        entryPrice := na

@@ -1,0 +1,47 @@
+
+//@version=5
+indicator("XAUUSD 1min - Success Rate Tracker", overlay=true)
+
+tpMult = 1.3
+slMult = 0.8
+atrLen = 14
+
+rsi = ta.rsi(close, 14)
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+atr = ta.atr(atrLen)
+
+longCond = rsi < 40 and ta.crossover(macdLine, signalLine)
+shortCond = rsi > 60 and ta.crossunder(macdLine, signalLine)
+
+var float entry = na
+var float sl = na
+var float tp = na
+var int trades = 0
+var int wins = 0
+var label lbl = na
+
+if (longCond or shortCond)
+    entry := close
+    sl := entry - atr * slMult * (longCond ? 1 : -1)
+    tp := entry + atr * tpMult * (longCond ? 1 : -1)
+    trades += 1
+
+    label.delete(lbl)
+    successPerc = trades > 0 ? (wins * 100.0) / trades : na
+    color clr = successPerc >= 95 ? color.green :
+                 successPerc >= 90 ? color.blue :
+                 successPerc >= 80 ? color.orange : color.gray
+    lbl := label.new(
+        bar_index, high + atr * 2,
+        text=str.tostring(successPerc, "#.0") + "%",
+        style=label.style_label_down,
+        color=clr,
+        textcolor=color.white,
+        size=size.large)
+
+if not na(entry)
+    if (longCond and high >= tp) or (shortCond and low <= tp)
+        wins += 1
+        entry := na
+    if (longCond and low <= sl) or (shortCond and high >= sl)
+        entry := na

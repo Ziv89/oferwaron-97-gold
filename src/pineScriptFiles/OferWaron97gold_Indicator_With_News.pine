@@ -1,0 +1,112 @@
+//@version=5
+indicator("Ofer Waron97%gold - FINAL WITH NEWS", overlay=true)
+
+// === Indicators ===
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+vwap = ta.vwap
+rmiUp = math.max(ta.change(close), 0)
+rmiDown = math.max(-ta.change(close), 0)
+rmi = ta.rma(rmiUp, 14) / (ta.rma(rmiUp, 14) + ta.rma(rmiDown, 14)) * 100
+vol = volume
+avgVol = ta.sma(vol, 20)
+highVol = vol > avgVol
+sma20 = ta.sma(close, 20)
+sqz = close - sma20
+sqzMom = ta.ema(sqz, 12) - ta.ema(sqz, 26)
+k = ta.stoch(close, high, low, 14)
+d = ta.sma(k, 3)
+atr = ta.atr(14)
+obv = ta.cum(close > close[1] ? volume : close < close[1] ? -volume : 0)
+[supertrend, directionTrend] = ta.supertrend(3.0, 10)
+fibHigh = ta.highest(high, 50)
+fibLow = ta.lowest(low, 50)
+fib38 = fibLow + 0.382 * (fibHigh - fibLow)
+fib61 = fibLow + 0.618 * (fibHigh - fibLow)
+cci = ta.cci(close, 20)
+adx = nz(ta.adx(14), 0)
+[middleBB, _, _] = ta.bb(close, 20, 2)
+
+// === Candlestick Patterns ===
+isBullishEngulfing = close > open and open[1] > close[1] and open <= close[1] and close >= open[1]
+isBearishEngulfing = close < open and open[1] < close[1] and open >= close[1] and close <= open[1]
+isDoji = math.abs(close - open) <= (high - low) * 0.1
+isHammer = close > open and (high - low) > 2 * (open - low) and (high - close) < (high - low) * 0.25
+isShootingStar = open > close and (high - low) > 2 * (high - open) and (close - low) < (high - low) * 0.25
+
+// === Daily High/Low Break ===
+dailyHigh = request.security(syminfo.tickerid, "D", high[1])
+dailyLow = request.security(syminfo.tickerid, "D", low[1])
+brokeHigh = high > dailyHigh
+brokeLow = low < dailyLow
+
+// === News Impact (Manual) ===
+newsImpact = input.bool(false, title="High Impact News Now?")
+newsScore = newsImpact ? 1.0 : 0.0
+
+// === Long Score ===
+longScore = 0.0
+longScore += macdLine > signalLine ? 1 : 0
+longScore += close > vwap ? 1 : 0
+longScore += rsi > 55 ? 1.3 : rsi > 50 ? 0.7 : 0
+longScore += rmi > 50 ? 1 : 0
+longScore += close > close[1] and highVol ? 1.2 : 0.7
+longScore += sqzMom > 0 ? 1.2 : 0.7
+longScore += k > d ? 1.1 : 0.6
+longScore += atr > ta.sma(atr, 14) ? 0.8 : 0
+longScore += obv > obv[1] ? 0.8 : 0
+longScore += directionTrend < 0 ? 0.8 : 0
+longScore += close > fib38 ? 0.7 : 0
+longScore += cci > 100 ? 0.6 : 0
+longScore += adx > 20 ? 0.6 : 0
+longScore += close > middleBB ? 0.6 : 0
+longScore += isBullishEngulfing ? 1.0 : 0
+longScore += isHammer ? 0.8 : 0
+longScore += isDoji ? 0.4 : 0
+longScore += brokeHigh ? 0.9 : 0
+longScore += newsScore
+
+// === Short Score ===
+shortScore = 0.0
+shortScore += macdLine < signalLine ? 1 : 0
+shortScore += close < vwap ? 1 : 0
+shortScore += rsi < 45 ? 1.3 : rsi < 50 ? 0.7 : 0
+shortScore += rmi < 50 ? 1 : 0
+shortScore += close < close[1] and highVol ? 1.2 : 0.7
+shortScore += sqzMom < 0 ? 1.2 : 0.7
+shortScore += k < d ? 1.1 : 0.6
+shortScore += atr > ta.sma(atr, 14) ? 0.8 : 0
+shortScore += obv < obv[1] ? 0.8 : 0
+shortScore += directionTrend > 0 ? 0.8 : 0
+shortScore += close < fib61 ? 0.7 : 0
+shortScore += cci < -100 ? 0.6 : 0
+shortScore += adx > 20 ? 0.6 : 0
+shortScore += close < middleBB ? 0.6 : 0
+shortScore += isBearishEngulfing ? 1.0 : 0
+shortScore += isShootingStar ? 0.8 : 0
+shortScore += isDoji ? 0.4 : 0
+shortScore += brokeLow ? 0.9 : 0
+shortScore += newsScore
+
+// === Success Rate Calculation ===
+useLong = longScore >= shortScore
+direction = useLong ? "LONG" : "SHORT"
+finalScore = math.max(longScore, shortScore)
+percentSuccess = math.round(math.min(97.0, finalScore * 1000 / 21.0)) / 10
+signalText = direction + " | " + str.tostring(percentSuccess, "#.0") + " %"
+signalColor = direction == "LONG" ? color.green : color.red
+
+// === Table Display ===
+var table t = table.new(position.top_right, 1, 1, border_width=2)
+if barstate.islast
+    table.cell(
+        table_id=t,
+        column=0,
+        row=0,
+        text=signalText,
+        bgcolor=(percentSuccess >= 97 ? signalColor : color.new(color.black, 80)),
+        text_color=color.white,
+        text_size=size.auto)
+
+// === Alert Condition ===
+alertcondition(barstate.islast and percentSuccess >= 90, title="High Confidence Signal", message="🔥 High Confidence " + direction + " Signal! Success: " + str.tostring(percentSuccess, "#.0") + "%")

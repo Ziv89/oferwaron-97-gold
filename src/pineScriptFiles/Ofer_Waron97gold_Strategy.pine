@@ -1,0 +1,51 @@
+//@version=5
+strategy("Ofer Waron97%gold Strategy", overlay=true, initial_capital=10000, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+
+// === Indicators ===
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+vwap = ta.vwap
+rmi = ta.rma(ta.change(close) > 0 ? ta.change(close) : 0, 14) / ta.rma(math.abs(ta.change(close)), 14) * 100
+vol = volume
+avgVol = ta.sma(vol, 20)
+highVol = vol > avgVol
+sqz = close - ta.sma(close, 20)
+sqzMom = ta.ema(sqz, 12) - ta.ema(sqz, 26)
+k = ta.stoch(close, high, low, 14)
+d = ta.sma(k, 3)
+
+// === Long and Short Score Calculation
+longScore = 0.0
+longScore += macdLine > signalLine ? 1 : 0
+longScore += close > vwap ? 1 : 0
+longScore += rsi > 50 ? 1 : 0
+longScore += rmi > 50 ? 1 : 0
+longScore += close > close[1] and highVol ? 1 : 0
+longScore += sqzMom > 0 ? 1 : 0
+longScore += k > d ? 1 : 0
+
+shortScore = 0.0
+shortScore += macdLine < signalLine ? 1 : 0
+shortScore += close < vwap ? 1 : 0
+shortScore += rsi < 50 ? 1 : 0
+shortScore += rmi < 50 ? 1 : 0
+shortScore += close < close[1] and highVol ? 1 : 0
+shortScore += sqzMom < 0 ? 1 : 0
+shortScore += k < d ? 1 : 0
+
+// === Entry Conditions ===
+longCondition = longScore >= 5
+shortCondition = shortScore >= 5
+
+if (longCondition)
+    strategy.entry("Long", strategy.long)
+
+if (shortCondition)
+    strategy.entry("Short", strategy.short)
+
+// === Exit Conditions ===
+if strategy.position_size > 0 and shortCondition
+    strategy.close("Long")
+
+if strategy.position_size < 0 and longCondition
+    strategy.close("Short")

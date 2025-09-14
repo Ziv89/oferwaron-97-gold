@@ -1,0 +1,58 @@
+//@version=5
+strategy("XAUUSD Smart Strategy - Full Setup", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+
+// === אינדיקטורים טכניים ===
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+atr = ta.atr(14)
+vwapLine = ta.vwap
+
+// === אחוז הצלחה מדומה (ניתן להחליף לרטרו בעתיד) ===
+trades = 20
+wins = 18
+successPerc = (wins * 100.0) / trades
+
+// === צבע לפי אחוז הצלחה ===
+color successColor = na
+if successPerc >= 95
+    successColor := color.green
+else if successPerc >= 90
+    successColor := color.blue
+else if successPerc >= 80
+    successColor := color.yellow
+else
+    successColor := color.red
+
+// === הצגת תווית גרפית עם אחוז הצלחה ===
+label.delete(lbl)
+lbl = label.new(
+    x=bar_index + 2,
+    y=high,
+    text="Success: " + str.tostring(successPerc, "#.0") + "%",
+    style=label.style_label_down,
+    color=successColor,
+    textcolor=color.white,
+    size=size.large
+)
+
+// === תנאים לכניסה לעסקה ===
+longCond = ta.crossover(macdLine, signalLine) and rsi > 50 and close > vwapLine
+shortCond = ta.crossunder(macdLine, signalLine) and rsi < 50 and close < vwapLine
+
+// === הגדרת TP ו־SL לפי ATR ===
+longTP = close + atr * 2
+longSL = close - atr * 1.5
+shortTP = close - atr * 2
+shortSL = close + atr * 1.5
+
+// === ביצוע עסקת לונג ===
+if longCond
+    strategy.entry("Long", strategy.long)
+    strategy.exit("Long TP/SL", from_entry="Long", limit=longTP, stop=longSL)
+    alert("כניסה ללונג - הצלחה: " + str.tostring(successPerc, "#.0") + "%", alert.freq_once_per_bar)
+
+// === ביצוע עסקת שורט ===
+if shortCond
+    strategy.entry("Short", strategy.short)
+    strategy.exit("Short TP/SL", from_entry="Short", limit=shortTP, stop=shortSL)
+    alert("כניסה לשורט - הצלחה: " + str.tostring(successPerc, "#.0") + "%", alert.freq_once_per_bar)

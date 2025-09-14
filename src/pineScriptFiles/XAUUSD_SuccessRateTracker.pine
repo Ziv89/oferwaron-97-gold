@@ -1,0 +1,47 @@
+//@version=5
+indicator("XAUUSD 1min - Success Rate Tracker", overlay=true)
+
+tpMult = 1.3
+slMult = 0.8
+riskReward = tpMult / slMult
+
+var float entryPrice = na
+var float sl = na
+var float tp = na
+var int trades = 0
+var int wins = 0
+
+// תנאי כניסה ללונג או שורט (תנאים פשוטים לדוגמה)
+longCond = ta.crossover(ta.sma(close, 14), ta.sma(close, 28))
+shortCond = ta.crossunder(ta.sma(close, 14), ta.sma(close, 28))
+
+if (longCond or shortCond)
+    entryPrice := close
+    sl := close - slMult * ta.atr(14) * (longCond ? 1 : -1)
+    tp := close + tpMult * ta.atr(14) * (longCond ? 1 : -1)
+    trades += 1
+
+    labelColor = color.gray
+    successText = "Success: NA"
+    if trades > 0
+        successPerc = (wins * 100.0) / trades
+        labelColor := successPerc >= 95 ? color.green :
+                      successPerc >= 90 ? color.blue :
+                      successPerc >= 80 ? color.orange : color.gray
+        successText := str.tostring(successPerc, "#.##") + "%"
+
+    label.new(bar_index, high + 2 * syminfo.mintick, text=successText,
+              style=label.style_label_down, color=labelColor,
+              textcolor=color.white, size=size.large)
+
+if not na(entryPrice)
+    // אם הגיע ל-TP
+    if (longCond and high >= tp) or (shortCond and low <= tp)
+        wins += 1
+        entryPrice := na
+    // אם הגיע ל-SL
+    if (longCond and low <= sl) or (shortCond and high >= sl)
+        label.new(bar_index, low - 2 * syminfo.mintick, text="LOSS",
+                  style=label.style_label_up, color=color.red,
+                  textcolor=color.white, size=size.normal)
+        entryPrice := na

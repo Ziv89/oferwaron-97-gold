@@ -1,0 +1,58 @@
+//@version=5
+strategy("XAUUSD - True Per Trade Success", overlay=true, default_qty_type=strategy.percent_of_equity, default_qty_value=10)
+
+// === אינדיקטורים ===
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+atr = ta.atr(14)
+vwap = ta.vwap
+
+// === תנאים לכניסה ===
+longCond = ta.crossover(macdLine, signalLine) and rsi > 50 and close > vwap
+shortCond = ta.crossunder(macdLine, signalLine) and rsi < 50 and close < vwap
+
+// === TP ו־SL לפי ATR ===
+longTP = close + atr * 2
+longSL = close - atr * 1.5
+shortTP = close - atr * 2
+shortSL = close + atr * 1.5
+
+// === מעקב מצב עסקה ===
+var bool inTrade = false
+var float entryPrice = na
+var bool isLong = na
+var label tradeLabel = na
+
+// === כניסה לעסקה ===
+if not inTrade and longCond
+    strategy.entry("Long", strategy.long)
+    inTrade := true
+    isLong := true
+    entryPrice := close
+
+if not inTrade and shortCond
+    strategy.entry("Short", strategy.short)
+    inTrade := true
+    isLong := false
+    entryPrice := close
+
+// === ניתוח הצלחה ===
+tp = isLong ? longTP : shortTP
+sl = isLong ? longSL : shortSL
+tpHit = isLong ? (high >= tp) : (low <= tp)
+slHit = isLong ? (low <= sl) : (high >= sl)
+
+if inTrade and (tpHit or slHit)
+    strategy.exit("Exit", from_entry=isLong ? "Long" : "Short", limit=tp, stop=sl)
+    success = tpHit ? 100 : 0
+    label.delete(tradeLabel)
+    tradeLabel := label.new(
+        x=bar_index,
+        y=high,
+        text="Success: " + str.tostring(success, "#") + "%",
+        style=label.style_label_down,
+        color=tpHit ? color.green : color.red,
+        textcolor=color.white,
+        size=size.normal
+    )
+    inTrade := false

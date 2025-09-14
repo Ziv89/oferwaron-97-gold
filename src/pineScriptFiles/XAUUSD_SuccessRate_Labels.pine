@@ -1,0 +1,40 @@
+
+//@version=5
+indicator("XAUUSD 1min - Success Rate + Labels", overlay=true)
+
+// === PARAMETERS ===
+tpMult = 1.3
+slMult = 0.8
+
+// === INDICATORS ===
+[macdLine, signalLine, _] = ta.macd(close, 12, 26, 9)
+rsi = ta.rsi(close, 14)
+sqz = ta.ema(close - ta.sma(close, 20), 10) - ta.ema(close - ta.sma(close, 20), 50)
+atr = ta.atr(14)
+lowVol = atr < ta.sma(atr, 14)
+
+// === CONDITIONS ===
+longCond = ta.crossover(macdLine, signalLine) and rsi < 40 and sqz > 0 and lowVol
+shortCond = ta.crossunder(macdLine, signalLine) and rsi > 60 and sqz < 0 and lowVol
+
+// === LABELS + SUCCESS RATE ===
+var float[] results = array.new_float()
+var int[] outcomes = array.new_int()
+
+if (longCond or shortCond)
+    dir = longCond ? 1 : -1
+    entry = close
+    sl = dir == 1 ? entry - atr * slMult : entry + atr * slMult
+    tp = dir == 1 ? entry + atr * tpMult : entry - atr * tpMult
+    success = dir == 1 ? high >= tp : low <= tp
+    array.push(results, success ? 1.0 : 0.0)
+    array.push(outcomes, bar_index)
+    successRate = array.avg(results)
+    
+    color labelColor = successRate >= 0.95 ? color.green :
+                       successRate >= 0.90 ? color.blue :
+                       successRate >= 0.80 ? color.yellow : color.gray
+                       
+    label.new(bar_index, high, text="Success: " + str.tostring(successRate * 100, "#.##") + "%", 
+        style=label.style_label_up, textcolor=color.black, size=size.small, color=labelColor)
+

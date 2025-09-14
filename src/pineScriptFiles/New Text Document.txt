@@ -1,0 +1,9 @@
+indicator('My EMA Cross Strategy');
+ema9 = ta.ema(close, 9);
+ema18 = ta.ema(close, 18);
+bull_bias = ema9 > ema18;
+bear_bias = ema9 < ema18;
+prev_close = close[1];
+diff_close = close - prev_close;
+_oo = open;
+_oo = math.abs(open[1] - close[2]);

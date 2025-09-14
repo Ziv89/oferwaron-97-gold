@@ -1,0 +1,36 @@
+.introduction-container {
+  color: white;
+  padding: 30px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.8;
+  text-align: left;
+}
+
+.introduction-container h1 {
+  font-size: 2em;
+  margin-bottom: 20px;
+  color: #ffd700;
+  background-color: transparent;;
+  border: none;
+}
+
+.introduction-container h2 {
+  font-size: 1.5em;
+  margin-top: 30px;
+  color: #ff8c00;
+}
+
+.introduction-container h3 {
+  font-size: 1.3em;
+  margin-top: 20px;
+  color: #00ced1;
+}
+
+.introduction-container ul {
+  list-style-type: square;
+  padding-right: 20px;
+}
+
+.introduction-container li {
+  margin-bottom: 8px;
+}

@@ -1,0 +1,80 @@
+
+//@version=5
+indicator("XAUUSD 1min - Success Rate + TP/SL", overlay=true)
+
+// === Inputs ===
+tpMult = input.float(1.3, title="TP Multiplier")
+slMult = input.float(0.8, title="SL Multiplier")
+atrLen = input.int(7, title="ATR Length")
+
+// === Indicators ===
+rsi = ta.rsi(close, 7)
+[macdLine, signalLine, _] = ta.macd(close, 6, 13, 5)
+sqz = ta.ema(close - ta.sma(close, 10), 6) - ta.ema(close - ta.sma(close, 10), 13)
+atr = ta.atr(atrLen)
+vol = volume
+avgVol = ta.sma(vol, 10)
+vwap = ta.vwap
+kde = 100 * ta.stdev(close, 10) / close
+lowKDE = kde < 5
+rmi = ta.rsi(close - close[5], 14)
+rmiTrendUp = rmi > rmi[1]
+rmiTrendDown = rmi < rmi[1]
+
+// === Conditions ===
+longCond = rsi < 40 and ta.crossover(macdLine, signalLine) and sqz > 0 and close > vwap and vol > avgVol and rmiTrendUp and lowKDE
+shortCond = rsi > 60 and ta.crossunder(macdLine, signalLine) and sqz < 0 and close < vwap and vol > avgVol and rmiTrendDown and lowKDE
+
+// === TP/SL Levels ===
+longTP = close + atr * tpMult
+longSL = close - atr * slMult
+shortTP = close - atr * tpMult
+shortSL = close + atr * slMult
+
+// === Success Detection ===
+checkSuccess(entryPrice, isLong) =>
+    var success = false
+    for i = 1 to 3
+        if isLong and high[i] >= entryPrice + atr * tpMult
+            success := true
+        if not isLong and low[i] <= entryPrice - atr * tpMult
+            success := true
+    success
+
+// === Success Stats ===
+var int totalTrades = 0
+var int successTrades = 0
+successRate = totalTrades > 0 ? (successTrades * 100.0 / totalTrades) : na
+
+// === Entry + Evaluation ===
+if (longCond)
+    totalTrades += 1
+    win = checkSuccess(close, true)
+    if win
+        successTrades += 1
+    sr = successRate
+    clr = sr >= 95 ? color.green : sr >= 90 ? color.blue : sr >= 80 ? color.yellow : color.gray
+    label.new(bar_index, high, "Success: " + str.tostring(sr, "#.##") + "%", style=label.style_label_down, color=clr, textcolor=color.black)
+
+if (shortCond)
+    totalTrades += 1
+    win = checkSuccess(close, false)
+    if win
+        successTrades += 1
+    sr = successRate
+    clr = sr >= 95 ? color.green : sr >= 90 ? color.blue : sr >= 80 ? color.yellow : color.gray
+    label.new(bar_index, low, "Success: " + str.tostring(sr, "#.##") + "%", style=label.style_label_up, color=clr, textcolor=color.black)
+
+// === Stats Table ===
+table stats = table.new(position.top_right, 2, 2, border_width=1)
+if bar_index % 10 == 0
+    table.cell(stats, 0, 0, "Success Rate", text_color=color.white)
+    table.cell(stats, 1, 0, str.tostring(successRate, "#.##") + "%", text_color=color.white)
+    table.cell(stats, 0, 1, "Total Trades", text_color=color.white)
+    table.cell(stats, 1, 1, str.tostring(totalTrades), text_color=color.white)
+
+// === Support/Resistance ===
+support = ta.lowest(low, 60)
+resistance = ta.highest(high, 60)
+plot(support, title="Support", color=color.teal)
+plot(resistance, title="Resistance", color=color.orange)

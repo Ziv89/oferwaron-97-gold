@@ -1,0 +1,93 @@
+.about-container {
+  position: relative;
+  padding: 4rem 2rem;
+  background: linear-gradient(to bottom right, #ffffffdd, #f0f8ffdd);
+  border-radius: 1.5rem;
+  max-width: 900px;
+  margin: 3rem auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  backdrop-filter: blur(4px);
+  animation: fadeIn 1.2s ease-in-out;
+  overflow: hidden;
+  min-height: 400px;
+}
+
+.gold-coin-icon {
+  position: absolute;
+  right: 0.1rem;
+  top: 60%;
+  transform: translateY(-50%);
+  width: 7rem;
+  height: 7rem;
+  animation: coinFloat 3s ease-in-out infinite;
+  cursor: pointer;
+  z-index: 10;
+  transition: all 0.4s ease-in-out;
+}
+
+
+.gold-coin-icon:hover {
+  right: 1.2rem;
+  transform: translateY(-50%) rotate(-20deg);
+}
+
+.gold-coin-icon.move-left {
+  right: 100px; 
+}
+.gold-coin-icon.move-left {
+  transform: translateY(-50%) translateX(-160px);
+}
+
+
+.cta-slide-container {
+  transition: transform 0.6s ease-in-out;
+}
+
+.cta-slide-container.slide-left {
+  transform: translateX(-100%);
+}
+
+.direct-cta-panel {
+  position: absolute;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  transition: right 0.6s ease-in-out;
+  padding: 4rem 2rem;
+}
+
+.direct-cta-panel.show-direct {
+  right: 0;
+}
+
+.about-content {
+  text-align: center;
+  transition: transform 0.6s ease-in-out;
+}
+
+.highlight-title {
+  font-size: 2.5rem;
+  color: #1a1a1a;
+  font-weight: bold;
+}
+
+.highlight-subtitle {
+  font-size: 1.25rem;
+  color: #333;
+  line-height: 1.6;
+  max-width: 750px;
+  margin: 0 auto 2rem auto;
+}
+
+/* Optional floating coin */
+@keyframes coinFloat {
+  0%, 100% { transform: translateY(-50%) translateY(0); }
+  50% { transform: translateY(-50%) translateY(-10px); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

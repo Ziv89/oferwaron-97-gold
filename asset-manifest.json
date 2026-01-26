@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/oferwaron-97-gold/static/css/main.3ce41820.css",
-    "main.js": "/oferwaron-97-gold/static/js/main.aadd969d.js",
+    "main.js": "/oferwaron-97-gold/static/js/main.0c05d161.js",
     "static/js/453.40b2967d.chunk.js": "/oferwaron-97-gold/static/js/453.40b2967d.chunk.js",
     "static/media/SantaLogo.jpg": "/oferwaron-97-gold/static/media/SantaLogo.487bcb7348123b0dc478.jpg",
     "static/media/questionMarkCoin.png": "/oferwaron-97-gold/static/media/questionMarkCoin.799f0fe1b0286211e941.png",
@@ -14,11 +14,11 @@
     "static/media/cv.pdf": "/oferwaron-97-gold/static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "/oferwaron-97-gold/index.html",
     "main.3ce41820.css.map": "/oferwaron-97-gold/static/css/main.3ce41820.css.map",
-    "main.aadd969d.js.map": "/oferwaron-97-gold/static/js/main.aadd969d.js.map",
+    "main.0c05d161.js.map": "/oferwaron-97-gold/static/js/main.0c05d161.js.map",
     "453.40b2967d.chunk.js.map": "/oferwaron-97-gold/static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.3ce41820.css",
-    "static/js/main.aadd969d.js"
+    "static/js/main.0c05d161.js"
   ]
 }

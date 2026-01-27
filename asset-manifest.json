@@ -1,24 +1,24 @@
 {
   "files": {
-    "main.css": "/oferwaron-97-gold/static/css/main.892eb87f.css",
-    "main.js": "/oferwaron-97-gold/static/js/main.7bdd1a91.js",
-    "static/js/453.40b2967d.chunk.js": "/oferwaron-97-gold/static/js/453.40b2967d.chunk.js",
-    "static/media/SantaLogo.jpg": "/oferwaron-97-gold/static/media/SantaLogo.487bcb7348123b0dc478.jpg",
-    "static/media/questionMarkCoin.png": "/oferwaron-97-gold/static/media/questionMarkCoin.799f0fe1b0286211e941.png",
-    "static/media/goldenface.png": "/oferwaron-97-gold/static/media/goldenface.b5e3d5de30bcf87f3b44.png",
-    "static/media/logo.jpg": "/oferwaron-97-gold/static/media/logo.c6afaef78b09df1a0a3a.jpg",
-    "static/media/ofernewChart.jpg": "/oferwaron-97-gold/static/media/ofernewChart.2ef12a3e2360b6d053a2.jpg",
-    "static/media/oferBlack.jpg": "/oferwaron-97-gold/static/media/oferBlack.d6c0dd25df30bdcbfb5e.jpg",
-    "static/media/whiteBackground.jpg": "/oferwaron-97-gold/static/media/whiteBackground.826f0577727a4c3989ba.jpg",
-    "static/media/oferWhite.jpg": "/oferwaron-97-gold/static/media/oferWhite.24c5934e974ced2c1920.jpg",
-    "static/media/cv.pdf": "/oferwaron-97-gold/static/media/cv.5eaab91b1c3e0f9b378c.pdf",
-    "index.html": "/oferwaron-97-gold/index.html",
-    "main.892eb87f.css.map": "/oferwaron-97-gold/static/css/main.892eb87f.css.map",
-    "main.7bdd1a91.js.map": "/oferwaron-97-gold/static/js/main.7bdd1a91.js.map",
-    "453.40b2967d.chunk.js.map": "/oferwaron-97-gold/static/js/453.40b2967d.chunk.js.map"
+    "main.css": "./static/css/main.22e48e0b.css",
+    "main.js": "./static/js/main.ed178093.js",
+    "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
+    "static/media/SantaLogo.jpg": "./static/media/SantaLogo.487bcb7348123b0dc478.jpg",
+    "static/media/questionMarkCoin.png": "./static/media/questionMarkCoin.799f0fe1b0286211e941.png",
+    "static/media/goldenface.png": "./static/media/goldenface.b5e3d5de30bcf87f3b44.png",
+    "static/media/logo.jpg": "./static/media/logo.c6afaef78b09df1a0a3a.jpg",
+    "static/media/ofernewChart.jpg": "./static/media/ofernewChart.2ef12a3e2360b6d053a2.jpg",
+    "static/media/oferBlack.jpg": "./static/media/oferBlack.d6c0dd25df30bdcbfb5e.jpg",
+    "static/media/whiteBackground.jpg": "./static/media/whiteBackground.826f0577727a4c3989ba.jpg",
+    "static/media/oferWhite.jpg": "./static/media/oferWhite.24c5934e974ced2c1920.jpg",
+    "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
+    "index.html": "./index.html",
+    "main.22e48e0b.css.map": "./static/css/main.22e48e0b.css.map",
+    "main.ed178093.js.map": "./static/js/main.ed178093.js.map",
+    "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.892eb87f.css",
-    "static/js/main.7bdd1a91.js"
+    "static/css/main.22e48e0b.css",
+    "static/js/main.ed178093.js"
   ]
 }

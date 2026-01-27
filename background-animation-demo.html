@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silk Fabric - Moving Folds Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a12 0%, #12121f 100%);
+            color: white;
+            padding: 15px;
+            min-height: 100vh;
+        }
+        h1 { text-align: center; color: #ffd700; font-size: 2rem; margin-bottom: 5px; }
+        .sub { text-align: center; color: #777; margin-bottom: 25px; font-size: 0.9rem; }
+        .cat { color: #ffd700; font-size: 1.3rem; margin: 35px auto 15px; padding-bottom: 8px; border-bottom: 2px solid rgba(255,215,0,0.2); max-width: 1400px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto 25px; }
+        .card { background: rgba(255,255,255,0.02); border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,215,0,0.1); }
+        .box { width: 100%; height: 260px; position: relative; overflow: hidden; background: #080808; }
+        .info { padding: 14px; background: rgba(0,0,0,0.4); }
+        .info h3 { color: #ffd700; margin-bottom: 5px; font-size: 1rem; }
+        .info p { color: #888; font-size: 11px; line-height: 1.4; }
+        .tag { display: inline-block; padding: 3px 8px; border-radius: 10px; font-size: 9px; margin-top: 6px; margin-right: 3px; background: rgba(255,215,0,0.12); color: #ffd700; }
+        .tag.best { background: rgba(255,80,80,0.15); color: #ff9090; }
+        .tag.new { background: rgba(80,255,120,0.15); color: #90ff90; }
+        .fbtn { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.8); color: #fff; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 10px; z-index: 100; }
+        .fbtn:hover { background: #ffd700; color: #000; }
+
+        /* Base silk image */
+        .silk {
+            position: absolute;
+            width: 160%; height: 160%;
+            top: -30%; left: -30%;
+            background: url('src/assets/images/whiteBackground.jpg') center/cover no-repeat;
+        }
+
+        /* Duplicate silk layers for fold effect - same image, different positions */
+        .silk2, .silk3, .silk4 {
+            position: absolute;
+            width: 160%; height: 160%;
+            top: -30%; left: -30%;
+            background: url('src/assets/images/whiteBackground.jpg') center/cover no-repeat;
+            mix-blend-mode: soft-light;
+            opacity: 0.4;
+        }
+
+        /* ===== ANIMATION 1: Horizontal Fold Wave ===== */
+        .anim1 .silk { animation: a1s 8s ease-in-out infinite; }
+        .anim1 .silk2 { animation: a1s2 6s ease-in-out infinite; opacity: 0.3; }
+        .anim1 .silk3 { animation: a1s3 10s ease-in-out infinite; opacity: 0.25; mix-blend-mode: overlay; }
+        @keyframes a1s {
+            0%, 100% { transform: translateX(0) scaleX(1); }
+            25% { transform: translateX(-2%) scaleX(1.02); }
+            50% { transform: translateX(1%) scaleX(0.99); }
+            75% { transform: translateX(-1%) scaleX(1.01); }
+        }
+        @keyframes a1s2 {
+            0%, 100% { transform: translateX(2%) skewX(0deg); }
+            50% { transform: translateX(-3%) skewX(2deg); }
+        }
+        @keyframes a1s3 {
+            0%, 100% { transform: translateX(-1%) scaleX(1.02); }
+            50% { transform: translateX(2%) scaleX(0.98); }
+        }
+
+        /* ===== ANIMATION 2: Vertical Fold Flow ===== */
+        .anim2 .silk { animation: a2s 10s ease-in-out infinite; }
+        .anim2 .silk2 { animation: a2s2 7s ease-in-out infinite; opacity: 0.35; }
+        .anim2 .silk3 { animation: a2s3 8s ease-in-out infinite; opacity: 0.3; mix-blend-mode: overlay; }
+        @keyframes a2s {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            33% { transform: translateY(-2%) scaleY(1.02); }
+            66% { transform: translateY(1%) scaleY(0.99); }
+        }
+        @keyframes a2s2 {
+            0%, 100% { transform: translateY(2%) skewY(0deg); }
+            50% { transform: translateY(-2%) skewY(1deg); }
+        }
+        @keyframes a2s3 {
+            0%, 100% { transform: translateY(-2%) scaleY(1.01); }
+            50% { transform: translateY(2%) scaleY(0.99); }
+        }
+
+        /* ===== ANIMATION 3: Diagonal Ripple ===== */
+        .anim3 .silk { animation: a3s 12s ease-in-out infinite; }
+        .anim3 .silk2 { animation: a3s2 8s ease-in-out infinite; opacity: 0.4; }
+        .anim3 .silk3 { animation: a3s3 10s ease-in-out infinite; opacity: 0.3; mix-blend-mode: overlay; }
+        @keyframes a3s {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-1.5%, -1%) rotate(0.5deg); }
+            50% { transform: translate(1%, 1%) rotate(-0.3deg); }
+            75% { transform: translate(-0.5%, 0.5%) rotate(0.2deg); }
+        }
+        @keyframes a3s2 {
+            0%, 100% { transform: translate(1%, -1%) skew(0deg); }
+            50% { transform: translate(-2%, 1%) skew(1deg, 0.5deg); }
+        }
+        @keyframes a3s3 {
+            0%, 100% { transform: translate(-1%, 1%) rotate(-0.5deg); }
+            50% { transform: translate(1%, -1%) rotate(0.5deg); }
+        }
+
+        /* ===== ANIMATION 4: Billowing Silk ===== */
+        .anim4 .silk { animation: a4s 6s ease-in-out infinite; }
+        .anim4 .silk2 { animation: a4s2 5s ease-in-out infinite; opacity: 0.35; }
+        .anim4 .silk3 { animation: a4s3 7s ease-in-out infinite; opacity: 0.3; mix-blend-mode: screen; }
+        @keyframes a4s {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.04); }
+        }
+        @keyframes a4s2 {
+            0%, 100% { transform: scale(1.02) translate(-1%, -1%); }
+            50% { transform: scale(0.98) translate(1%, 1%); }
+        }
+        @keyframes a4s3 {
+            0%, 100% { transform: scale(0.98) translate(1%, 0); }
+            50% { transform: scale(1.03) translate(-1%, 0); }
+        }
+
+        /* ===== ANIMATION 5: Wind Wave ===== */
+        .anim5 .silk { animation: a5s 5s ease-in-out infinite; }
+        .anim5 .silk2 { animation: a5s2 4s ease-in-out infinite; opacity: 0.4; }
+        .anim5 .silk3 { animation: a5s3 6s ease-in-out infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        .anim5 .silk4 { animation: a5s4 3.5s ease-in-out infinite; opacity: 0.25; mix-blend-mode: soft-light; }
+        @keyframes a5s {
+            0%, 100% { transform: translateX(0) skewX(0deg); }
+            25% { transform: translateX(-1.5%) skewX(1deg); }
+            50% { transform: translateX(1%) skewX(-0.5deg); }
+            75% { transform: translateX(-0.5%) skewX(0.5deg); }
+        }
+        @keyframes a5s2 {
+            0%, 100% { transform: translateX(1%) skewX(-0.5deg); }
+            50% { transform: translateX(-2%) skewX(1.5deg); }
+        }
+        @keyframes a5s3 {
+            0%, 100% { transform: translateX(-1%) skewX(0.5deg); }
+            50% { transform: translateX(1.5%) skewX(-1deg); }
+        }
+        @keyframes a5s4 {
+            0%, 100% { transform: translateX(0.5%) skewX(-0.3deg); }
+            50% { transform: translateX(-1%) skewX(0.8deg); }
+        }
+
+        /* ===== ANIMATION 6: Ocean Waves ===== */
+        .anim6 .silk { animation: a6s 15s ease-in-out infinite; }
+        .anim6 .silk2 { animation: a6s2 10s ease-in-out infinite; opacity: 0.4; }
+        .anim6 .silk3 { animation: a6s3 12s ease-in-out infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        .anim6 .silk4 { animation: a6s4 8s ease-in-out infinite; opacity: 0.3; mix-blend-mode: soft-light; }
+        @keyframes a6s {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            20% { transform: translate(-2%, 1%) scale(1.01) rotate(0.3deg); }
+            40% { transform: translate(1%, -1%) scale(1) rotate(-0.2deg); }
+            60% { transform: translate(-1%, 0.5%) scale(1.02) rotate(0.2deg); }
+            80% { transform: translate(0.5%, -0.5%) scale(1) rotate(-0.1deg); }
+        }
+        @keyframes a6s2 {
+            0%, 100% { transform: translate(1%, -0.5%) skew(0deg); }
+            50% { transform: translate(-2%, 1%) skew(1deg, 0.5deg); }
+        }
+        @keyframes a6s3 {
+            0%, 100% { transform: translate(-1%, 0.5%) scale(1.01); }
+            50% { transform: translate(1.5%, -1%) scale(0.99); }
+        }
+        @keyframes a6s4 {
+            0%, 100% { transform: translate(0.5%, 0.5%) rotate(-0.3deg); }
+            50% { transform: translate(-1%, -0.5%) rotate(0.5deg); }
+        }
+
+        /* ===== ANIMATION 7: Silk Storm ===== */
+        .anim7 .silk { animation: a7s 4s ease-in-out infinite; }
+        .anim7 .silk2 { animation: a7s2 3s ease-in-out infinite; opacity: 0.45; }
+        .anim7 .silk3 { animation: a7s3 3.5s ease-in-out infinite; opacity: 0.4; mix-blend-mode: overlay; }
+        .anim7 .silk4 { animation: a7s4 2.5s ease-in-out infinite; opacity: 0.35; mix-blend-mode: soft-light; }
+        @keyframes a7s {
+            0%, 100% { transform: translate(0, 0) skew(0deg) rotate(0deg); }
+            20% { transform: translate(2%, -1%) skew(1deg, 0.5deg) rotate(0.5deg); }
+            40% { transform: translate(-1.5%, 1%) skew(-0.5deg, -0.3deg) rotate(-0.3deg); }
+            60% { transform: translate(1%, 0.5%) skew(0.5deg, 0.3deg) rotate(0.2deg); }
+            80% { transform: translate(-0.5%, -0.5%) skew(-0.3deg, -0.2deg) rotate(-0.2deg); }
+        }
+        @keyframes a7s2 {
+            0%, 100% { transform: translate(-1%, 0.5%) skew(0.5deg); }
+            50% { transform: translate(2%, -1%) skew(-1deg); }
+        }
+        @keyframes a7s3 {
+            0%, 100% { transform: translate(1%, -0.5%) rotate(0.5deg); }
+            50% { transform: translate(-1.5%, 1%) rotate(-0.5deg); }
+        }
+        @keyframes a7s4 {
+            0%, 100% { transform: translate(0.5%, 0.5%) skew(-0.3deg); }
+            50% { transform: translate(-1%, -0.5%) skew(0.5deg); }
+        }
+
+        /* ===== ANIMATION 8: Gentle Breathing ===== */
+        .anim8 .silk { animation: a8s 8s ease-in-out infinite; }
+        .anim8 .silk2 { animation: a8s2 8s ease-in-out infinite 1s; opacity: 0.35; }
+        .anim8 .silk3 { animation: a8s3 8s ease-in-out infinite 2s; opacity: 0.3; mix-blend-mode: overlay; }
+        @keyframes a8s {
+            0%, 100% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.03); filter: brightness(1.03); }
+        }
+        @keyframes a8s2 {
+            0%, 100% { transform: scale(1.01) translate(-0.5%, -0.5%); }
+            50% { transform: scale(0.99) translate(0.5%, 0.5%); }
+        }
+        @keyframes a8s3 {
+            0%, 100% { transform: scale(0.99) translate(0.5%, 0); }
+            50% { transform: scale(1.02) translate(-0.5%, 0); }
+        }
+
+        /* ===== ANIMATION 9: Silk Waterfall ===== */
+        .anim9 .silk { animation: a9s 6s ease-in-out infinite; }
+        .anim9 .silk2 { animation: a9s2 5s linear infinite; opacity: 0.4; }
+        .anim9 .silk3 { animation: a9s3 7s linear infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        .anim9 .silk4 { animation: a9s4 4s linear infinite; opacity: 0.3; mix-blend-mode: soft-light; }
+        @keyframes a9s {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-1.5%) scaleY(1.01); }
+        }
+        @keyframes a9s2 {
+            0% { transform: translateY(-3%) skewY(0.5deg); }
+            100% { transform: translateY(3%) skewY(-0.5deg); }
+        }
+        @keyframes a9s3 {
+            0% { transform: translateY(2%) skewY(-0.3deg); }
+            100% { transform: translateY(-2%) skewY(0.3deg); }
+        }
+        @keyframes a9s4 {
+            0% { transform: translateY(-2.5%) skewY(0.4deg); }
+            100% { transform: translateY(2.5%) skewY(-0.4deg); }
+        }
+
+        /* ===== ANIMATION 10: Ripple Effect ===== */
+        .anim10 .silk { animation: a10s 5s ease-in-out infinite; }
+        .anim10 .silk2 { animation: a10s2 5s ease-in-out infinite 0.5s; opacity: 0.4; }
+        .anim10 .silk3 { animation: a10s3 5s ease-in-out infinite 1s; opacity: 0.35; mix-blend-mode: overlay; }
+        .anim10 .silk4 { animation: a10s4 5s ease-in-out infinite 1.5s; opacity: 0.3; mix-blend-mode: soft-light; }
+        @keyframes a10s {
+            0%, 100% { transform: scale(1) translate(0, 0); }
+            50% { transform: scale(1.02) translate(-0.5%, -0.5%); }
+        }
+        @keyframes a10s2 {
+            0%, 100% { transform: scale(1.01) translate(0.3%, 0.3%); }
+            50% { transform: scale(0.99) translate(-0.3%, -0.3%); }
+        }
+        @keyframes a10s3 {
+            0%, 100% { transform: scale(0.99) translate(-0.3%, 0.3%); }
+            50% { transform: scale(1.01) translate(0.3%, -0.3%); }
+        }
+        @keyframes a10s4 {
+            0%, 100% { transform: scale(1) translate(0.2%, -0.2%); }
+            50% { transform: scale(1.01) translate(-0.2%, 0.2%); }
+        }
+
+        /* ===== ANIMATION 11: Swirl ===== */
+        .anim11 .silk { animation: a11s 20s ease-in-out infinite; }
+        .anim11 .silk2 { animation: a11s2 15s ease-in-out infinite; opacity: 0.4; }
+        .anim11 .silk3 { animation: a11s3 18s ease-in-out infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        @keyframes a11s {
+            0%, 100% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(3deg) scale(1.02); }
+        }
+        @keyframes a11s2 {
+            0%, 100% { transform: rotate(1deg) scale(1.01) translate(-0.5%, 0); }
+            50% { transform: rotate(-2deg) scale(0.99) translate(0.5%, 0); }
+        }
+        @keyframes a11s3 {
+            0%, 100% { transform: rotate(-1deg) scale(0.99); }
+            50% { transform: rotate(2deg) scale(1.01); }
+        }
+
+        /* ===== ANIMATION 12: Elastic Stretch ===== */
+        .anim12 .silk { animation: a12s 4s ease-in-out infinite; }
+        .anim12 .silk2 { animation: a12s2 4s ease-in-out infinite 0.5s; opacity: 0.4; }
+        .anim12 .silk3 { animation: a12s3 4s ease-in-out infinite 1s; opacity: 0.35; mix-blend-mode: overlay; }
+        @keyframes a12s {
+            0%, 100% { transform: scale(1, 1); }
+            25% { transform: scale(1.03, 0.98); }
+            50% { transform: scale(0.98, 1.02); }
+            75% { transform: scale(1.01, 0.99); }
+        }
+        @keyframes a12s2 {
+            0%, 100% { transform: scale(1.01, 0.99) translate(-0.3%, 0.3%); }
+            50% { transform: scale(0.99, 1.01) translate(0.3%, -0.3%); }
+        }
+        @keyframes a12s3 {
+            0%, 100% { transform: scale(0.99, 1.01) translate(0.2%, 0); }
+            50% { transform: scale(1.01, 0.99) translate(-0.2%, 0); }
+        }
+
+        /* ===== ANIMATION 13: Perspective Tilt ===== */
+        .anim13 .silk { animation: a13s 10s ease-in-out infinite; }
+        .anim13 .silk2 { animation: a13s2 8s ease-in-out infinite; opacity: 0.4; }
+        .anim13 .silk3 { animation: a13s3 12s ease-in-out infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        @keyframes a13s {
+            0%, 100% { transform: perspective(1000px) rotateX(0deg) rotateY(0deg); }
+            25% { transform: perspective(1000px) rotateX(2deg) rotateY(-2deg); }
+            50% { transform: perspective(1000px) rotateX(-1deg) rotateY(2deg); }
+            75% { transform: perspective(1000px) rotateX(1deg) rotateY(-1deg); }
+        }
+        @keyframes a13s2 {
+            0%, 100% { transform: perspective(1000px) rotateX(1deg) rotateY(1deg) translate(-0.5%, 0); }
+            50% { transform: perspective(1000px) rotateX(-1deg) rotateY(-1deg) translate(0.5%, 0); }
+        }
+        @keyframes a13s3 {
+            0%, 100% { transform: perspective(1000px) rotateX(-0.5deg) rotateY(0.5deg); }
+            50% { transform: perspective(1000px) rotateX(1deg) rotateY(-0.5deg); }
+        }
+
+        /* ===== ANIMATION 14: Fold Cascade ===== */
+        .anim14 .silk { animation: a14s 7s ease-in-out infinite; }
+        .anim14 .silk2 { animation: a14s2 5s linear infinite; opacity: 0.45; }
+        .anim14 .silk3 { animation: a14s3 6s linear infinite; opacity: 0.4; mix-blend-mode: overlay; }
+        .anim14 .silk4 { animation: a14s4 4s linear infinite; opacity: 0.35; mix-blend-mode: soft-light; }
+        @keyframes a14s {
+            0%, 100% { transform: translate(0, 0) skew(0deg); }
+            50% { transform: translate(-1%, -0.5%) skew(0.5deg, 0.3deg); }
+        }
+        @keyframes a14s2 {
+            0% { transform: translate(-2%, -2%) skew(0.3deg); }
+            100% { transform: translate(2%, 2%) skew(-0.3deg); }
+        }
+        @keyframes a14s3 {
+            0% { transform: translate(1.5%, -1.5%) skew(-0.2deg); }
+            100% { transform: translate(-1.5%, 1.5%) skew(0.2deg); }
+        }
+        @keyframes a14s4 {
+            0% { transform: translate(-1%, 1%) skew(0.4deg); }
+            100% { transform: translate(1%, -1%) skew(-0.4deg); }
+        }
+
+        /* ===== ANIMATION 15: Liquid Silk ===== */
+        .anim15 .silk { animation: a15s 8s ease-in-out infinite; }
+        .anim15 .silk2 { animation: a15s2 6s ease-in-out infinite; opacity: 0.45; }
+        .anim15 .silk3 { animation: a15s3 7s ease-in-out infinite; opacity: 0.4; mix-blend-mode: overlay; }
+        .anim15 .silk4 { animation: a15s4 5s ease-in-out infinite; opacity: 0.35; mix-blend-mode: soft-light; }
+        @keyframes a15s {
+            0%, 100% { transform: translate(0, 0) skew(0deg) scale(1); }
+            25% { transform: translate(-1%, 0.5%) skew(1deg, 0.3deg) scale(1.01); }
+            50% { transform: translate(0.5%, -0.5%) skew(-0.5deg, -0.2deg) scale(1); }
+            75% { transform: translate(-0.5%, 0.3%) skew(0.3deg, 0.2deg) scale(1.01); }
+        }
+        @keyframes a15s2 {
+            0%, 100% { transform: translate(0.5%, -0.3%) skew(-0.5deg) scale(1.01); }
+            50% { transform: translate(-1%, 0.5%) skew(0.8deg) scale(0.99); }
+        }
+        @keyframes a15s3 {
+            0%, 100% { transform: translate(-0.5%, 0.3%) skew(0.3deg) scale(0.99); }
+            50% { transform: translate(0.8%, -0.5%) skew(-0.5deg) scale(1.01); }
+        }
+        @keyframes a15s4 {
+            0%, 100% { transform: translate(0.3%, 0.3%) skew(-0.2deg); }
+            50% { transform: translate(-0.5%, -0.3%) skew(0.4deg); }
+        }
+
+        /* ===== ANIMATION 16: Royal Velvet ===== */
+        .anim16 .silk { animation: a16s 12s ease-in-out infinite; }
+        .anim16 .silk2 { animation: a16s2 10s ease-in-out infinite; opacity: 0.4; }
+        .anim16 .silk3 { animation: a16s3 8s ease-in-out infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        .anim16 .silk4 { animation: a16s4 14s ease-in-out infinite; opacity: 0.3; mix-blend-mode: soft-light; }
+        @keyframes a16s {
+            0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); filter: brightness(1); }
+            25% { transform: translate(-0.8%, -0.5%) scale(1.01) rotate(0.2deg); filter: brightness(1.02); }
+            50% { transform: translate(0.5%, 0.3%) scale(1) rotate(-0.1deg); filter: brightness(1); }
+            75% { transform: translate(-0.3%, 0.2%) scale(1.01) rotate(0.1deg); filter: brightness(1.01); }
+        }
+        @keyframes a16s2 {
+            0%, 100% { transform: translate(0.5%, -0.3%) skew(0deg) scale(1.01); }
+            50% { transform: translate(-0.8%, 0.5%) skew(0.5deg, 0.2deg) scale(0.99); }
+        }
+        @keyframes a16s3 {
+            0%, 100% { transform: translate(-0.3%, 0.3%) rotate(-0.3deg); }
+            50% { transform: translate(0.5%, -0.3%) rotate(0.3deg); }
+        }
+        @keyframes a16s4 {
+            0%, 100% { transform: translate(0.2%, 0.2%) scale(0.99); }
+            50% { transform: translate(-0.3%, -0.2%) scale(1.01); }
+        }
+
+        /* ===== ANIMATION 17: Dreamy Float ===== */
+        .anim17 .silk { animation: a17s 16s ease-in-out infinite; }
+        .anim17 .silk2 { animation: a17s2 12s ease-in-out infinite; opacity: 0.4; }
+        .anim17 .silk3 { animation: a17s3 14s ease-in-out infinite; opacity: 0.35; mix-blend-mode: overlay; }
+        @keyframes a17s {
+            0%, 100% { transform: translate(0, 0) scale(1); filter: brightness(1); }
+            33% { transform: translate(-1%, -0.8%) scale(1.01); filter: brightness(1.02); }
+            66% { transform: translate(0.8%, 0.5%) scale(1); filter: brightness(1.01); }
+        }
+        @keyframes a17s2 {
+            0%, 100% { transform: translate(0.5%, 0) scale(1.01); }
+            50% { transform: translate(-0.8%, 0) scale(0.99); }
+        }
+        @keyframes a17s3 {
+            0%, 100% { transform: translate(-0.3%, 0.3%) rotate(-0.2deg); }
+            50% { transform: translate(0.5%, -0.3%) rotate(0.3deg); }
+        }
+
+        /* ===== ANIMATION 18: Multi-Wave Complex ===== */
+        .anim18 .silk { animation: a18s 6s ease-in-out infinite; }
+        .anim18 .silk2 { animation: a18s2 5s ease-in-out infinite; opacity: 0.45; }
+        .anim18 .silk3 { animation: a18s3 7s ease-in-out infinite; opacity: 0.4; mix-blend-mode: overlay; }
+        .anim18 .silk4 { animation: a18s4 4s ease-in-out infinite; opacity: 0.35; mix-blend-mode: soft-light; }
+        @keyframes a18s {
+            0%, 100% { transform: translateX(0) scaleX(1) skewX(0deg); }
+            25% { transform: translateX(-1.5%) scaleX(1.01) skewX(0.5deg); }
+            50% { transform: translateX(1%) scaleX(0.99) skewX(-0.3deg); }
+            75% { transform: translateX(-0.5%) scaleX(1.01) skewX(0.2deg); }
+        }
+        @keyframes a18s2 {
+            0%, 100% { transform: translateY(0) scaleY(1) skewY(0deg); }
+            50% { transform: translateY(-1%) scaleY(1.01) skewY(0.5deg); }
+        }
+        @keyframes a18s3 {
+            0%, 100% { transform: translate(0.5%, -0.5%) rotate(-0.3deg); }
+            50% { transform: translate(-0.8%, 0.5%) rotate(0.5deg); }
+        }
+        @keyframes a18s4 {
+            0%, 100% { transform: scale(1.01) skew(0.2deg); }
+            50% { transform: scale(0.99) skew(-0.3deg); }
+        }
+
+        /* ===== ANIMATION 19: Silk Pulse ===== */
+        .anim19 .silk { animation: a19s 3s ease-in-out infinite; }
+        .anim19 .silk2 { animation: a19s2 3s ease-in-out infinite 0.3s; opacity: 0.45; }
+        .anim19 .silk3 { animation: a19s3 3s ease-in-out infinite 0.6s; opacity: 0.4; mix-blend-mode: overlay; }
+        .anim19 .silk4 { animation: a19s4 3s ease-in-out infinite 0.9s; opacity: 0.35; mix-blend-mode: soft-light; }
+        @keyframes a19s {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        @keyframes a19s2 {
+            0%, 100% { transform: scale(1.01) translate(-0.3%, -0.3%); }
+            50% { transform: scale(0.99) translate(0.3%, 0.3%); }
+        }
+        @keyframes a19s3 {
+            0%, 100% { transform: scale(0.99) translate(0.2%, -0.2%); }
+            50% { transform: scale(1.01) translate(-0.2%, 0.2%); }
+        }
+        @keyframes a19s4 {
+            0%, 100% { transform: scale(1) translate(0.1%, 0.1%); }
+            50% { transform: scale(1.02) translate(-0.1%, -0.1%); }
+        }
+
+        /* ===== ANIMATION 20: Ultimate Fabric ===== */
+        .anim20 .silk { animation: a20s 10s ease-in-out infinite; }
+        .anim20 .silk2 { animation: a20s2 8s ease-in-out infinite; opacity: 0.45; }
+        .anim20 .silk3 { animation: a20s3 6s ease-in-out infinite; opacity: 0.4; mix-blend-mode: overlay; }
+        .anim20 .silk4 { animation: a20s4 12s ease-in-out infinite; opacity: 0.35; mix-blend-mode: soft-light; }
+        @keyframes a20s {
+            0%, 100% { transform: translate(0, 0) scale(1) skew(0deg) rotate(0deg); filter: brightness(1); }
+            20% { transform: translate(-1%, -0.5%) scale(1.01) skew(0.3deg, 0.2deg) rotate(0.2deg); filter: brightness(1.02); }
+            40% { transform: translate(0.8%, 0.3%) scale(1) skew(-0.2deg, -0.1deg) rotate(-0.1deg); filter: brightness(1); }
+            60% { transform: translate(-0.5%, 0.5%) scale(1.01) skew(0.2deg, 0.1deg) rotate(0.1deg); filter: brightness(1.01); }
+            80% { transform: translate(0.3%, -0.3%) scale(1) skew(-0.1deg, 0.1deg) rotate(-0.1deg); filter: brightness(1); }
+        }
+        @keyframes a20s2 {
+            0%, 100% { transform: translate(0.5%, -0.3%) skew(-0.3deg) scale(1.01); }
+            33% { transform: translate(-1%, 0.5%) skew(0.5deg) scale(0.99); }
+            66% { transform: translate(0.3%, 0.3%) skew(-0.2deg) scale(1); }
+        }
+        @keyframes a20s3 {
+            0%, 100% { transform: translate(-0.3%, 0.2%) rotate(-0.2deg) scale(0.99); }
+            50% { transform: translate(0.5%, -0.3%) rotate(0.3deg) scale(1.01); }
+        }
+        @keyframes a20s4 {
+            0%, 100% { transform: translate(0.2%, 0.1%) skew(0.1deg) scale(1); }
+            50% { transform: translate(-0.3%, -0.2%) skew(-0.2deg) scale(1.01); }
+        }
+
+        /* Fullscreen */
+        .over { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; background: #000; }
+        .over.show { display: block; }
+        .over .silk, .over .silk2, .over .silk3, .over .silk4 { width: 130%; height: 130%; top: -15%; left: -15%; }
+        .cbtn { position: absolute; top: 15px; right: 15px; background: rgba(255,255,255,0.1); color: #fff; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; z-index: 1000; }
+        .cbtn:hover { background: #ffd700; color: #000; }
+        .cnt { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; z-index: 10; pointer-events: none; }
+        .cnt h2 { color: #1a1a1a; font-size: 2.2rem; text-shadow: 0 0 25px rgba(255,255,255,0.9); }
+        .cnt p { color: #333; font-size: 1rem; margin-top: 8px; }
+        footer { text-align: center; padding: 20px; background: rgba(0,0,0,0.25); border-radius: 10px; max-width: 800px; margin: 35px auto; }
+        footer h2 { color: #ffd700; margin-bottom: 10px; font-size: 1.1rem; }
+        footer p { color: #777; line-height: 1.6; font-size: 12px; }
+        code { background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 3px; color: #5c5; font-family: monospace; }
+    </style>
+</head>
+<body>
+    <h1>Silk Fabric - Moving Folds</h1>
+    <p class="sub">20 animations using layered silk images to create realistic moving fold effects</p>
+
+    <h2 class="cat">Horizontal & Vertical Waves</h2>
+    <div class="grid">
+        <div class="card"><div class="box anim1"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim1')">Full</button></div><div class="info"><h3>1. Horizontal Fold Wave</h3><p>Layered silk moving horizontally with stretch and skew creating wave-like folds.</p><span class="tag">Smooth</span></div></div>
+        <div class="card"><div class="box anim2"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim2')">Full</button></div><div class="info"><h3>2. Vertical Fold Flow</h3><p>Vertical movement with layers creating cascading fold illusion.</p><span class="tag">Elegant</span></div></div>
+        <div class="card"><div class="box anim3"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim3')">Full</button></div><div class="info"><h3>3. Diagonal Ripple</h3><p>Multi-directional movement with subtle rotation for natural ripple.</p><span class="tag best">Popular</span></div></div>
+        <div class="card"><div class="box anim18"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim18')">Full</button></div><div class="info"><h3>4. Multi-Wave Complex</h3><p>Combined horizontal and vertical waves for complex fold movement.</p><span class="tag new">New</span></div></div>
+    </div>
+
+    <h2 class="cat">Billowing & Breathing</h2>
+    <div class="grid">
+        <div class="card"><div class="box anim4"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim4')">Full</button></div><div class="info"><h3>5. Billowing Silk</h3><p>Fabric expanding and contracting like being blown by gentle wind.</p><span class="tag best">Recommended</span></div></div>
+        <div class="card"><div class="box anim8"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim8')">Full</button></div><div class="info"><h3>6. Gentle Breathing</h3><p>Soft synchronized pulsing with staggered layers for organic feel.</p><span class="tag">Calming</span></div></div>
+        <div class="card"><div class="box anim19"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim19')">Full</button></div><div class="info"><h3>7. Silk Pulse</h3><p>Rhythmic pulsing with cascading layer delays for wave pulse.</p><span class="tag">Rhythmic</span></div></div>
+        <div class="card"><div class="box anim10"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim10')">Full</button></div><div class="info"><h3>8. Ripple Effect</h3><p>Staggered ripples emanating outward through layered movement.</p><span class="tag">Mesmerizing</span></div></div>
+    </div>
+
+    <h2 class="cat">Wind & Storm Effects</h2>
+    <div class="grid">
+        <div class="card"><div class="box anim5"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim5')">Full</button></div><div class="info"><h3>9. Wind Wave</h3><p>4-layer wind effect with skew transforms simulating fabric in breeze.</p><span class="tag best">Realistic</span></div></div>
+        <div class="card"><div class="box anim7"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim7')">Full</button></div><div class="info"><h3>10. Silk Storm</h3><p>Intense movement with rapid layer shifts like storm-blown fabric.</p><span class="tag new">Dramatic</span></div></div>
+        <div class="card"><div class="box anim6"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim6')">Full</button></div><div class="info"><h3>11. Ocean Waves</h3><p>Slow, rolling movement mimicking ocean currents through fabric.</p><span class="tag">Serene</span></div></div>
+        <div class="card"><div class="box anim9"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim9')">Full</button></div><div class="info"><h3>12. Silk Waterfall</h3><p>Continuous downward flow with counter-moving layers.</p><span class="tag">Flowing</span></div></div>
+    </div>
+
+    <h2 class="cat">Elastic & Liquid</h2>
+    <div class="grid">
+        <div class="card"><div class="box anim12"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim12')">Full</button></div><div class="info"><h3>13. Elastic Stretch</h3><p>Stretchy, bouncy movement with squish and stretch deformation.</p><span class="tag">Fun</span></div></div>
+        <div class="card"><div class="box anim15"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim15')">Full</button></div><div class="info"><h3>14. Liquid Silk</h3><p>Fluid, liquid-like movement with morphing skew transforms.</p><span class="tag best">Premium</span></div></div>
+        <div class="card"><div class="box anim11"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim11')">Full</button></div><div class="info"><h3>15. Swirl</h3><p>Gentle rotation with counter-rotating layers for swirl effect.</p><span class="tag">Hypnotic</span></div></div>
+        <div class="card"><div class="box anim13"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim13')">Full</button></div><div class="info"><h3>16. Perspective Tilt</h3><p>3D perspective rotation creating depth and fold illusion.</p><span class="tag new">3D Effect</span></div></div>
+    </div>
+
+    <h2 class="cat">Premium & Complete</h2>
+    <div class="grid">
+        <div class="card"><div class="box anim14"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim14')">Full</button></div><div class="info"><h3>17. Fold Cascade</h3><p>Diagonal cascading folds with continuous layer movement.</p><span class="tag">Luxurious</span></div></div>
+        <div class="card"><div class="box anim16"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim16')">Full</button></div><div class="info"><h3>18. Royal Velvet</h3><p>Slow, elegant movement with brightness shifts for luxury feel.</p><span class="tag">Elegant</span></div></div>
+        <div class="card"><div class="box anim17"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><button class="fbtn" onclick="openF('anim17')">Full</button></div><div class="info"><h3>19. Dreamy Float</h3><p>Very slow, ethereal floating with gentle brightness changes.</p><span class="tag">Dreamy</span></div></div>
+        <div class="card"><div class="box anim20"><div class="silk"></div><div class="silk2"></div><div class="silk3"></div><div class="silk4"></div><button class="fbtn" onclick="openF('anim20')">Full</button></div><div class="info"><h3>20. Ultimate Fabric</h3><p>All techniques combined - the most realistic moving fold effect.</p><span class="tag best">Best Overall</span></div></div>
+    </div>
+
+    <div id="over" class="over">
+        <button class="cbtn" onclick="closeF()">✕ Close (ESC)</button>
+        <div id="fc"></div>
+        <div class="cnt"><h2>Premium Gold</h2><p>Trading Excellence</p></div>
+    </div>
+
+    <footer>
+        <h2>How It Works</h2>
+        <p>
+            Each animation uses <strong>multiple copies of the same silk image</strong> layered on top of each other with different:<br><br>
+            • <code>mix-blend-mode</code> (soft-light, overlay, screen) for blending<br>
+            • <code>opacity</code> levels for depth<br>
+            • <code>transform</code> animations (translate, scale, skew, rotate) at different speeds<br><br>
+            This creates the illusion of the actual fabric folds moving and waving!
+        </p>
+    </footer>
+
+    <script>
+        function openF(c) {
+            const o = document.getElementById('over');
+            const fc = document.getElementById('fc');
+            const src = document.querySelector('.' + c);
+            if (src) {
+                fc.innerHTML = src.innerHTML;
+                fc.className = c;
+                const btn = fc.querySelector('.fbtn');
+                if (btn) btn.remove();
+            }
+            o.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeF() {
+            document.getElementById('over').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeF(); });
+        document.getElementById('over').addEventListener('click', e => { if (e.target.id === 'over') closeF(); });
+    </script>
+</body>
+</html>

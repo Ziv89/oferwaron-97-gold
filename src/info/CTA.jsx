@@ -1,62 +1,85 @@
-import { Component } from "react";
-import { FaWhatsapp, FaEnvelope, FaFileDownload, FaFileAlt } from "react-icons/fa";
+import { FaFileDownload, FaFileAlt } from "react-icons/fa";
 import CV from "../assets/files/cv.pdf";
-import '../styles/styles.css';
+import "../styles/styles.css";
+import oferBlack from "../assets/images/oferBlack.jpg";
+import { usePerformanceHistory } from "../App";
 
+const CTA = () => {
+  const { performance, loading: perfLoading } = usePerformanceHistory();
 
-class CTA extends Component {
-  openCV = () => {
-    window.open(CV, "_blank");
+  const experienceSince =
+    performance?.experienceSince ?? "2009"; // fallback if not loaded
+
+  const team = [
+    {
+      name: "Ofer Waron",
+      role: "Lead Strategist & Founder",
+      bio: `Investment specialist and architect of the 97% Gold strategy with 16 years of trading experience since ${performance.experienceSince}.`,
+      avatar: oferBlack,
+    },
+  ];
+
+  const openCV = () => {
+    window.open(CV, "_blank", "noopener,noreferrer");
   };
 
-  downloadCV = () => {
+  const downloadCV = () => {
     const link = document.createElement("a");
     link.href = CV;
     link.download = "Ofer_Waron_CV.pdf";
+    document.body.appendChild(link);
     link.click();
+    link.remove();
   };
 
-  render() {
-    return (
-      <div className="cta-section">
-        <div className="about-me-block">
-          <h2>About Me</h2>
-          <p>
-            I'm Ofer Waron, an investment specialist. I provide paid consulting services to help you learn how to grow your money wisely through smart investments.
+  return (
+    <div className="cta-section">
+      <div className="about-me-block">
+        <div className="text-center">
+          <p className="strategy-subtitle" style={{ marginBottom: "1.5rem" }}>
+            I'm <strong>Ofer Waron</strong>, an investment specialist. I provide paid
+            consulting services through my WhatsApp signals group to help you grow your money wisely
+            through disciplined investment strategies.
           </p>
         </div>
 
-        <div className="button-group">
-          <button onClick={this.openCV} className="btn btn-view">
+        <div className="team-grid">
+          {team.map((member, i) => (
+            <div key={i} className="strategy-rule-card team-card">
+              <div className="team-avatar">
+                <img
+                  src={member.avatar}
+                  alt={member.name}
+                  className="team-avatar-img"
+                />
+              </div>
+
+              <h3 className="strategy-rule-title">{member.name}</h3>
+              <p className="team-role">{member.role}</p>
+
+              <p className="strategy-rule-desc">
+                {perfLoading ? "Loading..." : member.bio}
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div className="strategy-btn-group" style={{ marginTop: "2rem" }}>
+          <button onClick={openCV} className="strategy-btn strategy-btn-secondary">
             <FaFileAlt /> View PDF
           </button>
-          <button onClick={this.downloadCV} className="btn btn-download">
+          <button
+            onClick={downloadCV}
+            className="strategy-btn strategy-btn-primary"
+          >
             <FaFileDownload /> Download PDF
           </button>
         </div>
-
-        <hr className="section-divider" />
-
-        {/* <div className="contact-me-block">
-          <h2>Contact Me</h2>
-          <p>You're welcome to reach me through any of the options below:</p>
-          <div className="button-group">
-            <a className="btn btn-email" href="mailto:oferwv123@gmail.com">
-              <FaEnvelope /> Mail Me
-            </a>
-            <a
-              className="btn btn-whatsapp"
-              href="https://wa.me/972526625716"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <FaWhatsapp /> WhatsApp Me
-            </a>
-          </div>
-        </div> */}
       </div>
-    );
-  }
-}
+
+      <hr className="section-divider" />
+    </div>
+  );
+};
 
 export default CTA;

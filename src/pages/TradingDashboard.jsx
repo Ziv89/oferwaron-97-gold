@@ -3,7 +3,7 @@
 // Full Pine Script → JavaScript Implementation
 // ============================================
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { createChart, CandlestickSeries, LineSeries } from 'lightweight-charts';
+import '../styles/styles.css';
 
 // ============================================
 // COMPLETE INDICATOR LIBRARY
@@ -664,176 +664,27 @@ function generateDemoData() {
 }
 
 // ============================================
-// PRICE CHART WITH INDICATORS
-// ============================================
-const PriceChart = ({ data, indicators }) => {
-  const chartContainerRef = useRef(null);
-  const chartRef = useRef(null);
-
-  useEffect(() => {
-    if (!chartContainerRef.current || data.length === 0) return;
-
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: 450,
-      layout: {
-        background: { color: '#0d0d0d' },
-        textColor: '#9ca3af',
-      },
-      grid: {
-        vertLines: { color: '#1a1a1a' },
-        horzLines: { color: '#1a1a1a' },
-      },
-      crosshair: { mode: 1 },
-      rightPriceScale: { borderColor: '#333' },
-      timeScale: { borderColor: '#333', timeVisible: true },
-    });
-
-    chartRef.current = chart;
-
-    // Candlesticks
-    const candleSeries = chart.addSeries(CandlestickSeries, {
-      upColor: '#22c55e',
-      downColor: '#ef4444',
-      borderDownColor: '#ef4444',
-      borderUpColor: '#22c55e',
-      wickDownColor: '#ef4444',
-      wickUpColor: '#22c55e',
-    });
-    candleSeries.setData(data);
-
-    // SMA 20 (Yellow)
-    const sma20 = chart.addSeries(LineSeries, { color: '#fbbf24', lineWidth: 2 });
-    sma20.setData(Indicators.SMA(data, 20));
-
-    // VWAP (Purple)
-    const vwapSeries = chart.addSeries(LineSeries, { color: '#a855f7', lineWidth: 2 });
-    vwapSeries.setData(Indicators.VWAP(data));
-
-    // Bollinger Bands
-    const bb = Indicators.BollingerBands(data, 20, 2);
-    const bbUpper = chart.addSeries(LineSeries, { color: '#3b82f6', lineWidth: 1, lineStyle: 2 });
-    bbUpper.setData(bb.upper);
-    const bbLower = chart.addSeries(LineSeries, { color: '#3b82f6', lineWidth: 1, lineStyle: 2 });
-    bbLower.setData(bb.lower);
-
-    // Supertrend
-    const supertrendData = Indicators.Supertrend(data, 3.0, 10);
-    const stUp = supertrendData.filter(d => d.direction < 0);
-    const stDown = supertrendData.filter(d => d.direction > 0);
-    
-    if (stUp.length > 0) {
-      const stUpSeries = chart.addSeries(LineSeries, { color: '#22c55e', lineWidth: 2 });
-      stUpSeries.setData(stUp);
-    }
-    if (stDown.length > 0) {
-      const stDownSeries = chart.addSeries(LineSeries, { color: '#ef4444', lineWidth: 2 });
-      stDownSeries.setData(stDown);
-    }
-
-    chart.timeScale().fitContent();
-
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
-      }
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
-    };
-  }, [data]);
-
-  return <div ref={chartContainerRef} style={{ borderRadius: '8px', overflow: 'hidden' }} />;
-};
-
-// ============================================
-// RSI CHART
-// ============================================
-const RSIChart = ({ data }) => {
-  const chartContainerRef = useRef(null);
-
-  useEffect(() => {
-    if (!chartContainerRef.current || data.length === 0) return;
-
-    const chart = createChart(chartContainerRef.current, {
-      width: chartContainerRef.current.clientWidth,
-      height: 150,
-      layout: {
-        background: { color: '#0d0d0d' },
-        textColor: '#9ca3af',
-      },
-      grid: {
-        vertLines: { color: '#1a1a1a' },
-        horzLines: { color: '#1a1a1a' },
-      },
-      rightPriceScale: { borderColor: '#333' },
-      timeScale: { visible: false },
-    });
-
-    const rsiSeries = chart.addSeries(LineSeries, { color: '#f59e0b', lineWidth: 2 });
-    rsiSeries.setData(Indicators.RSI(data, 14));
-
-    // Overbought/Oversold lines
-    const overbought = chart.addSeries(LineSeries, { color: '#ef4444', lineWidth: 1, lineStyle: 2 });
-    const oversold = chart.addSeries(LineSeries, { color: '#22c55e', lineWidth: 1, lineStyle: 2 });
-    
-    const timeRange = data.map(d => ({ time: d.time, value: 70 }));
-    const timeRange30 = data.map(d => ({ time: d.time, value: 30 }));
-    overbought.setData(timeRange);
-    oversold.setData(timeRange30);
-
-    chart.timeScale().fitContent();
-
-    const handleResize = () => {
-      if (chartContainerRef.current) {
-        chart.applyOptions({ width: chartContainerRef.current.clientWidth });
-      }
-    };
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      chart.remove();
-    };
-  }, [data]);
-
-  return <div ref={chartContainerRef} style={{ borderRadius: '8px', overflow: 'hidden' }} />;
-};
-
-// ============================================
-// INDICATOR PANEL
+// INDICATOR PANEL COMPONENT
 // ============================================
 const IndicatorPanel = ({ indicators }) => {
-  if (!indicators) return null;
-
   const items = [
-    { label: 'MACD', value: `${indicators.macd.line} / ${indicators.macd.signal}`, color: parseFloat(indicators.macd.line) > parseFloat(indicators.macd.signal) ? '#22c55e' : '#ef4444' },
-    { label: 'RSI', value: indicators.rsi, color: parseFloat(indicators.rsi) > 55 ? '#22c55e' : parseFloat(indicators.rsi) < 45 ? '#ef4444' : '#fbbf24' },
-    { label: 'RMI', value: indicators.rmi, color: parseFloat(indicators.rmi) > 50 ? '#22c55e' : '#ef4444' },
-    { label: 'Stoch K/D', value: `${indicators.stoch.k} / ${indicators.stoch.d}`, color: parseFloat(indicators.stoch.k) > parseFloat(indicators.stoch.d) ? '#22c55e' : '#ef4444' },
-    { label: 'CCI', value: indicators.cci, color: parseFloat(indicators.cci) > 100 ? '#22c55e' : parseFloat(indicators.cci) < -100 ? '#ef4444' : '#9ca3af' },
-    { label: 'ADX', value: indicators.adx, color: parseFloat(indicators.adx) > 20 ? '#22c55e' : '#9ca3af' },
-    { label: 'ATR', value: indicators.atr, color: '#a855f7' },
-    { label: 'Squeeze', value: indicators.sqzMom, color: parseFloat(indicators.sqzMom) > 0 ? '#22c55e' : '#ef4444' },
-    { label: 'Supertrend', value: indicators.supertrend, color: indicators.supertrend === 'Bullish' ? '#22c55e' : '#ef4444' },
+    { label: 'RSI', value: indicators.rsi, color: parseFloat(indicators.rsi) > 50 ? 'var(--green)' : 'var(--red)' },
+    { label: 'RMI', value: indicators.rmi, color: parseFloat(indicators.rmi) > 50 ? 'var(--green)' : 'var(--red)' },
+    { label: 'MACD', value: indicators.macd.line, color: parseFloat(indicators.macd.line) > parseFloat(indicators.macd.signal) ? 'var(--green)' : 'var(--red)' },
+    { label: 'Stoch K', value: indicators.stoch.k, color: parseFloat(indicators.stoch.k) > parseFloat(indicators.stoch.d) ? 'var(--green)' : 'var(--red)' },
+    { label: 'CCI', value: indicators.cci, color: parseFloat(indicators.cci) > 0 ? 'var(--green)' : 'var(--red)' },
+    { label: 'ADX', value: indicators.adx, color: parseFloat(indicators.adx) > 20 ? 'var(--gold)' : 'var(--text-muted)' },
+    { label: 'ATR', value: indicators.atr, color: 'var(--gold)' },
+    { label: 'VWAP', value: indicators.vwap, color: 'var(--purple)' },
+    { label: 'Supertrend', value: indicators.supertrend, color: indicators.supertrend === 'Bullish' ? 'var(--green)' : 'var(--red)' },
   ];
 
   return (
-    <div style={{ 
-      display: 'grid', 
-      gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', 
-      gap: '0.75rem',
-      padding: '1rem',
-      background: '#111',
-      borderRadius: '8px'
-    }}>
+    <div className="indicator-panel">
       {items.map((item, i) => (
-        <div key={i} style={{ textAlign: 'center', padding: '0.5rem' }}>
-          <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '0.25rem' }}>{item.label}</div>
-          <div style={{ fontSize: '0.95rem', fontWeight: '600', color: item.color }}>{item.value}</div>
+        <div key={i} className="indicator-item">
+          <span className="indicator-label">{item.label}</span>
+          <span className="indicator-value" style={{ color: item.color }}>{item.value}</span>
         </div>
       ))}
     </div>
@@ -841,19 +692,56 @@ const IndicatorPanel = ({ indicators }) => {
 };
 
 // ============================================
+// COMING SOON CHART PLACEHOLDER - TradingView Style with Zoom
+// ============================================
+const ComingSoonChart = () => {
+  return (
+    <div className="coming-soon-chart tradingview-style">
+      <div className="coming-soon-content">
+        <div className="coming-soon-logos">
+          <div className="zoom-logo-container">
+            <svg className="zoom-logo" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="10" fill="#2D8CFF"/>
+              <path d="M12 17C12 15.3431 13.3431 14 15 14H25C26.6569 14 28 15.3431 28 17V31C28 32.6569 26.6569 34 25 34H15C13.3431 34 12 32.6569 12 31V17Z" fill="white"/>
+              <path d="M30 20L36 16V32L30 28V20Z" fill="white"/>
+            </svg>
+          </div>
+          <span className="connection-indicator">⟷</span>
+          <div className="tradingview-logo-container">
+            <svg className="tradingview-logo" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+              <rect width="48" height="48" rx="10" fill="#131722"/>
+              <path d="M8 32L16 18L22 26L30 14L40 28" stroke="#2962FF" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+              <circle cx="40" cy="28" r="3" fill="#2962FF"/>
+            </svg>
+          </div>
+        </div>
+        <h3 className="coming-soon-title coming-soon-title-emphasized">
+          🔴 LIVE DEMO COMING SOON
+        </h3>
+        <p className="coming-soon-text coming-soon-text-emphasized">
+          Real-time TradingView chart demonstration via Zoom
+        </p>
+        <div className="coming-soon-features">
+          <span className="feature-tag feature-tag-primary">📺 Live TradingView Charts</span>
+          <span className="feature-tag feature-tag-primary">🎥 Zoom Screen Share</span>
+          <span className="feature-tag feature-tag-primary">📊 Real-time Analysis</span>
+        </div>
+        <div className="coming-soon-subtext">
+          <p>Join live sessions to see the strategy in action</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================
 // MAIN DASHBOARD
 // ============================================
-function TradingDashboard() {
-  const [data, setData] = useState([]);
-  const [signal, setSignal] = useState(null);
-  const [chartType, setChartType] = useState('custom');
+export default function TradingDashboard() {
+  const [data, setData] = useState(() => generateDemoData());
+  const [signal, setSignal] = useState(() => OferWaronStrategy.calculate(generateDemoData()));
 
   useEffect(() => {
-    const marketData = generateDemoData();
-    setData(marketData);
-    setSignal(OferWaronStrategy.calculate(marketData));
-
-    // Live updates every 3 seconds
     const interval = setInterval(() => {
       setData(prev => {
         const newData = [...prev];
@@ -879,178 +767,66 @@ function TradingDashboard() {
   const latestPrice = data[data.length - 1]?.close || 0;
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: 'linear-gradient(180deg, #0a0a0a 0%, #111 100%)',
-      color: '#fff',
-      padding: '1.5rem'
-    }}>
+    <div className="trading-dashboard">
       {/* Header */}
-      <header style={{ textAlign: 'center', marginBottom: '2rem' }}>
-        <h1 style={{ 
-          fontSize: '2rem', 
-          fontWeight: '700',
-          background: 'linear-gradient(90deg, #fbbf24, #f59e0b)',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          marginBottom: '0.5rem'
-        }}>
-          🏆 Ofer Waron Gold Strategy
+      <header className="dashboard-header">
+        <h1 className="dashboard-title get-in-touch-title get-in-touch-title--shimmer">
+          <span className="get-in-touch-shimmer">
+            🏆 Ofer Waron Gold Strategy
+            <span className="sparkle sparkle-1">✦</span>
+            <span className="sparkle sparkle-2">✦</span>
+          </span>
         </h1>
-        <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
-          Full Pine Script Implementation • Live Demo • XAUUSD
-        </p>
       </header>
 
       {/* Main Signal Panel */}
       {signal && (
-        <div style={{
-          background: signal.signal === 'LONG' 
-            ? 'linear-gradient(135deg, rgba(34,197,94,0.15) 0%, rgba(34,197,94,0.05) 100%)'
-            : 'linear-gradient(135deg, rgba(239,68,68,0.15) 0%, rgba(239,68,68,0.05) 100%)',
-          border: `2px solid ${signal.signal === 'LONG' ? '#22c55e' : '#ef4444'}`,
-          borderRadius: '16px',
-          padding: '1.5rem',
-          marginBottom: '1.5rem'
-        }}>
-          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '1rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <span style={{
-                fontSize: '2.5rem',
-                fontWeight: '800',
-                color: signal.signal === 'LONG' ? '#22c55e' : '#ef4444'
-              }}>
+        <div className={`signal-panel ${signal.signal === 'LONG' ? 'signal-long' : 'signal-short'}`}>
+          <div className="signal-content">
+            {/* <div className="signal-main">
+              <span className={`signal-direction ${signal.signal === 'LONG' ? 'text-green' : 'text-red'}`}>
                 {signal.signal === 'LONG' ? '📈' : '📉'} {signal.signal}
               </span>
-              <div style={{
-                background: signal.confidence >= 97 ? (signal.signal === 'LONG' ? '#22c55e' : '#ef4444') : '#333',
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                fontSize: '1.5rem',
-                fontWeight: '700'
-              }}>
+              <div className={`confidence-badge ${signal.confidence >= 97 ? (signal.signal === 'LONG' ? 'confidence-high-long' : 'confidence-high-short') : ''}`}>
                 {signal.confidence}%
               </div>
-            </div>
+            </div> */}
             
-            <div style={{ textAlign: 'right' }}>
-              <div style={{ color: '#fbbf24', fontSize: '2rem', fontWeight: '700' }}>
-                ${latestPrice.toFixed(2)}
-              </div>
-              <div style={{ color: '#6b7280', fontSize: '0.8rem' }}>
+            {/* <div className="signal-price">
+              <div className="price-value">${latestPrice.toFixed(2)}</div>
+              <div className="score-display">
                 Long: {signal.longScore} | Short: {signal.shortScore}
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Signal Reasons */}
-          <div style={{ 
-            display: 'flex', 
-            flexWrap: 'wrap', 
-            gap: '0.5rem', 
-            marginTop: '1rem' 
-          }}>
+          {/* <div className="signal-reasons">
             {signal.reasons.slice(0, 8).map((reason, i) => (
-              <span key={i} style={{
-                background: 'rgba(255,255,255,0.1)',
-                padding: '0.35rem 0.75rem',
-                borderRadius: '20px',
-                fontSize: '0.8rem',
-                color: '#d1d5db'
-              }}>
-                {reason}
-              </span>
+              <span key={i} className="reason-tag">{reason}</span>
             ))}
-          </div>
+          </div> */}
         </div>
       )}
 
       {/* Indicator Panel */}
-      {signal?.indicators && (
-        <div style={{ marginBottom: '1.5rem' }}>
-          <h3 style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
-            📊 Live Indicator Values
-          </h3>
+      {/* {signal?.indicators && (
+        <div className="indicators-section">
+          <h3 className="section-label">📊 Live Indicator Values</h3>
           <IndicatorPanel indicators={signal.indicators} />
         </div>
-      )}
+      )} */}
 
-      {/* Chart Type Toggle */}
-      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-        <button
-          onClick={() => setChartType('custom')}
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: '8px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600',
-            background: chartType === 'custom' ? '#fbbf24' : '#333',
-            color: chartType === 'custom' ? '#000' : '#fff'
-          }}
-        >
-          📊 Strategy Chart
-        </button>
-        <button
-          onClick={() => setChartType('tradingview')}
-          style={{
-            padding: '0.6rem 1.2rem',
-            borderRadius: '8px',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: '600',
-            background: chartType === 'tradingview' ? '#fbbf24' : '#333',
-            color: chartType === 'tradingview' ? '#000' : '#fff'
-          }}
-        >
-          📺 TradingView Widget
-        </button>
-      </div>
-
-      {/* Charts */}
-      <div style={{ 
-        background: '#0d0d0d', 
-        borderRadius: '12px', 
-        padding: '1rem',
-        marginBottom: '1.5rem'
-      }}>
-        {chartType === 'custom' ? (
-          <>
-            <div style={{ marginBottom: '0.5rem' }}>
-              <span style={{ color: '#fbbf24', marginRight: '1rem' }}>━ SMA20</span>
-              <span style={{ color: '#a855f7', marginRight: '1rem' }}>━ VWAP</span>
-              <span style={{ color: '#3b82f6', marginRight: '1rem' }}>┅ BB</span>
-              <span style={{ color: '#22c55e' }}>━ Supertrend</span>
-            </div>
-            <PriceChart data={data} />
-            <div style={{ marginTop: '1rem' }}>
-              <div style={{ color: '#6b7280', fontSize: '0.8rem', marginBottom: '0.5rem' }}>RSI (14)</div>
-              <RSIChart data={data} />
-            </div>
-          </>
-        ) : (
-          <div style={{ height: '500px' }}>
-            <iframe
-              style={{ width: '100%', height: '100%', border: 'none', borderRadius: '8px' }}
-              src="https://s.tradingview.com/widgetembed/?symbol=OANDA%3AXAUUSD&interval=60&theme=dark&style=1&timezone=Asia%2FJerusalem&studies=MASimple%4040&studies=RSI%4014"
-              title="TradingView"
-            />
-          </div>
-        )}
+      {/* Chart Section - Coming Soon */}
+      <div className="chart-section">
+        <ComingSoonChart />
       </div>
 
       {/* Pattern Detection */}
-      {signal?.patterns && (
-        <div style={{ 
-          background: '#111', 
-          borderRadius: '12px', 
-          padding: '1rem',
-          marginBottom: '1.5rem'
-        }}>
-          <h3 style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '0.75rem' }}>
-            🕯️ Candlestick Pattern Detection
-          </h3>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem' }}>
+      {/* {signal?.patterns && ( */}
+        {/* // <div className="patterns-section"> */}
+          {/* <h3 className="section-label">🕯️ Candlestick Pattern Detection</h3> */}
+          {/* <div className="patterns-grid">
             {[
               { name: 'Bullish Engulfing', active: signal.patterns.bullishEngulfing, type: 'bull' },
               { name: 'Bearish Engulfing', active: signal.patterns.bearishEngulfing, type: 'bear' },
@@ -1058,40 +834,20 @@ function TradingDashboard() {
               { name: 'Hammer', active: signal.patterns.hammer, type: 'bull' },
               { name: 'Shooting Star', active: signal.patterns.shootingStar, type: 'bear' },
             ].map((pattern, i) => (
-              <div key={i} style={{
-                padding: '0.5rem 1rem',
-                borderRadius: '8px',
-                background: pattern.active ? (
-                  pattern.type === 'bull' ? 'rgba(34,197,94,0.2)' :
-                  pattern.type === 'bear' ? 'rgba(239,68,68,0.2)' : 'rgba(251,191,36,0.2)'
-                ) : '#1a1a1a',
-                border: `1px solid ${pattern.active ? (
-                  pattern.type === 'bull' ? '#22c55e' :
-                  pattern.type === 'bear' ? '#ef4444' : '#fbbf24'
-                ) : '#333'}`,
-                color: pattern.active ? '#fff' : '#6b7280',
-                fontSize: '0.85rem'
-              }}>
+              <div key={i} className={`pattern-item ${pattern.active ? `pattern-active pattern-${pattern.type}` : ''}`}>
                 {pattern.active ? '✓ ' : ''}{pattern.name}
               </div>
             ))}
           </div>
-        </div>
-      )}
+        </div> */}
+        {/* )} */}
+      
 
       {/* Disclaimer */}
-      <footer style={{ 
-        textAlign: 'center', 
-        color: '#6b7280', 
-        fontSize: '0.8rem',
-        padding: '1rem',
-        borderTop: '1px solid #222'
-      }}>
+      {/* <footer className="dashboard-footer">
         ⚠️ Educational purposes only. This is a JavaScript implementation of the Pine Script strategy.
         <br />Always do your own research. Past performance ≠ future results.
-      </footer>
+      </footer> */}
     </div>
   );
 }
-
-export default TradingDashboard;

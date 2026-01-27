@@ -1,6 +1,10 @@
 {
   "redirects": [
-    { "source": "/", "destination": "/oferwaron-97-gold/", "permanent": false }
+    {
+      "source": "/oferwaron-97-gold/:path*",
+      "destination": "/",
+      "permanent": true
+    }
   ],
   "rewrites": [
     { "source": "/oferwaron-97-gold", "destination": "/index.html" },

@@ -1,24 +1,23 @@
 {
   "files": {
-    "main.css": "./static/css/main.22e48e0b.css",
-    "main.js": "./static/js/main.e560064d.js",
+    "main.css": "./static/css/main.8f8bf6b9.css",
+    "main.js": "./static/js/main.52d065c8.js",
     "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
     "static/media/SantaLogo.jpg": "./static/media/SantaLogo.487bcb7348123b0dc478.jpg",
     "static/media/questionMarkCoin.png": "./static/media/questionMarkCoin.799f0fe1b0286211e941.png",
     "static/media/goldenface.png": "./static/media/goldenface.b5e3d5de30bcf87f3b44.png",
     "static/media/logo.jpg": "./static/media/logo.c6afaef78b09df1a0a3a.jpg",
-    "static/media/ofernewChart.jpg": "./static/media/ofernewChart.2ef12a3e2360b6d053a2.jpg",
     "static/media/oferBlack.jpg": "./static/media/oferBlack.d6c0dd25df30bdcbfb5e.jpg",
     "static/media/whiteBackground.jpg": "./static/media/whiteBackground.826f0577727a4c3989ba.jpg",
     "static/media/oferWhite.jpg": "./static/media/oferWhite.24c5934e974ced2c1920.jpg",
     "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "./index.html",
-    "main.22e48e0b.css.map": "./static/css/main.22e48e0b.css.map",
-    "main.e560064d.js.map": "./static/js/main.e560064d.js.map",
+    "main.8f8bf6b9.css.map": "./static/css/main.8f8bf6b9.css.map",
+    "main.52d065c8.js.map": "./static/js/main.52d065c8.js.map",
     "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.22e48e0b.css",
-    "static/js/main.e560064d.js"
+    "static/css/main.8f8bf6b9.css",
+    "static/js/main.52d065c8.js"
   ]
 }

@@ -1,0 +1,15 @@
+{
+  "redirects": [
+    {
+      "source": "/oferwaron-97-gold/:path*",
+      "destination": "/:path*",
+      "permanent": true
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}

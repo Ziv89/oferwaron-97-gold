@@ -1,43 +1,51 @@
 // ============================================
-// YouTube.jsx - YouTube Channel Page (No inline styles)
+// YouTube.jsx - YouTube Channel Page (Dynamic Firebase Videos)
+// Videos loaded dynamically from Firebase youTubeids array
+// First video = featured/main, rest displayed in responsive grid
 // ============================================
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSiteConfig, useOwnerDetails } from '../App';
 
-// Video Card Component
-const VideoCard = ({ video, onPlay }) => {
-  const thumbnailUrl = `https://img.youtube.com/vi/${video.id}/maxresdefault.jpg`;
-  const fallbackUrl = `https://img.youtube.com/vi/${video.id}/hqdefault.jpg`;
+// ============================================
+// VIDEO CARD COMPONENT
+// Individual video thumbnail with play overlay
+// ============================================
+const VideoCard = ({ videoId, index, onPlay }) => {
+  const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+  const fallbackUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   const [imgSrc, setImgSrc] = useState(thumbnailUrl);
 
   return (
-    <div className="video-card" onClick={() => onPlay(video.id)}>
+    <div className="video-card" onClick={() => onPlay(videoId)}>
       <div className="video-thumbnail">
         <img 
           src={imgSrc} 
-          alt={video.title}
+          alt={`Video ${index + 1}`}
           onError={() => setImgSrc(fallbackUrl)}
+          loading="lazy"
         />
         <div className="play-overlay">
           <span className="play-icon">▶</span>
         </div>
       </div>
       <div className="video-info">
-        <h3>{video.title}</h3>
-        <p>{video.desc}</p>
+        <span className="video-number">Video #{index + 1}</span>
       </div>
     </div>
   );
 };
 
-// Video Modal Component
+// ============================================
+// VIDEO MODAL COMPONENT
+// Fullscreen video player overlay
+// ============================================
 const VideoModal = ({ videoId, onClose }) => {
   if (!videoId) return null;
 
   return (
     <div className="video-modal-overlay" onClick={onClose}>
       <div className="video-modal" onClick={e => e.stopPropagation()}>
-        <button className="close-modal" onClick={onClose}>✕</button>
+        <button className="close-modal" onClick={onClose} aria-label="Close video">✕</button>
         <iframe
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
           title="YouTube Video"
@@ -50,113 +58,159 @@ const VideoModal = ({ videoId, onClose }) => {
   );
 };
 
-// Subscribe Button
-const SubscribeButton = ({ channelId }) => {
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://apis.google.com/js/platform.js';
-    script.async = true;
-    document.body.appendChild(script);
-    return () => document.body.removeChild(script);
-  }, []);
-
-  return (
-    <div className="subscribe-container">
-      <div 
-        className="g-ytsubscribe" 
-        data-channelid={channelId}
-        data-layout="full" 
-        data-count="default"
-      />
+// ============================================
+// LOADING SKELETON COMPONENT
+// Shows while videos are loading
+// ============================================
+const LoadingSkeleton = () => (
+  <div className="youtube-loading">
+    <div className="youtube-loading-featured">
+      <div className="skeleton-shimmer" />
     </div>
-  );
-};
+    <div className="youtube-loading-grid">
+      {[1, 2, 3].map(i => (
+        <div key={i} className="skeleton-card">
+          <div className="skeleton-shimmer" />
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ============================================
+// EMPTY STATE COMPONENT
+// Shows when no videos are configured
+// ============================================
+const EmptyState = ({ channelUrl }) => (
+  <div className="youtube-empty-state">
+    <h2>No Videos Yet</h2>
+    <p>Videos will appear here once they're added to Firebase.</p>
+    {channelUrl && (
+      <a 
+        href={channelUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="youtube-channel-link"
+      >
+        Visit Channel →
+      </a>
+    )}
+  </div>
+);
+
 
 function YouTube() {
   const [activeVideo, setActiveVideo] = useState(null);
   
   // Get data from Firebase
   const { config, loading: configLoading } = useSiteConfig();
-  const { social, loading: ownerLoading } = useOwnerDetails();
+  const { social, youTubeids, loading: ownerLoading } = useOwnerDetails();
 
   const loading = configLoading || ownerLoading;
 
   // YouTube channel URL from Firebase
   const YOUTUBE_CHANNEL = social.youtube || 'https://www.youtube.com/@Oferwv';
 
-  const playlists = [
-    { icon: '📈', name: 'Trading Tutorials', count: '12 videos' },
-    { icon: '📊', name: 'Weekly Analysis', count: '24 videos' },
-    { icon: '💰', name: 'Success Stories', count: '8 videos' },
-    { icon: '⚙️', name: 'Strategy Deep Dives', count: '15 videos' }
-  ];
+  // Memoize video processing to prevent unnecessary recalculations
+  const { featuredVideo, gridVideos } = useMemo(() => {
+    if (!youTubeids || youTubeids.length === 0) {
+      return { featuredVideo: null, gridVideos: [] };
+    }
+    
+    // First video ID is the featured/main video
+    const featured = youTubeids[0];
+    // Rest of the videos go into the grid
+    const grid = youTubeids.slice(1);
+    
+    return { featuredVideo: featured, gridVideos: grid };
+  }, [youTubeids]);
 
-  const learningTopics = [
-    { icon: '📊', title: 'Technical Analysis', desc: 'Master MACD, RSI, Bollinger Bands and our confluence strategy.' },
-    { icon: '⚡', title: 'Live Trading', desc: 'Watch real trades with entry, exit, and risk management.' },
-    { icon: '🛡️', title: 'Risk Management', desc: 'Learn the 1:1 risk-reward strategy that protects capital.' },
-    { icon: '📈', title: 'Market Psychology', desc: 'Understand why gold moves and predict market sentiment.' }
-  ];
-
-  // Grid videos (3 specific videos)
-  const gridVideos = [
-    { id: 'WV2d2CKUl0Y', title: 'Gold Trading Analysis', desc: 'Latest market insights' },
-    { id: 'bmE75Jl6fE0', title: 'Trading Strategy', desc: 'Learn proven methods' },
-    { id: 'Y5t_FrYu7fo', title: 'Market Update', desc: 'Current gold trends' }
-  ];
-
+  // Show loading state
   if (loading) {
     return (
-      <div className="page">
-        <section className="section text-center">
-          <p>Loading...</p>
-        </section>
+      <div className="page youtube-page">
+        <LoadingSkeleton />
+      </div>
+    );
+  }
+
+  // Show empty state if no videos
+  if (!featuredVideo && gridVideos.length === 0) {
+    return (
+      <div className="page youtube-page">
+        <EmptyState channelUrl={YOUTUBE_CHANNEL} />
       </div>
     );
   }
 
   return (
-    <div className="page">
-      {/* Featured Video */}
-      <section className="section">
-        <div className="featured-video-container">
-          <div className="featured-video-wrapper">
-            <iframe
-              src="https://www.youtube.com/embed/vjMLBfpIuYE?rel=0"
-              title="Featured Video"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            />
-          </div>
-        </div>
+    <div className="page youtube-page">
+      {/* Page Header */}
+      <section className="youtube-header">
+      <h1 className="strategy-main-title get-in-touch-title get-in-touch-title--shimmer">
+          <span className="get-in-touch-shimmer">          <span className="youtube-icon"></span>
+
+          Video Gallery
+          </span>
+        </h1>
+        <p className="strategy-subtitle">Watch trading insights, analysis & tutorials</p>
       </section>
 
-      {/* Video Grid */}
-      <section className="section">
-        <div className="video-grid">
-          {gridVideos.map((video, i) => (
-            <VideoCard 
-              key={i}
-              video={video}
-              onPlay={setActiveVideo}
-            />
-          ))}
-        </div>
-      </section>
+      {/* Featured Video - First video from youTubeids array */}
+      {featuredVideo && (
+        <section className="section youtube-featured-section">
+          <div className="youtube-featured-label">
+            <span className="featured-badge">⭐ Featured</span>
+          </div>
+          <div className="featured-video-container">
+            <div className="featured-video-wrapper">
+              <iframe
+                src={`https://www.youtube.com/embed/${featuredVideo}?rel=0`}
+                title="Featured Video"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Video Grid - Remaining videos from youTubeids array */}
+      {gridVideos.length > 0 && (
+        <section className="section youtube-grid-section">
+
+          <div className="video-grid youtube-dynamic-grid">
+            {gridVideos.map((videoId, index) => (
+              <VideoCard 
+                key={videoId}
+                videoId={videoId}
+                index={index}
+                onPlay={setActiveVideo}
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Subscribe CTA */}
-      <section className="section">
+      <section className="section youtube-cta-section">
         <div className="card subscribe-cta-card">
           <h2 className="subscribe-cta-title">🔔 Never Miss an Update!</h2>
-          <p className="subscribe-cta-text">Subscribe and turn on notifications to get:</p>
+          <p className="subscribe-cta-text">
+                    <p className="strategy-subtitle">Watch trading insights, analysis & tutorial
+
+            Subscribe to get the latest trading signals, market analysis, and educational content.
+            s</p>
+          </p>
           <a 
             href={`${YOUTUBE_CHANNEL}?sub_confirmation=1`}
             target="_blank"
             rel="noopener noreferrer"
             className="subscribe-btn"
           >
-            ▶ Subscribe Now
+            <span className="subscribe-icon">▶</span>
+            Subscribe Now
           </a>
         </div>
       </section>

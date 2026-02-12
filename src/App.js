@@ -2,11 +2,12 @@
 // App.js - 97% Gold Trading Platform
 // All data fetched from Firebase siteData collection
 // ============================================
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
 import { HashRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './styles/styles.css';
-import imageLogo from './assets/images/logo.jpg';
+import './styles/responsive-overrides.css';
 import SantaLogo from './assets/images/SantaLogo.jpg';
+import { Analytics } from "@vercel/analytics/react";
 
 // Page imports
 import Home from './pages/Home';
@@ -18,22 +19,31 @@ import About from './pages/About';
 import TradingDashboard from './pages/TradingDashboard';
 
 // ✅ Firebase
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from './services/firebase';
 
 const LOADING_STATS = {
   dd: '...',
   winRate: '...',
+  tradingwinRate: '...',
+  tradingloseRate: '...',
   totalTrades: '...',
   profitFactor: '...',
   since: '...',
   subscribers: '...',
   targetProfit: '...',
+  targetLoses: '...',
   assets: [],
-  tagline: '...'
+  tagline: '...',
+  totalLosestrading: 0,
+  totalWiningTrading: 0,
+  tradeViewChartImage: '', 
+   tradeViewChartImages: [],
 };
 
 const LOADING_PERFORMANCE = {
+  dd: '...',
+  profitFactor: '...',
   tradeSuccessRate: '...',
   maxPointsPerSignal: '...',
   maxLossPoints: '...',
@@ -49,7 +59,8 @@ const LOADING_PERFORMANCE = {
 
 const LOADING_OWNER = {
   contact: { email: '', whatsapp: '' },
-  social: { youtube: '', tradingview: '' }
+  social: { youtube: '', tradingview: '' },
+  youTubeids: []
 };
 
 const LOADING_CONFIG = {
@@ -84,7 +95,7 @@ export const usePerformanceHistory = () => {
 };
 
 // ============================================
-// OWNER DETAILS CONTEXT (Contact & Social)
+// OWNER DETAILS CONTEXT
 // ============================================
 const OwnerDetailsContext = createContext(null);
 
@@ -94,6 +105,7 @@ export const useOwnerDetails = () => {
     return {
       contact: LOADING_OWNER.contact,
       social: LOADING_OWNER.social,
+      youTubeids: LOADING_OWNER.youTubeids,
       loading: true,
       error: null
     };
@@ -116,7 +128,6 @@ export const useSiteConfig = () => {
 
 // ============================================
 // COMBINED DATA PROVIDER
-// All data from siteData collection
 // ============================================
 const FirebaseDataProvider = ({ children }) => {
   // Trading Stats State
@@ -129,9 +140,10 @@ const FirebaseDataProvider = ({ children }) => {
   const [performanceLoading, setPerformanceLoading] = useState(true);
   const [performanceError, setPerformanceError] = useState(null);
 
-  // Owner Details State (Contact & Social)
+  // Owner Details State
   const [contact, setContact] = useState(LOADING_OWNER.contact);
   const [social, setSocial] = useState(LOADING_OWNER.social);
+  const [youTubeids, setYouTubeids] = useState(LOADING_OWNER.youTubeids);
   const [ownerLoading, setOwnerLoading] = useState(true);
   const [ownerError, setOwnerError] = useState(null);
 
@@ -141,40 +153,69 @@ const FirebaseDataProvider = ({ children }) => {
   const [configError, setConfigError] = useState(null);
 
   useEffect(() => {
-    // Fetch Trading Stats from siteData/tradingStats
-    const fetchTradingStats = async () => {
-      try {
-        const docRef = doc(db, 'siteData', 'tradingStats');
-        const docSnap = await getDoc(docRef);
+    // ✅ LIVE listener: Trading Stats from siteData/tradingStats
+    const tradingStatsRef = doc(db, 'siteData', 'tradingStats');
 
-        if (docSnap.exists()) {
-          const data = docSnap.data();
-          console.log('Fetched trading stats:', data);
-
-          setStats({
-            winRate: data.winRate ? `${data.winRate}%` : '',
-            totalTrades: data.totalTrades ? `${data.totalTrades}` : '',
-            since: data.since || '',
-
-            subscribers: data.subscribers ? `${data.subscribers}+` : '',
-            assets: data.assets || [],
-            tagline: data.tagline || '',
-            targetProfit: data.targetProfit ? `${data.targetProfit}` : '',
-            dd: data.dd ? `${data.dd}%` : '',
-            profitFactor: data.profitFactor ? `${data.profitFactor.toFixed(2)}` : '',
-            updatedAt: data.updatedAt || null
-          });
-        } else {
+    const unsubTradingStats = onSnapshot(
+      tradingStatsRef,
+      (docSnap) => {
+        if (!docSnap.exists()) {
           console.error('No tradingStats document found in siteData!');
           setStatsError('Document not found');
+          setStatsLoading(false);
+          return;
         }
-      } catch (err) {
-        console.error('Error fetching trading stats:', err);
+
+        const data = docSnap.data();
+        console.log('Fetched trading stats (live):', data);
+const images = Array.isArray(data.tradeViewChartImages)
+  ? data.tradeViewChartImages.filter(Boolean)
+  : [];
+
+        // ✅ numeric inputs
+        const totalTradesNum = Number(data.totalTrades ?? 0);
+        const totalLosestradingNum = Number(data.totalLosestrading ?? 0);
+
+        // ✅ WIN RATE based on trading losses
+        const tradingwinRate =
+          totalTradesNum > 0
+            ? (((totalTradesNum - totalLosestradingNum) / totalTradesNum) * 100).toFixed(2) + '%'
+            : '0.00';
+
+        const tradingloseRate =
+          totalTradesNum > 0
+            ? ((1 - (totalTradesNum - totalLosestradingNum) / totalTradesNum) * 100).toFixed(2)
+            : '0.00';
+
+      setStats({
+  winRate: data.winRate ? `${data.winRate}%` : '',
+  tradingwinRate,
+  tradingloseRate,
+  totalTrades: totalTradesNum ? `${totalTradesNum}` : '',
+  since: data.since || '',
+  totalLosestrading: data.totalLosestrading,
+  totalWiningTrading: data.totalWiningTrading,
+  subscribers: data.subscribers ? `${data.subscribers}+` : '',
+  assets: data.assets || [],
+  tagline: data.tagline || '',
+  targetProfit: data.targetProfit ? `${data.targetProfit}` : '',
+  targetLoses: data.targetLoses ? `${data.targetLoses}` : '',
+  dd: data.dd ? `${data.dd}%` : '',
+  profitFactor: data.profitFactor ? `${Number(data.profitFactor).toFixed(2)}` : '',
+  updatedAt: data.updatedAt || null,
+
+  tradeViewChartImages: images,
+
+  tradeViewChartImage: images[0] || '',
+});
+        setStatsLoading(false);
+      },
+      (err) => {
+        console.error('Error listening to trading stats:', err);
         setStatsError(err.message);
-      } finally {
         setStatsLoading(false);
       }
-    };
+    );
 
     // Fetch Performance History from siteData/performanceHistory
     const fetchPerformanceHistory = async () => {
@@ -186,13 +227,15 @@ const FirebaseDataProvider = ({ children }) => {
           const data = docSnap.data();
           console.log('Fetched performance history:', data);
 
-          const totalTrades = data.totalTrades || 0;
-          const totalWins = data.totalWins || 0;
-          const maxConsecutiveWins = data.maxConsecutiveWins || 0;
+          const totalWins = Number(data.totalWins) || 0;
+          const maxConsecutiveWins = Number(data.maxConsecutiveWins) || 0;
 
-          const totalLosses = totalTrades - totalWins;
+          const totalLosses = Number(data.totalLosses) || 0;
+          const totalTrades = totalWins + totalLosses;
+
           const winRate = totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(2) : '0.00';
           const lossRate = totalTrades > 0 ? ((totalLosses / totalTrades) * 100).toFixed(2) : '0.00';
+
           const totalWinsPresnt =
             (data.maxProfit + data.totalLosses) > 0
               ? ((data.maxProfit / (data.maxProfit + data.totalLosses)) * 100).toFixed(2)
@@ -213,6 +256,10 @@ const FirebaseDataProvider = ({ children }) => {
             winRate,
             lossRate,
             maxConsecutiveWins,
+
+            dd: data.dd != null ? `${data.dd}%` : '',
+            profitFactor: data.profitFactor != null ? `${Number(data.profitFactor).toFixed(2)}` : '',
+
             updatedAt: data.lastUpdated || null
           });
         } else {
@@ -260,6 +307,14 @@ const FirebaseDataProvider = ({ children }) => {
               tradingview: data.tradingview || ''
             });
           }
+
+          if (data.youTubeids && Array.isArray(data.youTubeids)) {
+            setYouTubeids(data.youTubeids);
+            console.log('Fetched YouTube IDs:', data.youTubeids);
+          } else {
+            setYouTubeids([]);
+            console.log('No youTubeids array found in ownerDetails');
+          }
         } else {
           console.error('No ownerDetails document found in siteData!');
           setOwnerError('Document not found');
@@ -298,22 +353,60 @@ const FirebaseDataProvider = ({ children }) => {
       }
     };
 
-    fetchTradingStats();
     fetchPerformanceHistory();
     fetchOwnerDetails();
     fetchSiteConfig();
+
+    // ✅ cleanup listener
+    return () => {
+      unsubTradingStats();
+    };
   }, []);
 
   return (
     <TradingStatsContext.Provider value={{ stats, loading: statsLoading, error: statsError }}>
       <PerformanceHistoryContext.Provider value={{ performance, loading: performanceLoading, error: performanceError }}>
-        <OwnerDetailsContext.Provider value={{ contact, social, loading: ownerLoading, error: ownerError }}>
+        <OwnerDetailsContext.Provider value={{ contact, social, youTubeids, loading: ownerLoading, error: ownerError }}>
           <SiteConfigContext.Provider value={{ config, loading: configLoading, error: configError }}>
             {children}
           </SiteConfigContext.Provider>
         </OwnerDetailsContext.Provider>
       </PerformanceHistoryContext.Provider>
     </TradingStatsContext.Provider>
+  );
+};
+
+// ============================================
+// SANTA LOGO WITH GLITTER + SHIMMER EFFECTS
+// ============================================
+const SantaLogoGlitter = ({ className = '' }) => {
+  const glitters = Array.from({ length: 18 }, (_, i) => {
+    const size = 2 + Math.random() * 4;
+    return {
+      key: i,
+      style: {
+        width: `${size}px`,
+        height: `${size}px`,
+        top: `${Math.random() * 100}%`,
+        left: `${Math.random() * 100}%`,
+        animationDuration: `${1.5 + Math.random() * 2}s`,
+        animationDelay: `${Math.random() * 3}s`,
+      },
+    };
+  });
+
+  return (
+    <span className={`logo-container logo-glitter-field ${className}`}>
+      <img src={SantaLogo} className="app-logo" alt="97% Gold Logo" />
+      <span className="glitter-layer" aria-hidden="true">
+        {glitters.map(g => (
+          <span key={g.key} className="glitter" style={g.style} />
+        ))}
+      </span>
+      <span className="shimmer-layer" aria-hidden="true">
+        <span className="shimmer-sweep" />
+      </span>
+    </span>
   );
 };
 
@@ -335,8 +428,8 @@ const Header = () => {
 
   return (
     <header className="app-header">
-      <NavLink to="/" className="logo-container">
-        <img src={SantaLogo} className="app-logo" alt="97% Gold Logo" />
+      <NavLink to="/" className="header-logo-link" aria-label="Go to home">
+        <SantaLogoGlitter className="header-logo-glitter" />
       </NavLink>
 
       <nav className="app-nav">
@@ -391,7 +484,25 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-section">
           <div className="footer-logo">
-            <img src={SantaLogo} className="footer-logo-image" alt="97% Gold Logo" />
+            <span className="logo-container logo-glitter-field footer-logo-glitter">
+              <img src={SantaLogo} className="footer-logo-image" alt="97% Gold Logo" />
+              <span className="glitter-layer" aria-hidden="true">
+                {Array.from({ length: 10 }, (_, i) => {
+                  const size = 1.5 + Math.random() * 2.5;
+                  return (
+                    <span key={i} className="glitter" style={{
+                      width: `${size}px`, height: `${size}px`,
+                      top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`,
+                      animationDuration: `${1.5 + Math.random() * 2}s`,
+                      animationDelay: `${Math.random() * 3}s`,
+                    }} />
+                  );
+                })}
+              </span>
+              <span className="shimmer-layer" aria-hidden="true">
+                <span className="shimmer-sweep" />
+              </span>
+            </span>
             <h3 className="footer-brand-title">{config.siteName}</h3>
           </div>
           <p className="footer-tagline">{stats.tagline || config.tagline}</p>
@@ -470,8 +581,8 @@ function App() {
             </Routes>
           </main>
           <Footer />
-          {/* <FloatingButtons /> */}
         </div>
+        <Analytics />
       </HashRouter>
     </FirebaseDataProvider>
   );

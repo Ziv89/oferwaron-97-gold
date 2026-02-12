@@ -75,22 +75,27 @@ function Pricing() {
         <div className="pricing-faq-layout">
           {/* FAQ Section - Left Side */}
           <div className="pricing-faq-column">
-      <h2 className="strategy-section-title text-center get-in-touch-title get-in-touch-title--shimmer">
-  <span className="get-in-touch-shimmer">
-    Frequently Asked Questions
-    <span className="sparkle sparkle-1">✦</span>
-    <span className="sparkle sparkle-2">✦</span>
-  </span>
+            {/* Header stays on its own row so the pricing card can align with the FAQ list */}
+            <div className="faq-header">
+              <h2 className="strategy-section-title text-center get-in-touch-title get-in-touch-title--shimmer">
+                <span className="get-in-touch-shimmer">
+                  Frequently Asked Questions
+                  <span className="sparkle sparkle-1">✦</span>
+                  <span className="sparkle sparkle-2">✦</span>
+                </span>
 
-  <img
-    src={questionMarkCoin}
-    alt="FAQ"
-    className="faq-coin"
-  />
-</h2>
-            <p className="strategy-subtitle text-center">Everything you need to know</p>
-            
-            <div className="faq-container">
+                <img
+                  src={questionMarkCoin}
+                  alt="FAQ"
+                  className="faq-coin"
+                />
+              </h2>
+
+              <p className="strategy-subtitle text-center">Everything you need to know</p>
+            </div>
+
+            <div className="faq-body">
+              <div className="faq-container">
               {faqs.map((faq, i) => (
                 <div 
                   key={i} 
@@ -108,6 +113,7 @@ function Pricing() {
                   )}
                 </div>
               ))}
+              </div>
             </div>
           </div>
 

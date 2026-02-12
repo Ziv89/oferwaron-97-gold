@@ -40,7 +40,7 @@ function Strategy() {
     {
       icon: '💰',
       title: 'Profit Targets',
-      desc: `Target profit up to ${loading ? '...' : (stats?.targetProfit ?? 'N/A')} points per signal with smart profit locks.`
+       desc: `Target profit of up to ${loading ? '...' : (stats?.targetProfit ?? 'N/A')} points per signal, or up to ${stats?.targetLoses ?? 'N/A'} points in case of a loss, with smart profit locks.`
     },
     { icon: '🤖', title: 'Auto Alerts', desc: 'Precise buy/sell signals delivered in real-time via TradingView alerts.' }
   ];
@@ -160,7 +160,7 @@ function Strategy() {
             <span className="strategy-performance-value">
               {loading ? '...' : (performance?.maxLossPoints ?? 'N/A')}
             </span>
-            <span className="strategy-stat-label">Loss</span>
+            <span className="strategy-stat-label">Losses</span>
           </div>
 
           <div className="strategy-stat-card">
@@ -172,14 +172,14 @@ function Strategy() {
 
           <div className="strategy-stat-card">
             <span className="strategy-stat-value">
-              {loading ? '...' : (stats?.profitFactor ?? 'N/A')}
+              {loading ? '...' : (performance?.profitFactor ?? 'N/A')}
             </span>
             <span className="strategy-stat-label">PF (Profit Factor)</span>
           </div>
 
           <div className="strategy-stat-card ">
             <span className="strategy-stat-value">
-              {loading ? '...' : (stats?.dd ?? 'N/A')}
+              {loading ? '...' : (performance?.dd ?? 'N/A')}
             </span>
             <span className="strategy-stat-label">DD (Max Drawdown)</span>
           </div>

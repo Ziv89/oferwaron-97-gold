@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.0e6601c2.css",
-    "main.js": "./static/js/main.8a85d902.js",
+    "main.css": "./static/css/main.7312e858.css",
+    "main.js": "./static/js/main.5ccb25db.js",
     "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
     "static/media/SantaLogo.jpg": "./static/media/SantaLogo.487bcb7348123b0dc478.jpg",
     "static/media/questionMarkCoin.png": "./static/media/questionMarkCoin.799f0fe1b0286211e941.png",
@@ -12,12 +12,12 @@
     "static/media/oferWhite.jpg": "./static/media/oferWhite.24c5934e974ced2c1920.jpg",
     "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "./index.html",
-    "main.0e6601c2.css.map": "./static/css/main.0e6601c2.css.map",
-    "main.8a85d902.js.map": "./static/js/main.8a85d902.js.map",
+    "main.7312e858.css.map": "./static/css/main.7312e858.css.map",
+    "main.5ccb25db.js.map": "./static/js/main.5ccb25db.js.map",
     "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0e6601c2.css",
-    "static/js/main.8a85d902.js"
+    "static/css/main.7312e858.css",
+    "static/js/main.5ccb25db.js"
   ]
 }

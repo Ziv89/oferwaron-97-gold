@@ -1,3 +1,5 @@
-# https://www.robotstxt.org/robotstxt.html
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /trading
+
+Sitemap: https://oferwaron97gold.vercel.app/sitemap.xml

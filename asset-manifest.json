@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "./static/css/main.0583f0bf.css",
-    "main.js": "./static/js/main.dcebf578.js",
+    "main.js": "./static/js/main.00c6ad52.js",
     "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
     "static/media/SantaLogo.jpg": "./static/media/SantaLogo.487bcb7348123b0dc478.jpg",
     "static/media/questionMarkCoin.png": "./static/media/questionMarkCoin.799f0fe1b0286211e941.png",
@@ -14,11 +14,11 @@
     "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "./index.html",
     "main.0583f0bf.css.map": "./static/css/main.0583f0bf.css.map",
-    "main.dcebf578.js.map": "./static/js/main.dcebf578.js.map",
+    "main.00c6ad52.js.map": "./static/js/main.00c6ad52.js.map",
     "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0583f0bf.css",
-    "static/js/main.dcebf578.js"
+    "static/js/main.00c6ad52.js"
   ]
 }

@@ -1,24 +1,22 @@
 {
   "files": {
-    "main.css": "./static/css/main.0583f0bf.css",
-    "main.js": "./static/js/main.00c6ad52.js",
+    "main.css": "./static/css/main.15ee274d.css",
+    "main.js": "./static/js/main.1d176bce.js",
     "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
-    "static/media/SantaLogo.jpg": "./static/media/SantaLogo.487bcb7348123b0dc478.jpg",
-    "static/media/questionMarkCoin.png": "./static/media/questionMarkCoin.799f0fe1b0286211e941.png",
     "static/media/goldenface.png": "./static/media/goldenface.b5e3d5de30bcf87f3b44.png",
-    "static/media/SantaLogoNew.png": "./static/media/SantaLogoNew.021ef146efa6e70bb3a4.png",
-    "static/media/ofernewChart.jpg": "./static/media/ofernewChart.d30a6d85270e01c1b3dc.jpg",
     "static/media/oferBlack.jpg": "./static/media/oferBlack.d6c0dd25df30bdcbfb5e.jpg",
     "static/media/whiteBackground.jpg": "./static/media/whiteBackground.826f0577727a4c3989ba.jpg",
+    "static/media/questionMarkCoin.webp": "./static/media/questionMarkCoin.c36b296ff50da618eba6.webp",
     "static/media/oferWhite.jpg": "./static/media/oferWhite.24c5934e974ced2c1920.jpg",
+    "static/media/SantaLogoNew.webp": "./static/media/SantaLogoNew.1ad386eaadb8b9e047fa.webp",
     "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "./index.html",
-    "main.0583f0bf.css.map": "./static/css/main.0583f0bf.css.map",
-    "main.00c6ad52.js.map": "./static/js/main.00c6ad52.js.map",
+    "main.15ee274d.css.map": "./static/css/main.15ee274d.css.map",
+    "main.1d176bce.js.map": "./static/js/main.1d176bce.js.map",
     "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.0583f0bf.css",
-    "static/js/main.00c6ad52.js"
+    "static/css/main.15ee274d.css",
+    "static/js/main.1d176bce.js"
   ]
 }

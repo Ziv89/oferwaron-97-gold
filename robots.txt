@@ -1,5 +1,4 @@
 User-agent: *
 Allow: /
-Disallow: /trading
 
-Sitemap: https://oferwaron97gold.vercel.app/sitemap.xml
+Sitemap: https://oferwaron97gold.vercel.app/sitemap.txt

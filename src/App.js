@@ -2,11 +2,12 @@
 // App.js - 97% Gold Trading Platform
 // All data fetched from Firebase siteData collection
 // ============================================
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
-import { HashRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './styles/styles.css';
 import './styles/responsive-overrides.css';
-import SantaLogo from './assets/images/SantaLogo.jpg';
+// To revert to the old logo: import SantaLogoNew from './assets/images/SantaLogo.jpg';
+import SantaLogoNew from './assets/images/SantaLogoNew.webp';
 import { Analytics } from "@vercel/analytics/react";
 
 // Page imports
@@ -17,17 +18,27 @@ import YouTube from './pages/YouTube';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import TradingDashboard from './pages/TradingDashboard';
+import Login from './pages/Login';
+import Members from './pages/Members';
+import Core from './pages/Core';
+import LiveStream from './pages/LiveStream';
+
+// Auth
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // ✅ Firebase
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from './services/firebase';
+import { log } from './utils/logger';
 
+const SantaLogo = SantaLogoNew; 
 const LOADING_STATS = {
   dd: '...',
-  winRate: '...',
   tradingwinRate: '...',
   tradingloseRate: '...',
   totalTrades: '...',
+  pnl: 0,
   profitFactor: '...',
   since: '...',
   subscribers: '...',
@@ -44,7 +55,6 @@ const LOADING_STATS = {
 const LOADING_PERFORMANCE = {
   dd: '...',
   profitFactor: '...',
-  tradeSuccessRate: '...',
   maxPointsPerSignal: '...',
   maxLossPoints: '...',
   backtestedSince: '...',
@@ -52,8 +62,6 @@ const LOADING_PERFORMANCE = {
   totalTrades: 0,
   totalWins: 0,
   totalLosses: 0,
-  winRate: '...',
-  lossRate: '...',
   maxConsecutiveWins: 0
 };
 
@@ -167,7 +175,7 @@ const FirebaseDataProvider = ({ children }) => {
         }
 
         const data = docSnap.data();
-        console.log('Fetched trading stats (live):', data);
+        log('Fetched trading stats (live):', data);
 const images = Array.isArray(data.tradeViewChartImages)
   ? data.tradeViewChartImages.filter(Boolean)
   : [];
@@ -179,7 +187,7 @@ const images = Array.isArray(data.tradeViewChartImages)
         // ✅ WIN RATE based on trading losses
         const tradingwinRate =
           totalTradesNum > 0
-            ? (((totalTradesNum - totalLosestradingNum) / totalTradesNum) * 100).toFixed(2) + '%'
+            ? (((totalTradesNum - totalLosestradingNum) / totalTradesNum) * 100).toFixed(2)
             : '0.00';
 
         const tradingloseRate =
@@ -188,7 +196,6 @@ const images = Array.isArray(data.tradeViewChartImages)
             : '0.00';
 
       setStats({
-  winRate: data.winRate ? `${data.winRate}%` : '',
   tradingwinRate,
   tradingloseRate,
   totalTrades: totalTradesNum ? `${totalTradesNum}` : '',
@@ -201,6 +208,7 @@ const images = Array.isArray(data.tradeViewChartImages)
   targetProfit: data.targetProfit ? `${data.targetProfit}` : '',
   targetLoses: data.targetLoses ? `${data.targetLoses}` : '',
   dd: data.dd ? `${data.dd}%` : '',
+  pnl: data.pnl != null ? `${Number(data.pnl).toFixed(2)}%` : '0.00',
   profitFactor: data.profitFactor ? `${Number(data.profitFactor).toFixed(2)}` : '',
   updatedAt: data.updatedAt || null,
 
@@ -225,7 +233,7 @@ const images = Array.isArray(data.tradeViewChartImages)
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log('Fetched performance history:', data);
+          log('Fetched performance history:', data);
 
           const totalWins = Number(data.totalWins) || 0;
           const maxConsecutiveWins = Number(data.maxConsecutiveWins) || 0;
@@ -233,16 +241,12 @@ const images = Array.isArray(data.tradeViewChartImages)
           const totalLosses = Number(data.totalLosses) || 0;
           const totalTrades = totalWins + totalLosses;
 
-          const winRate = totalTrades > 0 ? ((totalWins / totalTrades) * 100).toFixed(2) : '0.00';
-          const lossRate = totalTrades > 0 ? ((totalLosses / totalTrades) * 100).toFixed(2) : '0.00';
-
-          const totalWinsPresnt =
-            (data.maxProfit + data.totalLosses) > 0
-              ? ((data.maxProfit / (data.maxProfit + data.totalLosses)) * 100).toFixed(2)
-              : '0.00';
+          // Win rate is not computed here — stats.tradingwinRate (from the
+          // tradingStats document) is the single source of truth sitewide,
+          // so this document doesn't maintain a second, independent formula
+          // that can drift out of sync with it.
 
           setPerformance({
-            tradeSuccessRate: winRate ? `${winRate}%` : '',
             maxPointsPerSignal: data.maxProfit?.toString() || '',
             maxLossPoints: data.maxLoss?.toString() || '',
             backtestedSince: data.backtestSince?.toString() || '',
@@ -251,10 +255,7 @@ const images = Array.isArray(data.tradeViewChartImages)
             timeframe: data.timeframe || '',
             totalTrades,
             totalWins,
-            totalWinsPresnt: totalWinsPresnt ? `${totalWinsPresnt}%` : '',
             totalLosses,
-            winRate,
-            lossRate,
             maxConsecutiveWins,
 
             dd: data.dd != null ? `${data.dd}%` : '',
@@ -282,7 +283,7 @@ const images = Array.isArray(data.tradeViewChartImages)
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log('Fetched owner details:', data);
+          log('Fetched owner details:', data);
 
           if (data.contact) {
             setContact({
@@ -310,10 +311,10 @@ const images = Array.isArray(data.tradeViewChartImages)
 
           if (data.youTubeids && Array.isArray(data.youTubeids)) {
             setYouTubeids(data.youTubeids);
-            console.log('Fetched YouTube IDs:', data.youTubeids);
+            log('Fetched YouTube IDs:', data.youTubeids);
           } else {
             setYouTubeids([]);
-            console.log('No youTubeids array found in ownerDetails');
+            log('No youTubeids array found in ownerDetails');
           }
         } else {
           console.error('No ownerDetails document found in siteData!');
@@ -335,14 +336,14 @@ const images = Array.isArray(data.tradeViewChartImages)
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-          console.log('Fetched site config:', data);
+          log('Fetched site config:', data);
 
           setConfig({
             siteName: data.siteName || '97% Gold',
             tagline: data.tagline || 'Professional Gold Trading Strategy'
           });
         } else {
-          console.log('No siteConfig document found, using defaults');
+          log('No siteConfig document found, using defaults');
           setConfig(LOADING_CONFIG);
         }
       } catch (err) {
@@ -357,7 +358,7 @@ const images = Array.isArray(data.tradeViewChartImages)
     fetchOwnerDetails();
     fetchSiteConfig();
 
-    // ✅ cleanup listener
+
     return () => {
       unsubTradingStats();
     };
@@ -377,44 +378,31 @@ const images = Array.isArray(data.tradeViewChartImages)
 };
 
 // ============================================
-// SANTA LOGO WITH GLITTER + SHIMMER EFFECTS
-// ============================================
-const SantaLogoGlitter = ({ className = '' }) => {
-  const glitters = Array.from({ length: 18 }, (_, i) => {
-    const size = 2 + Math.random() * 4;
-    return {
-      key: i,
-      style: {
-        width: `${size}px`,
-        height: `${size}px`,
-        top: `${Math.random() * 100}%`,
-        left: `${Math.random() * 100}%`,
-        animationDuration: `${1.5 + Math.random() * 2}s`,
-        animationDelay: `${Math.random() * 3}s`,
-      },
-    };
-  });
-
-  return (
-    <span className={`logo-container logo-glitter-field ${className}`}>
-      <img src={SantaLogo} className="app-logo" alt="97% Gold Logo" />
-      <span className="glitter-layer" aria-hidden="true">
-        {glitters.map(g => (
-          <span key={g.key} className="glitter" style={g.style} />
-        ))}
-      </span>
-      <span className="shimmer-layer" aria-hidden="true">
-        <span className="shimmer-sweep" />
-      </span>
-    </span>
-  );
-};
-
-// ============================================
 // HEADER COMPONENT
 // ============================================
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // ✨ Effect #7: Glitter + Shimmer Hybrid
+  const [glitters, setGlitters] = useState([]);
+
+  useEffect(() => {
+    const COUNT = 28;
+    const dots = Array.from({ length: COUNT }, (_, i) => {
+      const size = 3 + Math.random() * 3;
+      return {
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size,
+        delay: Math.random() * 3,
+        duration: 0.8 + Math.random() * 0.8,
+      };
+    });
+    setGlitters(dots);
+  }, []);
+
+  const { user, logout } = useAuth();
 
   const navLinks = [
     { to: '/', label: 'Home' },
@@ -423,25 +411,63 @@ const Header = () => {
     { to: '/pricing', label: 'Pricing' },
     { to: '/youtube', label: 'YouTube' },
     { to: '/about', label: 'About' },
-    { to: '/contact', label: 'Contact' }
+    { to: '/contact', label: 'Contact' },
+    user
+      ? { to: '/members', label: 'My Account', member: true }
+      : { to: '/login', label: 'Member Login', member: true }
   ];
 
   return (
     <header className="app-header">
-      <NavLink to="/" className="header-logo-link" aria-label="Go to home">
-        <SantaLogoGlitter className="header-logo-glitter" />
+      <NavLink to="/" className="logo-container logo-glitter-field" aria-label="Go to home">
+        {/* Layer 1: Shimmer sweep (below logo) */}
+        <div className="shimmer-layer" aria-hidden="true">
+          <div className="shimmer-sweep" />
+        </div>
+
+        {/* Layer 2: Glitter dots (above logo) */}
+        <div className="glitter-layer" aria-hidden="true">
+          {glitters.map(g => (
+            <span
+              key={g.id}
+              className="glitter"
+              style={{
+                left: `${g.x}%`,
+                top: `${g.y}%`,
+                width: `${g.size}px`,
+                height: `${g.size}px`,
+                animationDelay: `${g.delay}s`,
+                animationDuration: `${g.duration}s`,
+              }}
+            />
+          ))}
+        </div>
+
+        <img src={SantaLogo} className="app-logo" alt="97% Gold Logo" />
       </NavLink>
 
       <nav className="app-nav">
-        {navLinks.map(link => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''}`}
-          >
-            {link.label}
-          </NavLink>
-        ))}
+        <div className="account-nav-group">
+          {navLinks.map(link => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''}`}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+
+          {user && (
+            <button
+              type="button"
+              className="nav-signout"
+              onClick={logout}
+            >
+              Sign out
+            </button>
+          )}
+        </div>
       </nav>
 
       <button
@@ -458,12 +484,25 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''}`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
             </NavLink>
           ))}
+
+          {user && (
+            <button
+              type="button"
+              className="nav-signout nav-signout-mobile"
+              onClick={() => {
+                logout();
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Sign out
+            </button>
+          )}
         </nav>
       )}
     </header>
@@ -484,25 +523,7 @@ const Footer = () => {
       <div className="footer-container">
         <div className="footer-section">
           <div className="footer-logo">
-            <span className="logo-container logo-glitter-field footer-logo-glitter">
-              <img src={SantaLogo} className="footer-logo-image" alt="97% Gold Logo" />
-              <span className="glitter-layer" aria-hidden="true">
-                {Array.from({ length: 10 }, (_, i) => {
-                  const size = 1.5 + Math.random() * 2.5;
-                  return (
-                    <span key={i} className="glitter" style={{
-                      width: `${size}px`, height: `${size}px`,
-                      top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%`,
-                      animationDuration: `${1.5 + Math.random() * 2}s`,
-                      animationDelay: `${Math.random() * 3}s`,
-                    }} />
-                  );
-                })}
-              </span>
-              <span className="shimmer-layer" aria-hidden="true">
-                <span className="shimmer-sweep" />
-              </span>
-            </span>
+            <img src={SantaLogo} className="footer-logo-image" alt="97% Gold Logo" loading="lazy" />
             <h3 className="footer-brand-title">{config.siteName}</h3>
           </div>
           <p className="footer-tagline">{stats.tagline || config.tagline}</p>
@@ -565,7 +586,8 @@ const Footer = () => {
 function App() {
   return (
     <FirebaseDataProvider>
-      <HashRouter>
+      <AuthProvider>
+      <BrowserRouter>
         <div className="app">
           <Header />
           <main className="main">
@@ -577,13 +599,35 @@ function App() {
               <Route path="/youtube" element={<YouTube />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/members"
+                element={
+                  <ProtectedRoute>
+                    <Members />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/core"
+                element={
+                  <ProtectedRoute requireActive>
+                    <Core />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/live"
+                element={<LiveStream />}
+              />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
           <Footer />
         </div>
         <Analytics />
-      </HashRouter>
+      </BrowserRouter>
+      </AuthProvider>
     </FirebaseDataProvider>
   );
 }

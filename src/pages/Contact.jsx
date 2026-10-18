@@ -3,6 +3,7 @@
 // ============================================
 import React, { useState } from 'react';
 import { useOwnerDetails } from '../App';
+import Seo from '../components/Seo';
 import OferWhite from '../assets/images/oferWhite.jpg';
 
 function Contact() {
@@ -22,7 +23,6 @@ function Contact() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Build mailto link with form data
     const subject = encodeURIComponent(`[${formData.subject}] Message from ${formData.name}`);
     const body = encodeURIComponent(
       `Name: ${formData.name}\n` +
@@ -75,15 +75,94 @@ function Contact() {
   if (loading) {
     return (
       <div className="strategy-page">
+        <Seo
+          title="Contact — 97% Gold"
+          description="Get in touch with 97% Gold via WhatsApp or email for questions about XAUUSD trading signals."
+          path="/contact"
+        />
         <section className="strategy-section text-center">
           <p className="strategy-subtitle">Loading contact information...</p>
         </section>
+{/* Contact Form */}
+      <section className="strategy-section">
+        <div className="strategy-principle-card contact-form-card">
+          {submitted ? (
+            <div className="text-center">
+              <h2 className="strategy-card-title">Message ready ✉️</h2>
+              <p className="strategy-principle-text">
+                Your email app should have opened with the message. If nothing happened,
+                reach me directly on WhatsApp above.
+              </p>
+            </div>
+          ) : (
+            <>
+              <h2 className="strategy-card-title text-center">Send a Message</h2>
+
+              <div className="contact-form">
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Your name"
+                  className="contact-input"
+                  required
+                />
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Your email"
+                  className="contact-input"
+                  required
+                />
+                <select
+                  name="subject"
+                  value={formData.subject}
+                  onChange={handleChange}
+                  className="contact-input"
+                >
+                  <option>General Inquiry</option>
+                  <option>Free Trial</option>
+                  <option>Subscription</option>
+                  <option>Technical Support</option>
+                </select>
+                <textarea
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  placeholder="Your message"
+                  rows={5}
+                  className="contact-input"
+                  required
+                />
+
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={isSubmitting || !formData.name || !formData.email || !formData.message}
+                  className="strategy-btn strategy-btn-primary"
+                >
+                  {isSubmitting ? 'Sending…' : 'Send Message'}
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </section>
       </div>
     );
   }
 
   return (
     <div className="strategy-page">
+      <Seo
+        title="Contact — 97% Gold"
+        description="Get in touch with 97% Gold via WhatsApp or email for questions about XAUUSD trading signals."
+        path="/contact"
+      />
+
       {/* Hero with Image */}
       <section className="strategy-section text-center">
         <h1 className="get-in-touch-title get-in-touch-title--shimmer">

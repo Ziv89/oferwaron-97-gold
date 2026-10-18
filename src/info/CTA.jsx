@@ -14,7 +14,7 @@ const CTA = () => {
     {
       name: "Ofer Waron",
       role: "Lead Strategist & Founder",
-      bio: `Investment specialist and architect of the 97% Gold strategy with 16 years of trading experience since ${performance.experienceSince}.`,
+      bio: `Investment specialist and architect of the 97% Gold strategy with 16 years of trading experience since ${experienceSince}.`,
       avatar: oferBlack,
     },
   ];
@@ -34,37 +34,43 @@ const CTA = () => {
 
   return (
     <div className="cta-section">
-      <div className="about-me-block">
-        <div className="text-center">
-          <p className="strategy-subtitle" style={{ marginBottom: "1.5rem" }}>
-            I'm <strong>Ofer Waron</strong>, an investment specialist. I provide paid
-            consulting services through my WhatsApp signals group to help you grow your money wisely
-            through disciplined investment strategies.
-          </p>
-        </div>
+      {/* Scrollable content area */}
+      <div className="about-panel-scroll">
+        <div className="about-me-block">
+          <div className="text-center">
+            <p className="strategy-subtitle" style={{ marginBottom: "1.5rem" }}>
+              I'm <strong>Ofer Waron</strong>, an investment specialist. I provide paid
+              consulting services through my WhatsApp signals group to help you grow your money wisely
+              through disciplined investment strategies.
+            </p>
+          </div>
 
-        <div className="team-grid">
-          {team.map((member, i) => (
-            <div key={i} className="strategy-rule-card team-card">
-              <div className="team-avatar">
-                <img
-                  src={member.avatar}
-                  alt={member.name}
-                  className="team-avatar-img"
-                />
+          <div className="team-grid">
+            {team.map((member, i) => (
+              <div key={i} className="strategy-rule-card team-card">
+                <div className="team-avatar">
+                  <img
+                    src={member.avatar}
+                    alt={member.name}
+                    className="team-avatar-img"
+                  />
+                </div>
+
+                <h3 className="strategy-rule-title">{member.name}</h3>
+                <p className="team-role">{member.role}</p>
+
+                <p className="strategy-rule-desc">
+                  {perfLoading ? "Loading..." : member.bio}
+                </p>
               </div>
-
-              <h3 className="strategy-rule-title">{member.name}</h3>
-              <p className="team-role">{member.role}</p>
-
-              <p className="strategy-rule-desc">
-                {perfLoading ? "Loading..." : member.bio}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
+      </div>
 
-        <div className="strategy-btn-group" style={{ marginTop: "2rem" }}>
+      {/* Buttons pinned at bottom */}
+      <div className="about-panel-footer">
+        <div className="strategy-btn-group">
           <button onClick={openCV} className="strategy-btn strategy-btn-secondary">
             <FaFileAlt /> View PDF
           </button>
@@ -76,8 +82,6 @@ const CTA = () => {
           </button>
         </div>
       </div>
-
-      <hr className="section-divider" />
     </div>
   );
 };

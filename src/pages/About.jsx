@@ -1,16 +1,15 @@
 // ============================================
-// About.jsx - Combined About Page with Interactive CTA
+// About.jsx - Single shared container, content crossfades
+// Coin stays right side with float animation
 // ============================================
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Tooltip } from 'react-tooltip';
-import 'react-tooltip/dist/react-tooltip.css';
+import Seo from '../components/Seo';
 
 import CTA from '../info/CTA';
 import DirectCTA from '../info/directCTA';
 
 import goldenCoin from '../assets/images/goldenface.png';
-import oferBlack from '../assets/images/oferBlack.jpg';
 
 function About() {
   const [showDirectCTA, setShowDirectCTA] = useState(false);
@@ -25,44 +24,50 @@ function About() {
     { icon: '🤝', title: 'Community', desc: "My success is measured by my members' success." }
   ];
 
-
+  const coinClass = showDirectCTA
+    ? 'gold-coin-icon coin-right coin-active'
+    : 'gold-coin-icon coin-right coin-float';
 
   return (
     <div className="strategy-page">
+      <Seo
+        title="About — 97% Gold"
+        description="Meet Ofer Waron, the trader behind 97% Gold's XAUUSD signals, and the values driving the strategy."
+        path="/about"
+      />
+
       <section className="about-hero-container">
-        
-        {/* Gold Coin */}
-<img
-  src={goldenCoin}
-  alt="Golden Coin"
-  className={`gold-coin-icon ${showDirectCTA ? 'coin-active' : ''}`}
-  data-tooltip-id="gold-coin-tooltip"
-  // data-tooltip-content={showDirectCTA ? 'Click to close' : 'Click to view'}
-  // data-tooltip-place={showDirectCTA ? 'right' : 'right'}
-  // data-tooltip-offset={-200}
-  onClick={handleCoinClick}
-/>
 
-        {/* Tooltip */}
-        <Tooltip id="gold-coin-tooltip" />
+        {/* Title — always visible, outside the container */}
+        <h1 className="highlight-title get-in-touch-title get-in-touch-title--shimmer">
+          <span className="get-in-touch-shimmer">
+            About Me &amp; Professional Summary
+          </span>
+        </h1>
 
-        {/* Main Content Panel */}
-        <div className={`about-main-panel ${showDirectCTA ? 'panel-hidden' : ''}`}>
-          <div className="about-hero-content">
-<h1 className="highlight-title get-in-touch-title get-in-touch-title--shimmer">
-  <span className="get-in-touch-shimmer">
-    About Me & Professional Summary
-  </span>
-</h1>
-            <CTA />
-          </div>
-        </div>
+        {/* Panel wrapper — holds the shared container + coin */}
+        <div className="about-panels-wrapper">
 
-        {/* Direct CTA Panel */}
-        <div className={`about-detail-panel ${showDirectCTA ? 'panel-visible' : ''}`}>
-          <div className="about-hero-content">
-            {/* <h1 className="highlight-title">About Me & Professional Summary</h1> */}
-            <DirectCTA />
+          <img
+            src={goldenCoin}
+            alt="Golden Coin"
+            className={coinClass}
+            onClick={handleCoinClick}
+          />
+
+          {/* Single shared container — both faces stacked */}
+          <div className="about-panel-container">
+
+            {/* Face 1: CTA */}
+            <div className={`about-panel-face face-cta ${showDirectCTA ? 'face-hidden' : 'face-visible'}`}>
+              <CTA />
+            </div>
+
+            {/* Face 2: DirectCTA */}
+            <div className={`about-panel-face face-direct ${showDirectCTA ? 'face-visible' : 'face-hidden'}`}>
+              <DirectCTA />
+            </div>
+
           </div>
         </div>
       </section>

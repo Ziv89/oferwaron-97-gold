@@ -5,6 +5,7 @@
 // ============================================
 import React, { useState, useMemo } from 'react';
 import { useSiteConfig, useOwnerDetails } from '../App';
+import Seo from '../components/Seo';
 
 // ============================================
 // VIDEO CARD COMPONENT
@@ -103,7 +104,7 @@ function YouTube() {
   const [activeVideo, setActiveVideo] = useState(null);
   
   // Get data from Firebase
-  const { config, loading: configLoading } = useSiteConfig();
+  const { loading: configLoading } = useSiteConfig();
   const { social, youTubeids, loading: ownerLoading } = useOwnerDetails();
 
   const loading = configLoading || ownerLoading;
@@ -129,6 +130,11 @@ function YouTube() {
   if (loading) {
     return (
       <div className="page youtube-page">
+        <Seo
+          title="YouTube Videos — 97% Gold"
+          description="Watch trading insights, market analysis and tutorials from 97% Gold on YouTube."
+          path="/youtube"
+        />
         <LoadingSkeleton />
       </div>
     );
@@ -138,6 +144,11 @@ function YouTube() {
   if (!featuredVideo && gridVideos.length === 0) {
     return (
       <div className="page youtube-page">
+        <Seo
+          title="YouTube Videos — 97% Gold"
+          description="Watch trading insights, market analysis and tutorials from 97% Gold on YouTube."
+          path="/youtube"
+        />
         <EmptyState channelUrl={YOUTUBE_CHANNEL} />
       </div>
     );
@@ -145,6 +156,12 @@ function YouTube() {
 
   return (
     <div className="page youtube-page">
+      <Seo
+        title="YouTube Videos — 97% Gold"
+        description="Watch trading insights, market analysis and tutorials from 97% Gold on YouTube."
+        path="/youtube"
+      />
+
       {/* Page Header */}
       <section className="youtube-header">
       <h1 className="strategy-main-title get-in-touch-title get-in-touch-title--shimmer">

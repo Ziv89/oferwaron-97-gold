@@ -9,8 +9,8 @@ module.exports = async (req, res) => {
     const isSignedIn = Boolean(req.headers.authorization);
     if (isSignedIn) await requireSignedInUser(req);
 
-    const { live, replays } = await getLiveInputOverview();
-    return res.status(200).json({ live, replays: isSignedIn ? replays : [] });
+    const { live, ingest, replays } = await getLiveInputOverview();
+    return res.status(200).json({ live, ingest, replays: isSignedIn ? replays : [] });
   } catch (error) {
     return sendError(res, error);
   }

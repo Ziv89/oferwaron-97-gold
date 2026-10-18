@@ -43,8 +43,14 @@ async function requireSignedInUser(req) {
 function sendError(res, error) {
   const status = error.status || 500;
   if (status >= 500) console.error('[stream api]', error);
+  const message = error.message === 'Server is missing Firebase admin credentials.'
+    ? 'Streaming setup is incomplete. Configure FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, and FIREBASE_PRIVATE_KEY on the server.'
+    : status >= 500
+      ? 'Streaming is temporarily unavailable.'
+      : error.message;
+
   return res.status(status).json({
-    error: status >= 500 ? 'Streaming is temporarily unavailable.' : error.message,
+    error: message,
   });
 }
 

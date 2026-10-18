@@ -54,18 +54,28 @@ async function getLiveInputOverview() {
 
   const accountId = env('CLOUDFLARE_ACCOUNT_ID');
   const liveInputUid = env('CLOUDFLARE_LIVE_INPUT_UID');
-  const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs/${liveInputUid}/videos`,
-    { headers: { Authorization: `Bearer ${env('CLOUDFLARE_STREAM_API_TOKEN')}` } }
-  );
-  const body = await response.json().catch(() => ({}));
+  const baseUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/live_inputs/${liveInputUid}`;
+  const options = { headers: { Authorization: `Bearer ${env('CLOUDFLARE_STREAM_API_TOKEN')}` } };
+  const [inputResponse, videosResponse] = await Promise.all([
+    fetch(baseUrl, options),
+    fetch(`${baseUrl}/videos`, options),
+  ]);
+  const [inputBody, videosBody] = await Promise.all([
+    inputResponse.json().catch(() => ({})),
+    videosResponse.json().catch(() => ({})),
+  ]);
 
-  if (!response.ok || !body.success) {
-    throw new HttpError(502, `Cloudflare API error: ${body.errors?.[0]?.message || response.status}`);
+  if (!inputResponse.ok || !inputBody.success) {
+    throw new HttpError(502, `Cloudflare API error: ${inputBody.errors?.[0]?.message || inputResponse.status}`);
+  }
+  if (!videosResponse.ok || !videosBody.success) {
+    throw new HttpError(502, `Cloudflare API error: ${videosBody.errors?.[0]?.message || videosResponse.status}`);
   }
 
-  const videos = Array.isArray(body.result) ? body.result : [];
-  const live = videos.some((video) => video.status?.state === 'live-inprogress');
+  const videos = Array.isArray(videosBody.result) ? videosBody.result : [];
+  const currentStatus = inputBody.result?.status?.current || {};
+  const live = currentStatus.state === 'connected' ||
+    videos.some((video) => video.status?.state === 'live-inprogress');
   const replays = videos
     .filter((video) => video.status?.state === 'ready' && video.readyToStream)
     .sort((first, second) => new Date(second.created) - new Date(first.created))
@@ -79,7 +89,16 @@ async function getLiveInputOverview() {
 
   statusCache = {
     at: Date.now(),
-    value: { live, replays, replayIds: new Set(replays.map((replay) => replay.uid)) },
+    value: {
+      live,
+      ingest: {
+        state: currentStatus.state || 'unknown',
+        reason: currentStatus.reason || '',
+        protocol: currentStatus.ingestProtocol || '',
+      },
+      replays,
+      replayIds: new Set(replays.map((replay) => replay.uid)),
+    },
   };
   return statusCache.value;
 }

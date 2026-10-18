@@ -53,7 +53,7 @@ Reuse existing values if those Firebase variables already exist in Vercel. Paste
 
 The Cloudflare token is used by the setup script and to read current/replay status. Playback URLs are signed locally with the signing key, so `/api/stream-token` does not call Cloudflare for every viewer. After setup is complete, you can replace the token with a **Stream Read-only** token; the setup script needs Stream Write only when creating/updating the input or creating a signing key.
 
-For local testing, keep these settings in the ignored `.env.local`. After the setup script creates the live input and signing key, add its `CLOUDFLARE_LIVE_INPUT_UID`, `CLOUDFLARE_SIGNING_KEY_ID`, and `CLOUDFLARE_SIGNING_KEY_PEM` values there as well as in Vercel. Do not store the OBS stream key in this project; enter it only in OBS. Vercel API functions are not served by `npm start`; run them with `npx vercel dev`.
+For local testing, keep these settings in the ignored `.env.local`. After the setup script creates the live input and signing key, add its `CLOUDFLARE_LIVE_INPUT_UID`, `CLOUDFLARE_SIGNING_KEY_ID`, and `CLOUDFLARE_SIGNING_KEY_PEM` values there as well as in Vercel. Also add `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY` to `.env.local`; authenticated stream requests cannot verify users without them. Keep the private key local and never commit it. Do not store the OBS stream key in this project; enter it only in OBS. Vercel API functions are not served by `npm start`; run them with `npx vercel dev`.
 
 ## 4. Configure OBS and test
 
@@ -85,5 +85,6 @@ The page shows scheduled documents in the upcoming section. It does not need doc
 - If the status endpoint returns an authorization error, confirm the API token has **Stream Read**. If setup fails creating a live input/signing key, confirm it also has **Stream Write**.
 - If playback fails, verify `CLOUDFLARE_STREAM_CUSTOMER_CODE`, `CLOUDFLARE_SIGNING_KEY_ID`, and `CLOUDFLARE_SIGNING_KEY_PEM` match the same Cloudflare account and saved signing key.
 - If the API token or OBS stream key was exposed, rotate it in Cloudflare and update the relevant environment variable.
+- If the page reports `OBS disconnected from Cloudflare`, open the live input in Cloudflare and confirm OBS is connected. In OBS, use **Settings → Stream → Custom** with the RTMPS server and stream key for this exact live input, then click **Start Streaming**. A `client disconnect` status means OBS connected and then ended its ingest session.
 
 Cloudflare references: [Start a live stream](https://developers.cloudflare.com/stream/stream-live/start-stream-live/), [Watch a live stream](https://developers.cloudflare.com/stream/stream-live/watch-live-stream/), and [Secure your Stream](https://developers.cloudflare.com/stream/viewing-videos/securing-your-stream/).

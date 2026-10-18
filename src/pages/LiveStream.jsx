@@ -20,6 +20,7 @@ const eventDate = (value) => {
 export default function LiveStream({ autoSelectLive = false, pagePath = '/live' }) {
   const { user, isActive } = useAuth();
   const [isLive, setIsLive] = useState(false);
+  const [ingestStatus, setIngestStatus] = useState(null);
   const [replays, setReplays] = useState([]);
   const [statusLoaded, setStatusLoaded] = useState(false);
   const [statusError, setStatusError] = useState('');
@@ -56,10 +57,14 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
         const result = await streamFetch('/api/stream-status');
         if (cancelled) return;
         setIsLive(Boolean(result.live));
+        setIngestStatus(result.ingest || null);
         setReplays(result.replays || []);
         setStatusError('');
       } catch (error) {
-        if (!cancelled) setStatusError(error.message);
+        if (!cancelled) {
+          setStatusError(error.message);
+          setIngestStatus(null);
+        }
       } finally {
         if (!cancelled) setStatusLoaded(true);
       }
@@ -232,6 +237,11 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
               <span className="live-dot" aria-hidden="true" />
               {isLive ? 'Live now' : 'Offline'}
             </span>
+            {!isLive && ingestStatus?.state === 'disconnected' && (
+              <p className="live-player-error">
+                OBS disconnected from Cloudflare{ingestStatus.reason ? ` (${ingestStatus.reason.replace(/_/g, ' ')})` : ''}.
+              </p>
+            )}
 
             {isLive && selected !== 'live' && (
               <button className="live-watch-button" type="button" onClick={() => pick('live')}>

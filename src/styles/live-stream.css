@@ -1,0 +1,360 @@
+.live-page {
+  max-width: 1120px;
+}
+
+.live-gate {
+  display: grid;
+  place-items: center;
+  min-height: 420px;
+  padding: 40px 20px;
+}
+
+.live-gate-card {
+  width: min(720px, 100%);
+  padding: clamp(24px, 5vw, 44px);
+  text-align: center;
+  border: 1px solid rgba(255, 215, 0, 0.5);
+  border-radius: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.07), rgba(255,215,0,0.04));
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.18), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.live-page-header {
+  padding: 20px 0 28px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 215, 0, 0.28);
+}
+
+.live-page-kicker {
+  margin: 0 0 8px;
+  color: #d39b00;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.live-page-header .strategy-section-title {
+  margin: 0 0 10px;
+}
+
+.live-dashboard-title {
+  margin: 4px auto 12px;
+}
+
+.live-dashboard-title .get-in-touch-shimmer {
+  display: inline-block;
+}
+
+.live-player-section,
+.live-events-section {
+  padding: 30px 0;
+}
+
+.live-player-section {
+  padding-top: 24px;
+}
+
+.live-player-heading,
+.live-events-heading-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.live-player-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.live-player-heading h2,
+.live-events-heading-row h2 {
+  margin: 0;
+  color: #181818;
+  font-size: 1.35rem;
+}
+
+.live-event-description {
+  color: #555;
+}
+
+.live-player-frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: radial-gradient(ellipse at center, #202020 0%, #0a0a0a 72%);
+  border: 1px solid rgba(199, 153, 32, 0.55);
+  border-radius: 8px;
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+}
+
+.live-player-frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.live-player-message {
+  display: grid;
+  gap: 8px;
+  width: min(520px, calc(100% - 32px));
+  padding: 18px 20px;
+  border: 1px solid rgba(255, 215, 0, 0.34);
+  border-left: 3px solid #d0a21c;
+  border-radius: 6px;
+  background: rgba(12, 12, 12, 0.92);
+  color: #f4ecd4;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  text-align: center;
+  z-index: 1;
+}
+
+.live-player-message strong {
+  color: #f1cc5a;
+  font-size: 1rem;
+}
+
+.live-player-error {
+  color: #a52828;
+}
+
+.live-frame-error {
+  border-color: rgba(190, 77, 57, 0.65);
+  border-left-color: #c85a45;
+}
+
+.live-frame-error strong {
+  color: #f0a08e;
+}
+
+.live-event-note,
+.live-empty-state {
+  color: #666;
+}
+
+.live-events-heading-row {
+  padding-bottom: 12px;
+  border-bottom: 2px solid #222;
+}
+
+.live-events-heading-row > span {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.live-event-row {
+  display: grid;
+  grid-template-columns: minmax(145px, 0.7fr) minmax(0, 2fr) auto;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 4px;
+  border-bottom: 1px solid #ddd;
+}
+
+.live-event-date {
+  color: #555;
+  font-size: 0.92rem;
+}
+
+.live-event-copy h3 {
+  margin: 8px 0 4px;
+  color: #181818;
+  font-size: 1.05rem;
+}
+
+.live-event-copy p {
+  margin: 0;
+  color: #666;
+}
+
+.live-status {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 24px;
+  padding: 3px 8px;
+  border: 1px solid #bbb;
+  border-radius: 4px;
+  color: #444;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.live-status-live {
+  border-color: #2e8b57;
+  background: #e8f5ed;
+  color: #176b3a;
+}
+
+.live-status-offline {
+  border-color: #c94a4a;
+  background: #fbecec;
+  color: #a52828;
+}
+
+.live-status-scheduled {
+  border-color: #bd9100;
+  color: #725800;
+}
+
+.live-status-ended {
+  border-color: #68876d;
+  color: #45634a;
+}
+
+.live-watch-button {
+  min-height: 40px;
+  padding: 8px 14px;
+  border: 1px solid #181818;
+  border-radius: 4px;
+  background: #181818;
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.live-watch-button:hover {
+  background: #343434;
+}
+
+.live-watch-button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.live-now-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px 16px;
+  padding: 18px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.live-now-bar p {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #555;
+}
+
+.live-now-bar .live-status {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.live-now-bar .live-watch-button {
+  grid-column: 3;
+  justify-self: end;
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  margin-right: 6px;
+  border-radius: 50%;
+}
+
+.live-status-live .live-dot {
+  background: #25834b;
+  animation: live-pulse 1.4s ease-in-out infinite;
+}
+
+.live-status-offline .live-dot {
+  background: #c33b3b;
+}
+
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.35; transform: scale(0.8); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot { animation: none; }
+}
+
+@media (max-width: 560px) {
+  .live-now-bar {
+    grid-template-columns: 1fr;
+  }
+
+  .live-now-bar .live-status,
+  .live-now-bar .live-watch-button {
+    grid-column: 1;
+  }
+
+  .live-now-bar .live-status {
+    grid-row: 1;
+  }
+
+  .live-now-bar .live-watch-button {
+    grid-row: 2;
+    justify-self: center;
+  }
+}
+
+.live-fullscreen-button,
+.live-close-button {
+  min-height: 36px;
+  padding: 6px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: transparent;
+  color: #333;
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.live-fullscreen-button {
+  border-color: #d4a008;
+  background: rgba(255, 215, 0, 0.08);
+  color: #5a4300;
+  font-weight: 700;
+}
+
+.live-fullscreen-button:hover,
+.live-close-button:hover {
+  border-color: #181818;
+  transform: translateY(-1px);
+}
+
+.live-player-heading {
+  margin-bottom: 14px;
+}
+
+@media (max-width: 640px) {
+  .live-page-header {
+    padding: 14px 0 22px;
+  }
+
+  .live-dashboard-title {
+    font-size: 1.7rem;
+  }
+
+  .live-event-row {
+    grid-template-columns: 1fr auto;
+    gap: 10px 14px;
+  }
+
+  .live-event-date {
+    grid-column: 1 / -1;
+  }
+
+  .live-event-copy h3 {
+    font-size: 0.98rem;
+  }
+
+  .live-player-heading {
+    align-items: flex-start;
+  }
+}

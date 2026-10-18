@@ -1,66 +1,26 @@
 // ============================================
 // Pricing.jsx - Pricing Page (Strategy-style golden design)
 // ============================================
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useOwnerDetails } from '../App';
-import questionMarkCoin from '../assets/images/questionMarkCoin.png';
-
-const plans = [
-  {
-    name: 'Gold Signals',
-    price: 100,
-    period: 'month',
-    description: 'Monthly subscription — continue only if it works for you',
-    features: [
-      'Real-time signals (instant)',
-      'WhatsApp alerts',
-      'Entry, exit & stop-loss levels',
-      'Risk management guidance',
-      'Monthly performance reports',
-      'Access to all analysis'
-    ],
-    notIncluded: [],
-    cta: 'Get Access'
-  }
-];
-
-const faqs = [
-  {
-    q: 'How do I receive the signals?',
-    a: 'Signals are sent instantly via my WhatsApps Group.'
-  },
-  {
-    q: 'What broker should I use?',
-    a: "I don't work with or promote a specific broker. You should use a regulated broker that supports Gold (XAUUSD), tight spreads, and fast execution. Popular choices are brokers regulated in the EU, UK, or Australia. The final choice is yours."
-  },
-  {
-    q: 'How many signals do you send?',
-    a: 'Signals are quality-based, not quantity-based. On the 4H timeframe, usually 1–3 signals per week, depending on market conditions. Some weeks have more, some less — no forced trades.'
-  },
-  {
-    q: 'Is there a money-back guarantee?',
-    a: 'No, but you can decide not to continue the subscription at the end of each month.'
-  },
-  {
-    q: 'Can I cancel my subscription?',
-    a: 'Yes. You can cancel anytime and your subscription will remain active until the end of the billing period.'
-  },
-  {
-    q: 'Do you provide trading education?',
-    a: "Yes. I provide practical trading education focused on risk management, market structure, and how to trade signals correctly. Alongside the signals, I explain why the trade was taken, how to manage risk, and how to avoid overtrading. The goal is not blind signals, but understanding how to trade them responsibly."
-  }
-];
+import Seo from '../components/Seo';
+import { useOwnerDetails, useTradingStats } from '../App';
+import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
 
 function Pricing() {
-  const [openFaq, setOpenFaq] = useState(null);
-  
   // Get contact data from Firebase
   const { contact, loading } = useOwnerDetails();
+  const { stats } = useTradingStats();
+  const comingSoonImage = stats?.tradeViewChartImages?.[1] || '';
 
   if (loading) {
     return (
       <div className="strategy-page">
+        <Seo
+          title="Pricing — 97% Gold XAUUSD Signals"
+          description="View 97% Gold's subscription plans for real-time XAUUSD trading signals, WhatsApp alerts, and risk management guidance."
+          path="/pricing"
+        />
         <section className="strategy-section text-center">
           <p className="strategy-subtitle">Loading...</p>
         </section>
@@ -70,6 +30,17 @@ function Pricing() {
 
   return (
     <div className="strategy-page">
+      <Seo
+        title="Pricing — 97% Gold XAUUSD Signals"
+        description="View 97% Gold's subscription plans for real-time XAUUSD trading signals, WhatsApp alerts, and risk management guidance."
+        path="/pricing"
+      />
+
+      {/* Option 3: Free Trial Banner */}
+      <section className="strategy-section">
+
+      </section>
+
       {/* Pricing Card + FAQ Side by Side */}
       <section className="strategy-section">
         <div className="pricing-faq-layout">
@@ -88,69 +59,43 @@ function Pricing() {
                   src={questionMarkCoin}
                   alt="FAQ"
                   className="faq-coin"
+                  loading="lazy"
                 />
               </h2>
 
               <p className="strategy-subtitle text-center">Everything you need to know</p>
             </div>
-
-            <div className="faq-body">
-              <div className="faq-container">
-              {faqs.map((faq, i) => (
-                <div 
-                  key={i} 
-                  className={`faq-item ${openFaq === i ? 'faq-open' : ''}`}
-                  onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                >
-                  <div className="faq-question">
-                    <h3>{faq.q}</h3>
-                    <span className="faq-toggle">{openFaq === i ? '−' : '+'}</span>
-                  </div>
-                  {openFaq === i && (
-                    <div className="faq-answer">
-                      <p>{faq.a}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
-              </div>
-            </div>
           </div>
 
-          {/* Pricing Card - Right Side */}
+          {/* Pricing Cards - Right Side */}
           <div className="pricing-card-column">
-            {plans.map((plan, i) => (
-              <div key={i} className="strategy-pricing-card">
-                <div className="pricing-tier-badge">{plan.name}</div>
-                <div className="pricing-price-display">
-                  <span className="pricing-currency">$</span>
-                  <span className="pricing-amount">{plan.price}</span>
-                  <span className="pricing-period">/month</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Trading Dashboard - Coming Soon */}
+      <section className="strategy-section text-center">
+        <div className="trading-dashboard trading-dashboard-coming-soon">
+          <div className="coming-soon-image-section">
+            <div className="coming-soon-image-wrapper">
+              {comingSoonImage ? (
+                <img
+                  src={comingSoonImage}
+                  alt="97% Gold Strategy - Coming Soon"
+                  className="coming-soon-hero-image"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="coming-soon-image-placeholder">
+                  Coming Soon
                 </div>
-                <p className="strategy-subtitle" style={{ marginBottom: '1.5rem', fontSize: '1rem' }}>
-                  {plan.description}
-                </p>
+              )}
 
-                <ul className="pricing-features-list">
-                  {plan.features.map((feature, j) => (
-                    <li key={j}>
-                      <span className="feature-check">✓</span>
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-
-                <a 
-                  href={contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace('+', '')}?text=Hi! I'm interested in the ${plan.name} subscription ($${plan.price}/month)` : '#'}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="strategy-btn strategy-btn-primary"
-                  style={{ width: '100%', marginTop: '1.5rem' }}
-                >
-                  {plan.cta}
-                </a>
+              <div className="coming-soon-image-overlay">
+                <div className="overlay-content">
+                </div>
               </div>
-            ))}
+            </div>
           </div>
         </div>
       </section>

@@ -1,0 +1,1715 @@
+/* ============================================
+   RESPONSIVE OVERRIDES - Clean Implementation
+   Import this AFTER styles.css in App.js
+   Uses !important to override conflicting rules
+   ============================================ */
+
+/* ============================================
+   FOOTER - CONSISTENT 4-COLUMN DESKTOP LAYOUT
+   ============================================ */
+.footer {
+  background: rgba(0, 0, 0, 0.4) !important;
+  border-top: 1px solid #333 !important;
+  padding: 48px 24px 24px 24px !important;
+  margin-top: auto !important;
+}
+
+.footer-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: 1.5fr 1fr 1fr 1fr !important;
+  gap: 32px !important;
+  text-align: left !important;
+}
+
+.footer-section {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  align-items: flex-start !important;
+}
+
+.footer-logo {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  margin-bottom: 8px !important;
+  justify-content: flex-start !important;
+}
+
+.footer-logo-image {
+  width: 50px !important;
+  height: 50px !important;
+  min-width: 50px !important;
+  border-radius: 50% !important;
+  object-fit: cover !important;
+}
+
+.footer-bottom {
+  max-width: 1200px !important;
+  margin: 32px auto 0 !important;
+  padding-top: 24px !important;
+  border-top: 1px solid rgba(255, 215, 0, 0.25) !important;
+  text-align: center !important;
+}
+
+/* ============================================
+   PRICING PAGE - SIDE BY SIDE LAYOUT
+   ============================================ */
+.pricing-faq-layout {
+  display: grid !important;
+  
+  gap: 48px !important;
+  align-items: start !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 24px !important;
+}
+
+.pricing-faq-column {
+  min-width: 0 !important;
+  order: 1 !important;
+  width: auto !important;
+}
+
+.pricing-card-column {
+  order: 2 !important;
+  position: sticky !important;
+  top: 24px !important;
+  width: auto !important;
+}
+
+.pricing-card-column .strategy-pricing-card {
+  width: 100% !important;
+  padding: 24px !important;
+}
+
+.faq-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: 24px 0 0 0 !important;
+}
+
+/* ============================================
+   TABLET - 1024px
+   ============================================ */
+@media screen and (max-width: 1024px) {
+  .footer-container {
+    grid-template-columns: 1.2fr 1fr 1fr 1fr !important;
+    gap: 24px !important;
+  }
+  
+  .pricing-faq-layout {
+    grid-template-columns: 1fr 320px !important;
+    gap: 32px !important;
+  }
+}
+
+/* ============================================
+   TABLET PORTRAIT - 900px
+   ============================================ */
+@media screen and (max-width: 900px) {
+  /* Footer: 2 columns */
+  .footer-container {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 24px 32px !important;
+    text-align: left !important;
+  }
+  
+  .footer-section {
+    align-items: flex-start !important;
+  }
+  
+  .footer-logo {
+    justify-content: flex-start !important;
+  }
+  
+  /* Pricing: Stack vertically, card on top */
+  .pricing-faq-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 32px !important;
+    padding: 0 16px !important;
+  }
+  
+  .pricing-card-column {
+    position: static !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    order: 1 !important;
+  }
+  
+  .pricing-faq-column {
+    width: 100% !important;
+    order: 2 !important;
+  }
+  
+  .pricing-card-column .strategy-pricing-card {
+    max-width: 400px !important;
+    width: 100% !important;
+  }
+}
+
+/* ============================================
+   MOBILE - 768px
+   ============================================ */
+@media screen and (max-width: 768px) {
+  .footer {
+    padding: 32px 16px 16px 16px !important;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 20px 24px !important;
+    text-align: left !important;
+  }
+  
+  .footer-section {
+    align-items: flex-start !important;
+  }
+  
+  .footer-logo {
+    justify-content: flex-start !important;
+  }
+  
+  .footer-section-heading {
+    font-size: 1rem !important;
+  }
+  
+  .footer-link {
+    font-size: 0.9rem !important;
+  }
+  
+  .footer-logo-image {
+    width: 45px !important;
+    height: 45px !important;
+    min-width: 45px !important;
+  }
+  
+  .footer-brand-title {
+    font-size: 1.1rem !important;
+  }
+  
+  .footer-tagline,
+  .footer-since {
+    font-size: 0.85rem !important;
+  }
+  
+  .footer-bottom {
+    margin-top: 20px !important;
+    padding-top: 16px !important;
+  }
+  
+  .footer-bottom p {
+    font-size: 0.85rem !important;
+  }
+  
+  .pricing-card-column .strategy-pricing-card {
+    max-width: 380px !important;
+    padding: 20px !important;
+  }
+  
+  .pricing-amount {
+    font-size: 3rem !important;
+  }
+}
+
+/* ============================================
+   SMALL MOBILE - 600px
+   ============================================ */
+@media screen and (max-width: 600px) {
+  .footer {
+    padding: 28px 12px 12px 12px !important;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px 20px !important;
+    text-align: left !important;
+  }
+  
+  .footer-section {
+    align-items: flex-start !important;
+  }
+  
+  .footer-logo {
+    justify-content: flex-start !important;
+  }
+  
+  .footer-section-heading {
+    font-size: 0.95rem !important;
+  }
+  
+  .footer-link {
+    font-size: 0.85rem !important;
+  }
+  
+  .footer-logo-image {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
+  
+  .footer-brand-title {
+    font-size: 1rem !important;
+  }
+  
+  .footer-tagline,
+  .footer-since {
+    font-size: 0.8rem !important;
+  }
+  
+  .footer-bottom p {
+    font-size: 0.8rem !important;
+  }
+  
+  .pricing-faq-layout {
+    padding: 0 12px !important;
+    gap: 24px !important;
+  }
+  
+  .pricing-card-column .strategy-pricing-card {
+    max-width: 340px !important;
+    padding: 16px !important;
+  }
+  
+  .pricing-tier-badge {
+    font-size: 0.85rem !important;
+    padding: 8px 20px !important;
+  }
+  
+  .pricing-amount {
+    font-size: 2.5rem !important;
+  }
+  
+  .pricing-features-list li {
+    font-size: 0.85rem !important;
+    padding: 6px 0 !important;
+  }
+  
+  .faq-question h3 {
+    font-size: 0.9rem !important;
+  }
+}
+
+/* ============================================
+   EXTRA SMALL MOBILE - 480px
+   Footer stays 2 columns, centered
+   ============================================ */
+@media screen and (max-width: 480px) {
+  .footer-container {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+    text-align: center !important;
+  }
+  
+  .footer-section {
+    align-items: center !important;
+  }
+  
+  .footer-logo {
+    justify-content: center !important;
+  }
+  
+  .footer-link:hover {
+    transform: none !important;
+  }
+  
+  .pricing-card-column .strategy-pricing-card {
+    max-width: 100% !important;
+    padding: 14px !important;
+  }
+  
+  .pricing-amount {
+    font-size: 2.2rem !important;
+  }
+  
+  .faq-question {
+    padding: 12px !important;
+  }
+  
+  .faq-question h3 {
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ============================================
+   TINY MOBILE - 360px
+   Footer stays 2 columns
+   ============================================ */
+@media screen and (max-width: 360px) {
+  .footer {
+    padding: 20px 8px 10px 8px !important;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px 16px !important;
+  }
+  
+  .footer-section-heading {
+    font-size: 0.85rem !important;
+  }
+  
+  .footer-link {
+    font-size: 0.75rem !important;
+  }
+  
+  .footer-logo-image {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+  
+  .footer-brand-title {
+    font-size: 0.9rem !important;
+  }
+  
+  .footer-tagline,
+  .footer-since {
+    font-size: 0.7rem !important;
+  }
+  
+  .footer-bottom p {
+    font-size: 0.7rem !important;
+  }
+  
+  .pricing-amount {
+    font-size: 1.8rem !important;
+  }
+  
+  .faq-question h3 {
+    font-size: 0.75rem !important;
+  }
+}
+/* =========================================================
+   FOOTER FIX v3 — Keep 4-column layout consistent on mobile
+   Goal: Same positioning as desktop screenshot, just smaller
+   ========================================================= */
+
+.footer {
+  /* keep your look, only make padding scale down */
+  padding: clamp(20px, 4vw, 48px) clamp(10px, 3vw, 24px) clamp(12px, 2.5vw, 24px) !important;
+}
+
+/* Always 4 columns like the screenshot */
+.footer-container {
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+
+  /* 4 columns forever */
+  grid-template-columns: 1.5fr 1fr 1fr 1fr !important;
+
+  /* gap scales down on small screens */
+  gap: clamp(12px, 3vw, 32px) !important;
+
+  /* NEVER center on mobile */
+  text-align: left !important;
+  justify-items: start !important;
+  align-items: start !important;
+}
+
+/* Prevent “one long thing” from blowing up the grid */
+.footer-section {
+  min-width: 0 !important;
+  align-items: flex-start !important;
+}
+
+/* Keep brand area aligned like screenshot */
+.footer-logo {
+  justify-content: flex-start !important;
+}
+
+/* Make text shrink smoothly instead of changing layout */
+.footer-section-heading {
+  font-size: clamp(0.82rem, 2.3vw, 1.05rem) !important;
+  line-height: 1.2 !important;
+}
+
+.footer-link {
+  font-size: clamp(0.72rem, 2.1vw, 0.95rem) !important;
+  line-height: 1.25 !important;
+
+  /* ensure links don’t cause horizontal overflow */
+  overflow-wrap: anywhere !important;
+  word-break: break-word !important;
+  min-width: 0 !important;
+}
+
+/* Brand text */
+.footer-brand-title {
+  font-size: clamp(0.9rem, 2.6vw, 1.2rem) !important;
+  line-height: 1.15 !important;
+}
+
+.footer-tagline,
+.footer-since {
+  font-size: clamp(0.68rem, 2vw, 0.95rem) !important;
+  line-height: 1.2 !important;
+  overflow-wrap: anywhere !important;
+}
+
+/* Logo shrinks on small screens but stays same position */
+.footer-logo-image {
+  width: clamp(30px, 7vw, 50px) !important;
+  height: clamp(30px, 7vw, 50px) !important;
+  min-width: clamp(30px, 7vw, 50px) !important;
+}
+
+/* Bottom line spacing scales down, but stays centered like your design */
+.footer-bottom {
+  max-width: 1200px !important;
+  margin: clamp(18px, 3.5vw, 32px) auto 0 !important;
+  padding-top: clamp(12px, 2.8vw, 24px) !important;
+  text-align: center !important;
+}
+
+@media screen and (max-width: 1024px),
+       screen and (max-width: 900px),
+       screen and (max-width: 768px),
+       screen and (max-width: 600px),
+       screen and (max-width: 480px),
+       screen and (max-width: 360px) {
+
+  /* force same structure at all breakpoints */
+  .footer-container {
+    grid-template-columns: 1.5fr 1fr 1fr 1fr !important;
+    text-align: left !important;
+    justify-items: start !important;
+  }
+
+  .footer-section {
+    align-items: flex-start !important;
+  }
+
+  .footer-logo {
+    justify-content: flex-start !important;
+  }
+}
+
+/* =========================================================
+   FLUID RESPONSIVE - ALL COMPONENTS (Footer-style approach)
+   Goal: Same layout structure at ALL sizes, just scaled down
+   Uses clamp() for fluid sizing instead of breakpoint changes
+   ========================================================= */
+
+/* STRATEGY STATS - Always 4 columns */
+.strategy-stats-grid {
+  grid-template-columns: repeat(4, 1fr) !important;
+  gap: clamp(6px, 1.5vw, 24px) !important;
+}
+
+/* Performance stats row (3 items) — 3 columns so no empty slot */
+.strategy-stats-grid.strategy-stats-grid-performance {
+  grid-template-columns: repeat(3, 1fr) !important;
+}
+
+/* STRATEGY CARD GRID - Always 3 columns */
+.strategy-card-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: clamp(10px, 2.5vw, 24px) !important;
+}
+
+.strategy-card-grid-2col {
+  grid-template-columns: repeat(2, 1fr) !important;
+}
+
+/* STRATEGY FLOW - Keep horizontal layout */
+.strategy-flow-item {
+  flex-direction: row !important;
+  text-align: left !important;
+  align-items: flex-start !important;
+}
+
+.strategy-flow-step {
+  margin: 0 !important;
+}
+
+/* BUTTONS - Keep inline layout */
+.strategy-btn-group {
+  flex-direction: row !important;
+  align-items: center !important;
+}
+
+.strategy-btn {
+  width: auto !important;
+  max-width: none !important;
+}
+
+/* NAV - Keep horizontal */
+.app-nav {
+  flex-wrap: wrap !important;
+}
+
+/* PRICING LAYOUT - Use fluid grid */
+.pricing-faq-layout {
+  display: grid !important;
+  grid-template-columns: 1fr clamp(280px, 35vw, 360px) !important;
+  gap: clamp(20px, 4vw, 48px) !important;
+  padding: 0 clamp(10px, 2vw, 24px) !important;
+}
+
+.pricing-card-column {
+  position: sticky !important;
+  top: clamp(12px, 3vw, 24px) !important;
+  order: 2 !important;
+}
+
+.pricing-faq-column {
+  order: 1 !important;
+}
+
+/* PRICING CARD */
+.strategy-pricing-card {
+  padding: clamp(14px, 3.5vw, 24px) !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.pricing-tier-badge {
+  font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
+  padding: clamp(6px, 1.5vw, 10px) clamp(16px, 4vw, 28px) !important;
+}
+
+.pricing-amount {
+  font-size: clamp(2rem, 8vw, 4rem) !important;
+}
+
+.pricing-currency,
+.pricing-period {
+  font-size: clamp(0.85rem, 2.5vw, 1.2rem) !important;
+}
+
+.pricing-features-list li {
+  font-size: clamp(0.75rem, 2vw, 0.95rem) !important;
+  padding: clamp(4px, 1vw, 8px) 0 !important;
+}
+
+/* FAQ */
+.faq-question {
+  padding: clamp(10px, 2.5vw, 16px) !important;
+}
+
+.faq-question h3 {
+  font-size: clamp(0.75rem, 2.2vw, 1rem) !important;
+}
+
+.faq-answer p {
+  font-size: clamp(0.7rem, 2vw, 0.95rem) !important;
+  padding: clamp(8px, 2vw, 14px) !important;
+}
+
+/* CONTACT METHODS */
+.contact-method-card {
+  padding: clamp(12px, 3vw, 24px) !important;
+}
+
+.contact-method-value {
+  font-size: clamp(0.7rem, 2vw, 0.9rem) !important;
+}
+
+/* ============================================
+   ABOUT PAGE - TEAM GRID
+   ============================================ */
+.about-hero-container {
+  position: relative !important;
+  min-height: auto !important;
+}
+
+.team-grid {
+  display: grid !important;
+  gap: clamp(6px, 1.5vw, 20px) !important;
+}
+
+.team-avatar {
+  width: clamp(40px, 12vw, 140px) !important;
+  height: clamp(40px, 12vw, 140px) !important;
+}
+
+.team-card {
+  min-width: 0 !important;
+  overflow: hidden !important;
+}
+
+.team-card h3 {
+  font-size: clamp(0.55rem, 1.8vw, 1.2rem) !important;
+  word-break: break-word !important;
+  overflow-wrap: anywhere !important;
+}
+
+.team-role {
+  font-size: clamp(0.45rem, 1.4vw, 0.85rem) !important;
+}
+
+/* Contact hero image: fluid */
+.contact-hero-image-container {
+  width: clamp(60px, 16vw, 180px) !important;
+  height: clamp(60px, 16vw, 180px) !important;
+}
+
+/* Gold coin icon: fluid — positioned right side */
+.gold-coin-icon {
+  width: clamp(28px, 6vw, 80px) !important;
+}
+
+/* On small screens pull coin closer to panel edge */
+@media screen and (max-width: 640px) {
+  .gold-coin-icon.coin-right {
+    right: clamp(-28px, -4vw, -18px) !important;
+  }
+  .about-panels-wrapper {
+    margin-left: clamp(20px, 5vw, 40px) !important;
+    margin-right: clamp(20px, 5vw, 40px) !important;
+  }
+}
+
+/* VIDEO GRID */
+.video-grid {
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: clamp(10px, 2.5vw, 24px) !important;
+}
+
+.video-card {
+  min-width: 0 !important;
+}
+
+.video-info h3 {
+  font-size: clamp(0.75rem, 2.2vw, 1rem) !important;
+}
+
+.video-info p {
+  font-size: clamp(0.65rem, 1.8vw, 0.85rem) !important;
+}
+
+/* SUBSCRIBE CARD */
+.subscribe-cta-card {
+  padding: clamp(16px, 4vw, 32px) !important;
+}
+
+.subscribe-cta-title {
+  font-size: clamp(1rem, 3.5vw, 1.5rem) !important;
+}
+
+.subscribe-cta-text {
+  font-size: clamp(0.8rem, 2.5vw, 1rem) !important;
+}
+
+.subscribe-btn {
+  font-size: clamp(0.85rem, 2.5vw, 1.1rem) !important;
+  padding: clamp(10px, 2.5vw, 14px) clamp(20px, 5vw, 40px) !important;
+}
+
+/* FEATURED VIDEO */
+.featured-video-container {
+  padding: clamp(12px, 3vw, 24px) !important;
+}
+
+/* Chart container */
+.chart-container,
+.chart-wrapper {
+  margin: clamp(12px, 3vw, 24px) 0 !important;
+  padding: clamp(8px, 2vw, 16px) !important;
+}
+
+/* Prevent any layout changes at any breakpoint - same structure always */
+@media screen and (max-width: 900px) {
+  .pricing-faq-layout {
+    grid-template-columns: 1fr clamp(260px, 35vw, 320px) !important;
+  }
+}
+
+@media screen and (max-width: 700px) {
+  /* Allow pricing to stack on very small screens but stay centered */
+  .pricing-faq-layout {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  
+  .pricing-card-column {
+    position: static !important;
+    order: 1 !important;
+    width: 100% !important;
+    max-width: clamp(280px, 80vw, 380px) !important;
+  }
+  
+  .pricing-faq-column {
+    order: 2 !important;
+    width: 100% !important;
+  }
+  
+  /* Video grid can go 2 columns on narrow screens */
+  .video-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+/* =========================================================
+   HEADER & LOGO - CONSISTENT ACROSS ALL SCREENS
+   Logo matches live site size
+   ========================================================= */
+
+/* Logo - Fluid sizing that scales down smoothly (matching live site) */
+.app-logo {
+  width: auto !important;
+  height: clamp(140px, 32vmin, 320px) !important;
+  max-width: min(88vw, 460px) !important;
+  object-fit: contain !important;
+}
+
+/* Header - Consistent padding */
+.app-header {
+  padding: clamp(16px, 4vw, 40px) clamp(12px, 2.5vw, 28px) !important;
+}
+
+/* Navigation - Prevent wrapping, scale down */
+.app-nav {
+  gap: clamp(4px, 1.2vw, 12px) !important;
+  flex-wrap: wrap !important;
+  justify-content: center !important;
+  max-width: 100% !important;
+  padding: 0 clamp(6px, 1.5vw, 20px) !important;
+}
+
+.app-nav-link {
+  font-size: clamp(0.6rem, 1.6vw, 0.95rem) !important;
+  padding: clamp(5px, 1.2vw, 10px) clamp(10px, 2.2vw, 20px) !important;
+  white-space: nowrap !important;
+  border-radius: clamp(18px, 4.5vw, 30px) !important;
+}
+
+/* =========================================================
+   PAGE TITLES - NEVER WRAP, SCALE DOWN INSTEAD
+   ========================================================= */
+
+/* All main titles - prevent wrapping */
+.strategy-main-title,
+.strategy-section-title,
+.section-title,
+.page-title,
+.pricing-page-title,
+.pricing-title,
+.faq-title,
+.contact-title,
+.youtube-title {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+}
+
+/* Main hero title - allow wrapping at word boundaries, never mid-word */
+.strategy-main-title-main,
+.strategy-main-title-main.get-in-touch-title {
+  white-space: normal !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+  overflow-wrap: normal !important;
+  text-wrap: balance !important;
+  max-width: 100% !important;
+  padding: 0 clamp(8px, 2vw, 20px) !important;
+}
+
+.strategy-main-title-main .get-in-touch-shimmer {
+  display: inline !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+}
+
+/* Fluid title sizing - scales down smoothly */
+.strategy-main-title,
+.strategy-main-title-main {
+  font-size: clamp(1.2rem, 5vw, 3rem) !important;
+}
+
+.strategy-section-title,
+.section-title {
+  font-size: clamp(1rem, 4vw, 2rem) !important;
+}
+
+.pricing-page-title,
+.pricing-title {
+  font-size: clamp(1.1rem, 4.5vw, 2.5rem) !important;
+}
+
+.faq-title {
+  font-size: clamp(1rem, 4vw, 2rem) !important;
+}
+
+/* =========================================================
+   MOBILE NAVIGATION - Match provided design
+   Background: #00000066
+   ========================================================= */
+
+.nav-mobile {
+  background: #00000066 !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  padding: clamp(12px, 3vw, 20px) !important;
+  gap: clamp(8px, 2vw, 12px) !important;
+  border-radius: clamp(12px, 3vw, 20px) !important;
+}
+
+.nav-mobile .app-nav-link {
+  width: 100% !important;
+  text-align: center !important;
+  padding: clamp(10px, 2.5vw, 14px) clamp(16px, 4vw, 24px) !important;
+  font-size: clamp(0.85rem, 3vw, 1.1rem) !important;
+}
+
+/* =========================================================
+   RESPONSIVE BREAKPOINTS - HEADER/LOGO SPECIFIC
+   SantaLogo bigger
+   ========================================================= */
+
+@media screen and (max-width: 900px) {
+  .app-logo {
+    height: clamp(140px, 32vmin, 280px) !important;
+    max-width: min(85vw, 440px) !important;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .app-logo {
+    height: clamp(120px, 28vmin, 220px) !important;
+    max-width: min(82vw, 380px) !important;
+  }
+  
+  .app-header {
+    padding: clamp(12px, 3vw, 24px) clamp(10px, 2.5vw, 20px) !important;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .app-logo {
+    height: clamp(100px, 24vmin, 180px) !important;
+    max-width: min(78vw, 340px) !important;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .app-logo {
+    height: clamp(85px, 20vmin, 150px) !important;
+    max-width: min(75vw, 300px) !important;
+  }
+  
+  .app-header {
+    padding: clamp(10px, 2.5vw, 18px) clamp(8px, 2vw, 14px) !important;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .app-logo {
+    height: clamp(70px, 18vmin, 120px) !important;
+    max-width: min(70vw, 260px) !important;
+  }
+}
+
+/* =========================================================
+   STRATEGY PAGE - STATS & CARDS RESPONSIVE
+   Keep layout consistent, just scale down
+   ========================================================= */
+
+.strategy-stat-item,
+.stat-card,
+.strategy-card {
+  padding: clamp(8px, 2vw, 20px) !important;
+}
+
+.strategy-stat-value,
+.stat-value {
+  font-size: clamp(1rem, 4vw, 2rem) !important;
+}
+
+.strategy-stat-label,
+.stat-label {
+  font-size: clamp(0.65rem, 1.8vw, 0.9rem) !important;
+}
+
+/* =========================================================
+   CONTACT PAGE - RESPONSIVE ELEMENTS
+   ========================================================= */
+
+.contact-hero-title,
+.contact-section-title {
+  font-size: clamp(1rem, 4vw, 2rem) !important;
+  white-space: normal !important;
+  word-break: keep-all !important;
+}
+
+.contact-method-title {
+  font-size: clamp(0.85rem, 2.5vw, 1.2rem) !important;
+}
+
+/* =========================================================
+   YOUTUBE PAGE - RESPONSIVE ELEMENTS
+   ========================================================= */
+
+.youtube-hero-title,
+.youtube-section-title {
+  font-size: clamp(1rem, 4vw, 2rem) !important;
+}
+
+.video-title {
+  font-size: clamp(0.75rem, 2.2vw, 1rem) !important;
+}
+
+/* =========================================================
+   CRITICAL: NO-WRAP TITLES
+   These specific titles must NEVER wrap - scale down instead
+   1. "Trade Gold with 97.22% Profit Factor 38.19 & DD 2.84%"
+   2. "About Me & Professional Summary"
+   3. "Ofer Waron 97% Gold Trading Algorithm"
+   ========================================================= */
+
+/* HOME PAGE - Main Hero Title - NEVER WRAP, scale to fit */
+.strategy-main-title-main,
+.strategy-main-title-main.get-in-touch-title,
+.strategy-main-title-main .get-in-touch-shimmer {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  font-size: clamp(0.55rem, 2.6vw, 2.5rem) !important;
+  line-height: 1.2 !important;
+  word-break: keep-all !important;
+  hyphens: none !important;
+}
+
+/* ============================================
+   DIRECTCTA - RESPONSIVE
+   ============================================ */
+.directCTA-container {
+  padding: 0 clamp(6px, 1.5vw, 16px) !important;
+  width: 100% !important;
+}
+
+.directCTA-container h1 {
+  font-size: clamp(0.9rem, 2.5vw, 1.8rem) !important;
+}
+
+.directCTA-container h2 {
+  font-size: clamp(0.75rem, 2vw, 1.3rem) !important;
+}
+
+.directCTA-container p,
+.directCTA-container li {
+  font-size: clamp(0.55rem, 1.6vw, 1rem) !important;
+}
+
+/* Match panel inner height on small screens */
+@media screen and (max-width: 480px) {
+  .about-panel-container {
+    height: clamp(320px, 50vh, 420px) !important;
+  }
+}
+
+.pricing-card-column {
+  max-width: 360px !important;
+  width: 100% !important;
+}
+.pricing-card-column .strategy-pricing-card {
+    max-width: 100% !important; 
+    padding: 1.5rem !important;
+  }
+@media screen and (max-width: 900px) {
+  .pricing-faq-layout {
+    display: flex !important;
+    flex-direction: column !important; 
+    align-items: center !important;
+    gap: 2rem !important;
+  }
+}
+
+/* ============================================
+   PRICING PAGE - SIDE BY SIDE (NO WRAP)
+   Keeps FAQ + Pricing card together at ALL screen sizes
+   They scale down proportionally instead of wrapping
+   
+   ADD THIS AT THE END OF responsive-overrides.css
+   ============================================ */
+
+/* ============================================
+   BASE LAYOUT - ALWAYS SIDE BY SIDE
+   ============================================ */
+.pricing-faq-layout {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  gap: clamp(1rem, 3vw, 3rem) !important;
+  align-items: flex-start !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+  padding: 0 clamp(0.5rem, 2vw, 1.5rem) !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* FAQ Column - takes remaining space, shrinks proportionally */
+.pricing-faq-column {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  width: auto !important;
+  order: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Pricing Card Column - fixed proportion, shrinks with screen */
+.pricing-card-column {
+  flex: 0 0 auto !important;
+  width: clamp(200px, 30vw, 360px) !important;
+  max-width: 360px !important;
+  min-width: 180px !important;
+  order: 2 !important;
+  position: sticky !important;
+  top: 1rem !important;
+  align-self: flex-start !important;
+}
+
+/* FAQ Container - scales with available space */
+.faq-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  margin: clamp(0.75rem, 2vw, 1.5rem) 0 0 0 !important;
+}
+
+/* FAQ Items - responsive sizing */
+.faq-item {
+  margin-bottom: clamp(0.5rem, 1.5vw, 1rem) !important;
+}
+
+.faq-question {
+  padding: clamp(0.6rem, 2vw, 1rem) clamp(0.75rem, 2vw, 1.25rem) !important;
+}
+
+.faq-question h3 {
+  font-size: clamp(0.7rem, 2vw, 1rem) !important;
+  line-height: 1.3 !important;
+}
+
+.faq-toggle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem) !important;
+  flex-shrink: 0 !important;
+  margin-left: 0.5rem !important;
+}
+
+.faq-answer {
+  padding: 0 clamp(0.75rem, 2vw, 1.25rem) clamp(0.6rem, 1.5vw, 1rem) !important;
+}
+
+.faq-answer p {
+  font-size: clamp(0.65rem, 1.8vw, 0.95rem) !important;
+  line-height: 1.4 !important;
+}
+
+/* ============================================
+   PRICING CARD - RESPONSIVE SCALING
+   ============================================ */
+.pricing-card-column .strategy-pricing-card {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: clamp(0.75rem, 2.5vw, 1.5rem) !important;
+  box-sizing: border-box !important;
+}
+
+/* Badge */
+.pricing-card-column .pricing-tier-badge {
+  padding: clamp(0.25rem, 1vw, 0.5rem) clamp(0.75rem, 2vw, 1.5rem) !important;
+  font-size: clamp(0.65rem, 1.8vw, 0.9rem) !important;
+  margin-bottom: clamp(0.5rem, 2vw, 1rem) !important;
+}
+
+/* Price Display */
+.pricing-card-column .pricing-price-display {
+  margin-bottom: clamp(0.5rem, 1.5vw, 1rem) !important;
+  display: flex !important;
+  align-items: baseline !important;
+  justify-content: center !important;
+  flex-wrap: nowrap !important;
+}
+
+.pricing-card-column .pricing-currency {
+  font-size: clamp(0.8rem, 2vw, 1.25rem) !important;
+}
+
+.pricing-card-column .pricing-amount {
+  font-size: clamp(1.5rem, 5vw, 3rem) !important;
+  line-height: 1 !important;
+}
+
+.pricing-card-column .pricing-period {
+  font-size: clamp(0.6rem, 1.5vw, 1rem) !important;
+}
+
+/* Description */
+.pricing-card-column .strategy-subtitle {
+  font-size: clamp(0.55rem, 1.5vw, 0.9rem) !important;
+  margin-bottom: clamp(0.5rem, 2vw, 1rem) !important;
+  line-height: 1.3 !important;
+}
+
+/* Features List */
+.pricing-card-column .pricing-features-list {
+  margin: clamp(0.5rem, 2vw, 1rem) 0 !important;
+  padding: 0 !important;
+}
+
+.pricing-card-column .pricing-features-list li {
+  font-size: clamp(0.55rem, 1.5vw, 0.9rem) !important;
+  padding: clamp(0.25rem, 0.8vw, 0.5rem) 0 !important;
+  gap: clamp(0.3rem, 1vw, 0.6rem) !important;
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.pricing-card-column .feature-check {
+  font-size: clamp(0.6rem, 1.5vw, 0.95rem) !important;
+  flex-shrink: 0 !important;
+}
+
+/* CTA Button */
+.pricing-card-column .strategy-btn {
+  padding: clamp(0.5rem, 1.5vw, 0.8rem) clamp(0.75rem, 2vw, 1.2rem) !important;
+  font-size: clamp(0.6rem, 1.8vw, 1rem) !important;
+  margin-top: clamp(0.5rem, 2vw, 1rem) !important;
+}
+
+/* ============================================
+   FAQ TITLE SECTION - RESPONSIVE
+   ============================================ */
+.pricing-faq-column .strategy-section-title,
+.pricing-faq-column .get-in-touch-title {
+  font-size: clamp(0.9rem, 3vw, 2rem) !important;
+  line-height: 1.2 !important;
+}
+
+.pricing-faq-column .strategy-subtitle {
+  font-size: clamp(0.65rem, 1.8vw, 1rem) !important;
+}
+
+/* FAQ Coin Icon - scales down */
+.faq-coin {
+  width: clamp(1.5rem, 5vw, 3rem) !important;
+  height: auto !important;
+}
+
+/* ============================================
+   BREAKPOINT ADJUSTMENTS (FINE-TUNING)
+   All still side-by-side, just proportional tweaks
+   ============================================ */
+
+/* Large tablets / small laptops */
+@media screen and (max-width: 1024px) {
+  .pricing-faq-layout {
+    gap: clamp(1rem, 2.5vw, 2rem) !important;
+  }
+  
+  .pricing-card-column {
+    width: clamp(200px, 32vw, 320px) !important;
+  }
+}
+
+/* Tablets */
+@media screen and (max-width: 900px) {
+  .pricing-faq-layout {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: clamp(0.75rem, 2vw, 1.5rem) !important;
+    padding: 0 clamp(0.5rem, 1.5vw, 1rem) !important;
+  }
+  
+  .pricing-card-column {
+    width: clamp(180px, 35vw, 280px) !important;
+    min-width: 160px !important;
+    position: relative !important;
+    top: 0 !important;
+  }
+  
+  .pricing-faq-column {
+    order: 1 !important;
+  }
+  
+  .pricing-card-column {
+    order: 2 !important;
+  }
+}
+
+/* Large phones / small tablets */
+@media screen and (max-width: 768px) {
+  .pricing-faq-layout {
+    gap: clamp(0.5rem, 2vw, 1rem) !important;
+    padding: 0 0.5rem !important;
+  }
+  
+  .pricing-card-column {
+    width: clamp(160px, 38vw, 260px) !important;
+    min-width: 145px !important;
+  }
+  
+  .faq-question h3 {
+    font-size: clamp(0.65rem, 2vw, 0.9rem) !important;
+  }
+  
+  .pricing-card-column .pricing-amount {
+    font-size: clamp(1.4rem, 5vw, 2.5rem) !important;
+  }
+}
+
+/* Medium phones */
+@media screen and (max-width: 600px) {
+  .pricing-faq-layout {
+    gap: clamp(0.4rem, 1.5vw, 0.75rem) !important;
+    padding: 0 0.35rem !important;
+  }
+  
+  .pricing-card-column {
+    width: clamp(140px, 40vw, 220px) !important;
+    min-width: 130px !important;
+  }
+  
+  .faq-question {
+    padding: clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.5rem, 1.5vw, 0.75rem) !important;
+  }
+  
+  .faq-question h3 {
+    font-size: clamp(0.6rem, 2.2vw, 0.85rem) !important;
+  }
+  
+  .faq-toggle {
+    font-size: clamp(0.9rem, 2.5vw, 1.2rem) !important;
+  }
+  
+  .faq-answer p {
+    font-size: clamp(0.55rem, 1.8vw, 0.8rem) !important;
+  }
+  
+  .pricing-card-column .pricing-tier-badge {
+    padding: clamp(0.2rem, 0.8vw, 0.35rem) clamp(0.5rem, 1.5vw, 1rem) !important;
+    font-size: clamp(0.55rem, 1.8vw, 0.75rem) !important;
+  }
+  
+  .pricing-card-column .pricing-amount {
+    font-size: clamp(1.2rem, 4.5vw, 2rem) !important;
+  }
+  
+  .pricing-card-column .pricing-features-list li {
+    font-size: clamp(0.5rem, 1.5vw, 0.75rem) !important;
+  }
+}
+
+/* Small phones */
+@media screen and (max-width: 480px) {
+  .pricing-faq-layout {
+    gap: 0.35rem !important;
+    padding: 0 0.25rem !important;
+  }
+  
+  .pricing-card-column {
+    width: clamp(120px, 42vw, 180px) !important;
+    min-width: 115px !important;
+  }
+  
+  .pricing-card-column .strategy-pricing-card {
+    padding: clamp(0.5rem, 2vw, 0.75rem) !important;
+  }
+  
+  .faq-question {
+    padding: 0.4rem 0.5rem !important;
+  }
+  
+  .faq-question h3 {
+    font-size: clamp(0.55rem, 2.5vw, 0.75rem) !important;
+  }
+  
+  .pricing-card-column .pricing-amount {
+    font-size: clamp(1.1rem, 5vw, 1.6rem) !important;
+  }
+  
+  .pricing-card-column .pricing-currency {
+    font-size: clamp(0.6rem, 2vw, 0.9rem) !important;
+  }
+  
+  .pricing-card-column .pricing-period {
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem) !important;
+  }
+  
+  .pricing-card-column .strategy-subtitle {
+    font-size: clamp(0.45rem, 1.5vw, 0.65rem) !important;
+  }
+  
+  .pricing-card-column .pricing-features-list li {
+    font-size: clamp(0.45rem, 1.5vw, 0.65rem) !important;
+    padding: 0.2rem 0 !important;
+  }
+  
+  .pricing-card-column .feature-check {
+    font-size: clamp(0.5rem, 1.5vw, 0.7rem) !important;
+  }
+  
+  .pricing-card-column .strategy-btn {
+    padding: 0.4rem 0.6rem !important;
+    font-size: clamp(0.5rem, 1.8vw, 0.75rem) !important;
+  }
+}
+
+/* Extra small phones */
+@media screen and (max-width: 380px) {
+  .pricing-faq-layout {
+    gap: 0.25rem !important;
+    padding: 0 0.15rem !important;
+  }
+  
+  .pricing-card-column {
+    width: clamp(100px, 44vw, 150px) !important;
+    min-width: 95px !important;
+  }
+  
+  .faq-question h3 {
+    font-size: clamp(0.5rem, 2.8vw, 0.7rem) !important;
+  }
+  
+  .faq-toggle {
+    font-size: 0.85rem !important;
+  }
+  
+  .pricing-card-column .pricing-tier-badge {
+    font-size: clamp(0.45rem, 1.8vw, 0.6rem) !important;
+    padding: 0.15rem 0.4rem !important;
+  }
+  
+  .pricing-card-column .pricing-amount {
+    font-size: clamp(1rem, 5.5vw, 1.4rem) !important;
+  }
+  
+  .pricing-card-column .pricing-features-list li {
+    font-size: clamp(0.4rem, 1.5vw, 0.55rem) !important;
+  }
+}
+
+/* === FAQ title: NEVER hidden, NEVER wraps, NEVER ellipsis === */
+@media (max-width: 980px) {
+
+  /* 1. Prevent ANY clipping */
+  .pricing-faq-column,
+  .pricing-faq-container,
+  .strategy-section,
+  .strategy-container {
+    overflow: visible !important;
+  }
+
+  /* 2. The H2 container */
+  .get-in-touch-title,
+  .strategy-section-title.get-in-touch-title {
+    position: relative !important;
+    z-index: 10 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+
+    width: auto !important;
+    max-width: none !important;
+
+    /* HARD RULES */
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+
+    margin: 0 0 6px 0 !important;
+    padding: 6px 8px !important;
+  }
+
+  /* 3. TEXT — this is where ellipsis was coming from */
+  .get-in-touch-shimmer {
+    display: inline-block !important;
+
+    /* ABSOLUTE RULES */
+    white-space: nowrap !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+
+    /* DO NOT allow flex to truncate it */
+    min-width: max-content !important;
+    max-width: none !important;
+    flex-shrink: 0 !important;
+
+    line-height: 1.05 !important;
+
+    /* Shrink instead of hiding */
+    font-size: clamp(15px, 3.1vw, 28px) !important;
+  }
+
+  /* 4. Sparkles must NOT affect width */
+  .sparkle {
+    font-size: 0.8em !important;
+    margin-left: 4px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* 5. Coin shrinks but never forces text truncation */
+  .faq-coin {
+    flex: 0 0 auto !important;
+    width: clamp(20px, 4.2vw, 36px) !important;
+    height: auto !important;
+    margin: 0 !important;
+  }
+}
+
+/* Ultra-small screens: still ONE line, still intact */
+@media (max-width: 420px) {
+  .get-in-touch-shimmer {
+    font-size: 12px !important;
+  }
+
+  .faq-coin {
+    width: 18px !important;
+  }
+  
+  .sparkle {
+    display: none !important;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 380px) {
+  .get-in-touch-shimmer {
+    font-size: 11px !important;
+  }
+  
+  .faq-coin {
+    width: 16px !important;
+  }
+}
+
+/* ============================================
+   FAQ TITLE - Prevent left cutoff on small screens
+   ============================================ */
+@media (max-width: 768px) {
+  /* Center the title properly */
+  .pricing-faq-column .strategy-section-title,
+  .pricing-faq-column .get-in-touch-title {
+    width: 100% !important;
+    justify-content: center !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  
+  /* Make shimmer text smaller to fit */
+  .pricing-faq-column .get-in-touch-shimmer {
+    font-size: clamp(11px, 3vw, 16px) !important;
+  }
+  
+  /* Smaller coin */
+  .pricing-faq-column .faq-coin {
+    width: clamp(14px, 4vw, 24px) !important;
+  }
+}
+
+/* ============================================
+   PRICING CARD & FAQ - Consistent Heights
+   ============================================ */
+
+/* Align pricing card to start (top) */
+.pricing-card-column {
+  align-self: flex-start !important;
+}
+
+/* Set consistent min-height for pricing card */
+.pricing-card-column .strategy-pricing-card {
+  min-height: 520px !important;
+}
+
+/* When side by side - match heights better */
+@media (min-width: 701px) {
+  .pricing-faq-layout {
+    align-items: stretch !important;
+  }
+  
+  .pricing-card-column {
+    display: flex !important;
+    align-items: stretch !important;
+  }
+  
+  .pricing-card-column .strategy-pricing-card {
+    min-height: 100% !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Push button to bottom */
+  .pricing-card-column .strategy-pricing-card .strategy-btn {
+    margin-top: 10% !important;
+  }
+}
+
+/* Mobile - remove fixed height */
+@media (max-width: 700px) {
+  .pricing-card-column .strategy-pricing-card {
+    min-height: auto !important;
+  }
+}
+
+
+
+
+/* Mobile - remove fixed height */
+
+
+/* =========================================================
+   PRICING: Fix FAQ title clipping + align pricing height
+   (added by ChatGPT)
+   ========================================================= */
+
+/* 1) Prevent FAQ title from being clipped on small screens */
+.pricing-faq-layout,
+.pricing-faq-column,
+.pricing-faq-column .faq-header,
+.pricing-faq-column .get-in-touch-title,
+.pricing-faq-column .strategy-section-title {
+  overflow: visible !important;
+}
+
+/* Keep it single-line but NEVER ellipsis/clip for FAQ title */
+.pricing-faq-column .get-in-touch-title--shimmer .get-in-touch-shimmer {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: unset !important;
+  display: inline-block;
+}
+
+.pricing-faq-column .get-in-touch-title {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.pricing-card-column {
+  display: flex !important;
+  flex-direction: column !important;
+  align-self: stretch !important;
+  height: auto !important;
+  padding-bottom: 6px !important;
+ margin-top: -25px; 
+}
+
+.pricing-card-column .strategy-pricing-card {
+  flex: 1 1 auto !important;
+height: auto !important;
+
+  min-height: 520px !important;
+  width: 100% !important;
+}
+
+@media (max-width: 700px) {
+  .pricing-card-column .strategy-pricing-card {
+    min-height: auto !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .pricing-faq-column .get-in-touch-title--shimmer .get-in-touch-shimmer {
+
+    padding-left: 50px;
+  }
+}
+
+
+
+
+
+
+
+/* =========================================================
+   DESKTOP (>700px): REDUCE pricing-card-column height
+   - removes forced stretching
+   - shrinks internal elements so the card becomes shorter
+   - no overflow / no transform
+   ========================================================= */
+   
+
+@media (min-width: 701px) {
+
+  .pricing-faq-layout{
+    align-items: flex-start !important;
+  }
+
+  .pricing-card-column{
+    display: block !important;
+    align-self: flex-start !important;
+    margin-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+  
+.pricing-card-column .strategy-pricing-card{
+    min-height: 320px !important;  
+    height: auto !important;
+    display: block !important;
+margin-top: 150px !important;
+
+    padding: 18px !important;
+  }
+  
+     .pricing-card-column .strategy-pricing-card{
+    min-height: 465px !important;  
+    height: auto !important;
+    display: block !important;
+    margin-top: 175px !important;
+
+    padding: 18px !important;
+  }
+
+
+  .pricing-card-column .pricing-tier-badge{
+    padding: 7px 18px !important;
+    font-size: 0.85rem !important;
+    margin-bottom: 10px !important;
+           width: 100% !important;
+
+  }
+
+  .pricing-card-column .pricing-amount{
+    font-size: 2.8rem !important;
+    line-height: 1.05 !important;
+  }
+
+  .pricing-card-column .strategy-subtitle{
+    font-size: 0.85rem !important;
+    margin-bottom: 10px !important;
+    line-height: 1.25 !important;
+  }
+
+  .pricing-card-column .pricing-features-list{
+    margin: 10px 0 !important;
+  }
+
+  .pricing-card-column .pricing-features-list li{
+    font-size: 0.85rem !important;
+    padding: 5px 0 !important;
+    line-height: 1.2 !important;
+  }
+
+  .pricing-card-column .strategy-btn{
+    padding: 10px 16px !important;
+    font-size: 0.95rem !important;
+    margin-top: 12px !important;
+       width: 100% !important;
+  }
+}
+

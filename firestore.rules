@@ -1,0 +1,56 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Public marketing data: read-only to the web app, no client writes.
+    match /siteData/{docId} {
+      allow read: if true;
+      allow write: if false;   // edit these docs from the Firebase console only
+    }
+
+    // A member's own profile. Created on first sign-in (ensureProfile) and
+    // updated for lastSeenAt / TradingView username requests only - never
+    // for entitlement fields (those don't live on this doc).
+    match /users/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['tvUsername', 'tvAccessRequestedAt', 'lastSeenAt']);
+      allow delete: if false;
+    }
+
+    // Entitlement record. Read-only to its owner; only admin/add-member.js
+    // (Admin SDK, bypasses rules) may write it.
+    match /subscriptions/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Active members can read the event schedule. Events are managed in the
+    // Firebase Console; clients cannot publish or change broadcasts.
+    match /streamEvents/{eventId} {
+      allow read: if request.auth != null
+        && exists(/databases/$(database)/documents/subscriptions/$(request.auth.uid))
+        && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.status in ['trial', 'active']
+        && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.expiresAt > request.time;
+      allow write: if false;
+    }
+
+    // Live trading signals from the TradingView webhook (written only by
+    // the tvWebhook Cloud Function via the Admin SDK, which bypasses these
+    // rules). Readable only by signed-in members with a live subscription -
+    // this is the actual invite-only gate for the live signal feed.
+    match /signals/{signalId} {
+      allow read: if request.auth != null
+        && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.status in ['trial', 'active']
+        && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.expiresAt > request.time;
+      allow write: if false;
+    }
+
+    // Everything else denied by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

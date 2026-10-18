@@ -3,7 +3,15 @@
 // ============================================
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Seo from '../components/Seo';
 import { usePerformanceHistory, useTradingStats } from '../App';
+
+// SantaLogo shimmer sweep (no glitter dots)
+const StatCardShimmer = () => (
+  <span className="stat-shimmer-layer" aria-hidden="true">
+    <span className="stat-shimmer-sweep" />
+  </span>
+);
 
 const features = [
   { icon: '📊', title: 'Live Dashboard', desc: 'Win/loss breakdowns, and heatmap by time' },
@@ -26,7 +34,7 @@ function Strategy() {
       desc: `Strict real-time validation against historical patterns since ${loading ? '...' : (performance?.experienceSince ?? 'N/A')}`
     },
     { step: 4, title: 'Smart Exit  Engine', desc: 'Profit and loss parameters are fixed and predefined in advance' },
-    { step: 5, title: 'Signal Delivery', desc: 'Alert sent to subscribers instantly via TradingView' }
+    { step: 5, title: 'Signal Delivery', desc: 'Alert sent to subscribers instantly via WhatsApp' }
   ];
 
   // Rules array defined inside component to access stats.targetProfit
@@ -42,11 +50,17 @@ function Strategy() {
       title: 'Profit Targets',
        desc: `Target profit of up to ${loading ? '...' : (stats?.targetProfit ?? 'N/A')} points per signal, or up to ${stats?.targetLoses ?? 'N/A'} points in case of a loss, with smart profit locks.`
     },
-    { icon: '🤖', title: 'Auto Alerts', desc: 'Precise buy/sell signals delivered in real-time via TradingView alerts.' }
+    { icon: '🤖', title: 'Auto Alerts', desc: 'Precise buy/sell signals delivered in real-time via WhatsApp.' }
   ];
 
   return (
     <div className="strategy-page">
+      <Seo
+        title="Trading Strategy — 97% Gold XAUUSD Signals"
+        description="Discover the proprietary 14-indicator, AI-powered strategy behind 97% Gold's XAUUSD signals — entry rules, risk management and historical performance."
+        path="/strategy"
+      />
+
       {/* Hero */}
       <section className="strategy-section text-center">
         <h1 className="strategy-main-title get-in-touch-title get-in-touch-title--shimmer">
@@ -129,15 +143,14 @@ function Strategy() {
         </div>
       </section>
 
-      {/* Performance - Now using dynamic data from Firebase */}
       <section className="strategy-section">
         <h2 className="strategy-section-title text-center">📈 Historical Performance</h2>
 
         <div className="strategy-stats-grid">
           <div className="strategy-stat-card">
+            <StatCardShimmer />
             <span className="strategy-stat-value">
-                            {loading ? '...' : (performance?.totalWinsPresnt ?? 'N/A')}
-
+              {loading ? '...' : `${stats.tradingwinRate}%`}
             </span>
             <span className="strategy-stat-label">Trade Success Rate</span>
           </div>
@@ -146,6 +159,7 @@ function Strategy() {
 
 
          <div className="strategy-stat-card stat-card-emphasized-totalWins strategy-performance-value">
+  <StatCardShimmer />
   <span className="strategy-performance-value">
     {loading ? '...' : performance.totalWins}
   </span>
@@ -157,6 +171,7 @@ function Strategy() {
        
 
           <div className="strategy-stat-card stat-card-emphasized-maxLossPoints strategy-performance-value">
+            <StatCardShimmer />
             <span className="strategy-performance-value">
               {loading ? '...' : (performance?.maxLossPoints ?? 'N/A')}
             </span>
@@ -164,6 +179,7 @@ function Strategy() {
           </div>
 
           <div className="strategy-stat-card">
+            <StatCardShimmer />
             <span className="strategy-stat-value">
               {loading ? '...' : (performance?.backtestedSince ?? 'N/A')}
             </span>
@@ -171,6 +187,7 @@ function Strategy() {
           </div>
 
           <div className="strategy-stat-card">
+            <StatCardShimmer />
             <span className="strategy-stat-value">
               {loading ? '...' : (performance?.profitFactor ?? 'N/A')}
             </span>
@@ -178,6 +195,7 @@ function Strategy() {
           </div>
 
           <div className="strategy-stat-card ">
+            <StatCardShimmer />
             <span className="strategy-stat-value">
               {loading ? '...' : (performance?.dd ?? 'N/A')}
             </span>

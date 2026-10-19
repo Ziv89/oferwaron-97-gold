@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { useTradingStats, useSiteConfig, usePerformanceHistory } from '../App';
+import { useAuth } from '../contexts/AuthContext';
 
 // SantaLogo shimmer sweep only (no glitter dots/stars)
 const StatCardShimmer = () => (
@@ -87,6 +88,7 @@ const steps = [
 ];
 
 function Home() {
+  const { user } = useAuth();
   // Use hooks to get dynamic data from Firebase
   const { stats, loading: statsLoading } = useTradingStats();
   const { loading: configLoading } = useSiteConfig();
@@ -144,7 +146,7 @@ function Home() {
             ? '...'
             : `${stats.tradingwinRate}% of ${stats.totalTrades} signals closed at target since ${stats.since}.`}
           {' '}
-          <Link to="/trading">Full trade log →</Link>
+          {user && <Link to="/trading">Full trade log →</Link>}
         </p>
 
         {/* CTAs */}

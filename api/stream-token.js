@@ -9,7 +9,7 @@ module.exports = async (req, res) => {
 
     const body = typeof req.body === 'string' ? JSON.parse(req.body || '{}') : req.body || {};
     const target = String(body.target || 'live');
-    if (target !== 'live' || req.headers.authorization) await requireSignedInUser(req);
+    await requireSignedInUser(req);
     let uid;
 
     if (target === 'live') {

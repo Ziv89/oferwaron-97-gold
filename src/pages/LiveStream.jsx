@@ -22,7 +22,6 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
   const [isLive, setIsLive] = useState(false);
   const [replays, setReplays] = useState([]);
   const [statusLoaded, setStatusLoaded] = useState(false);
-  const [statusError, setStatusError] = useState('');
   const [selected, setSelected] = useState(autoSelectLive ? 'live' : '');
   const [embedUrl, setEmbedUrl] = useState('');
   const [playerLoading, setPlayerLoading] = useState(false);
@@ -57,11 +56,8 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
         if (cancelled) return;
         setIsLive(Boolean(result.live));
         setReplays(result.replays || []);
-        setStatusError('');
-      } catch (error) {
-        if (!cancelled) {
-          setStatusError(error.message);
-        }
+      } catch {
+        if (!cancelled) setIsLive(false);
       } finally {
         if (!cancelled) setStatusLoaded(true);
       }
@@ -227,12 +223,11 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
 
       <section className="live-now-bar" aria-live="polite">
         {!statusLoaded && <p className="live-empty-state">Checking for a live session…</p>}
-        {statusLoaded && statusError && <p className="live-player-error">{statusError}</p>}
-        {statusLoaded && !statusError && (
+        {statusLoaded && (
           <>
             <span className={`live-status ${isLive ? 'live-status-live' : 'live-status-offline'}`}>
               <span className="live-dot" aria-hidden="true" />
-              {isLive ? 'Live now' : 'Offline'}
+              {isLive ? 'Live' : 'Offline'}
             </span>
             {isLive && selected !== 'live' && (
               <button className="live-watch-button" type="button" onClick={() => pick('live')}>

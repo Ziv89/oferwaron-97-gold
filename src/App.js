@@ -627,7 +627,7 @@ function App() {
                 path="/live"
                 element={
                   <ProtectedRoute>
-                    <LiveStream />
+                    <LiveStream autoSelectLive />
                   </ProtectedRoute>
                 }
               />

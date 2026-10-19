@@ -594,7 +594,14 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/strategy" element={<Strategy />} />
-              <Route path="/trading" element={<TradingDashboard />} />
+              <Route
+                path="/trading"
+                element={
+                  <ProtectedRoute>
+                    <TradingDashboard />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/youtube" element={<YouTube />} />
               <Route path="/contact" element={<Contact />} />
@@ -618,7 +625,11 @@ function App() {
               />
               <Route
                 path="/live"
-                element={<LiveStream />}
+                element={
+                  <ProtectedRoute>
+                    <LiveStream />
+                  </ProtectedRoute>
+                }
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

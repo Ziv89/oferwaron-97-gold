@@ -1686,6 +1686,79 @@ img {
 }
 
 /* ============================================
+   PERFORMANCE REPORT GALLERY (reuses YouTube layout)
+   ============================================ */
+.youtube-empty-state .strategy-btn-group {
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.report-featured {
+  cursor: zoom-in;
+  background: #111;
+}
+
+.report-featured-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.report-lightbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: min(1400px, 95vw);
+}
+
+.report-lightbox-image {
+  display: block;
+  max-width: 100%;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.report-lightbox-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  color: var(--gold);
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.report-lightbox-nav:hover {
+  background: var(--gold);
+  color: #000;
+}
+
+.report-lightbox-prev {
+  left: 8px;
+}
+
+.report-lightbox-next {
+  right: 8px;
+}
+
+.report-lightbox-counter {
+  position: absolute;
+  bottom: -36px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* ============================================
    YOUTUBE RESPONSIVE BREAKPOINTS
    ============================================ */
 

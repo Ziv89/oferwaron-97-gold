@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // public read only for chart images (ofernewChart.jpg, ofernewChart1.jpg, ...)
+    match /charts/{fileName} {
+      allow read: if fileName.matches('ofernewChart(\\d+)?\\.(jpg|jpeg|png|webp)$');
+      allow write: if false;
+    }
+
+    // public read only for performance report images (ofernewPerformance.jpg, ofernewPerformance1.jpg, ...)
+    match /performances/{fileName} {
+      allow read: if fileName.matches('ofernewPerformance(\\d+)?\\.(jpg|jpeg|png|webp)$');
+      allow write: if false;
+    }
+
+    // block everything else
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

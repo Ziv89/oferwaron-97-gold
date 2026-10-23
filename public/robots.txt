@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://oferwaron97gold.vercel.app/sitemap.txt
+Sitemap: https://www.oferwaron.com/sitemap.txt

@@ -109,7 +109,7 @@ function Home() {
       <section className="strategy-section text-center">
         <h1 className="strategy-main-title-main get-in-touch-title get-in-touch-title--shimmer">
   <span className="get-in-touch-shimmer">
-    Trade Gold with {stats.tradingwinRate}% Profit Factor {stats.profitFactor} & DD {stats.dd}
+    XAUUSD 4H {stats.tradingwinRate}% Profit Factor {stats.profitFactor} & DD {stats.dd}
 
   </span>
 </h1>

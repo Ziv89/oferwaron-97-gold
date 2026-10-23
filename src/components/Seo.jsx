@@ -7,7 +7,7 @@ import React from 'react';
 import { Helmet } from 'react-helmet-async';
 
 // Change this once if you move to a custom domain (e.g. https://97gold.com)
-export const SITE_URL = 'https://oferwaron97gold.vercel.app';
+export const SITE_URL = 'https://www.oferwaron.com';
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 /**

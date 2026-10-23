@@ -15,6 +15,7 @@ import Home from './pages/Home';
 import Strategy from './pages/Strategy';
 import Pricing from './pages/Pricing';
 import YouTube from './pages/YouTube';
+import PerformanceReport from './pages/PerformanceReport';
 import Contact from './pages/Contact';
 import About from './pages/About';
 import TradingDashboard from './pages/TradingDashboard';
@@ -410,6 +411,7 @@ const Header = () => {
     { to: '/trading', label: 'Live Trading' },
     { to: '/pricing', label: 'Pricing' },
     { to: '/youtube', label: 'YouTube' },
+    { to: '/performance', label: 'Performance Report' },
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
     user
@@ -536,6 +538,7 @@ const Footer = () => {
           <NavLink to="/strategy" className="footer-link">Strategy</NavLink>
           <NavLink to="/pricing" className="footer-link">Pricing</NavLink>
           <NavLink to="/youtube" className="footer-link">YouTube</NavLink>
+          <NavLink to="/performance" className="footer-link">Performance Report</NavLink>
         </div>
 
         <div className="footer-section">
@@ -604,6 +607,7 @@ function App() {
               />
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/youtube" element={<YouTube />} />
+              <Route path="/performance" element={<PerformanceReport />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />

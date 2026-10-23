@@ -1,22 +1,20 @@
 {
   "files": {
-    "main.css": "./static/css/main.3c78e87d.css",
-    "main.js": "./static/js/main.b07ff01d.js",
+    "main.css": "./static/css/main.36742f25.css",
+    "main.js": "./static/js/main.6266aace.js",
     "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
     "static/media/goldenface.png": "./static/media/goldenface.b5e3d5de30bcf87f3b44.png",
-    "static/media/oferBlack.jpg": "./static/media/oferBlack.d6c0dd25df30bdcbfb5e.jpg",
     "static/media/whiteBackground.jpg": "./static/media/whiteBackground.826f0577727a4c3989ba.jpg",
     "static/media/questionMarkCoin.webp": "./static/media/questionMarkCoin.c36b296ff50da618eba6.webp",
-    "static/media/oferWhite.jpg": "./static/media/oferWhite.24c5934e974ced2c1920.jpg",
     "static/media/SantaLogoNew.webp": "./static/media/SantaLogoNew.1ad386eaadb8b9e047fa.webp",
     "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "./index.html",
-    "main.3c78e87d.css.map": "./static/css/main.3c78e87d.css.map",
-    "main.b07ff01d.js.map": "./static/js/main.b07ff01d.js.map",
+    "main.36742f25.css.map": "./static/css/main.36742f25.css.map",
+    "main.6266aace.js.map": "./static/js/main.6266aace.js.map",
     "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.3c78e87d.css",
-    "static/js/main.b07ff01d.js"
+    "static/css/main.36742f25.css",
+    "static/js/main.6266aace.js"
   ]
 }

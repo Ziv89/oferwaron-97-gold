@@ -14,6 +14,18 @@ service firebase.storage {
       allow write: if false;
     }
 
+    // public read only for self images (ofernewSelfimage.jpg, ofernewSelfimage1.jpg, ...)
+    match /selfimages/{fileName} {
+      allow read: if fileName.matches('ofernewSelfimage(\\d+)?\\.(jpg|jpeg|png|webp)$');
+      allow write: if false;
+    }
+
+    // public read only for scan code images (ofernewScancode.jpg, ofernewScancode1.jpg, ...)
+    match /scancodes/{fileName} {
+      allow read: if fileName.matches('ofernewScancode(\\d+)?\\.(jpg|jpeg|png|webp)$');
+      allow write: if false;
+    }
+
     // block everything else
     match /{allPaths=**} {
       allow read, write: if false;

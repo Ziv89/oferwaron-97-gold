@@ -4,14 +4,17 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
-import { useOwnerDetails, useTradingStats } from '../App';
+import { useOwnerDetails } from '../App';
+import { useScancodeImage } from '../services/scancodeImages';
+import { WhatsAppQrButton } from '../components/WhatsAppQr';
 import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
 
 function Pricing() {
   // Get contact data from Firebase
   const { contact, loading } = useOwnerDetails();
-  const { stats } = useTradingStats();
-  const comingSoonImage = stats?.tradeViewChartImages?.[1] || '';
+
+  // Price image from Firebase Storage: scancodes/ofernewScancode1.jpg
+  const comingSoonImage = useScancodeImage(1);
 
   if (loading) {
     return (
@@ -81,7 +84,7 @@ function Pricing() {
               {comingSoonImage ? (
                 <img
                   src={comingSoonImage}
-                  alt="97% Gold Strategy - Coming Soon"
+                  alt="97% Gold Pricing"
                   className="coming-soon-hero-image"
                   loading="lazy"
                 />
@@ -108,16 +111,8 @@ function Pricing() {
             Chat with me directly on WhatsApp or send me an email. I'm here to help!
           </p>
           <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
-            {contact.whatsapp && (
-              <a 
-                href={`https://wa.me/${contact.whatsapp.replace('+', '')}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="strategy-btn strategy-btn-primary"
-              >
-                WhatsApp Me 💬
-              </a>
-            )}
+            {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
+            <WhatsAppQrButton />
             {contact.email && (
               <a
                 href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}`}

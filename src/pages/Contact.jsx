@@ -4,7 +4,8 @@
 import React, { useState } from 'react';
 import { useOwnerDetails } from '../App';
 import Seo from '../components/Seo';
-import OferWhite from '../assets/images/oferWhite.jpg';
+import { useSelfImage } from '../services/selfImages';
+import WhatsAppQr from '../components/WhatsAppQr';
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -18,6 +19,9 @@ function Contact() {
 
   // Get contact and social data from Firebase
   const { contact, social, loading } = useOwnerDetails();
+
+  // Hero image from Firebase Storage: selfimages/ofernewSelfimage.jpg
+  const heroImageSrc = useSelfImage(0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,9 +62,8 @@ function Contact() {
       icon: '💬',
       title: 'WhatsApp',
       desc: 'Fastest response',
-      value: contact.whatsapp,
-      link: contact.whatsapp ? `https://wa.me/${contact.whatsapp.replace('+', '')}` : '#',
-      colorClass: 'whatsapp'
+      colorClass: 'whatsapp',
+      showQr: true
     },
     {
       icon: '📺',
@@ -176,11 +179,13 @@ function Contact() {
         {/* Contact Hero Image */}
         <div className="contact-hero-image-wrapper">
           <div className="contact-hero-image-container">
-            <img 
-              src={OferWhite} 
-              alt="Ofer Waron - Ready to help" 
-              className="contact-hero-image"
-            />
+            {heroImageSrc && (
+              <img
+                src={heroImageSrc}
+                alt="Ofer Waron - Ready to help"
+                className="contact-hero-image"
+              />
+            )}
             <div className="contact-hero-image-glow"></div>
           </div>
         </div>
@@ -194,21 +199,43 @@ function Contact() {
       {/* Contact Methods - Strategy Card Style */}
       <section className="strategy-section">
         <div className="strategy-card-grid">
-          {contactMethods.map((method, i) => (
-            <a
-              key={i}
-              href={method.link}
-              target={method.link.startsWith('mailto:') ? '_self' : '_blank'}
-              rel={method.link.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
-              className={`strategy-rule-card contact-method-card contact-method-${method.colorClass}`}
-              style={{ textDecoration: 'none', cursor: 'pointer' }}
-            >
-              <div className="strategy-rule-icon">{method.icon}</div>
-              <h3 className="strategy-rule-title">{method.title}</h3>
-              <p className="strategy-rule-desc">{method.desc}</p>
-              <p className="contact-method-value">{method.value}</p>
-            </a>
-          ))}
+          {contactMethods.map((method, i) => {
+            const cardContent = (
+              <>
+                <div className="strategy-rule-icon">{method.icon}</div>
+                <h3 className="strategy-rule-title">{method.title}</h3>
+                <p className="strategy-rule-desc">{method.desc}</p>
+                {method.showQr ? (
+                  <WhatsAppQr caption="Scan to chat" compact />
+                ) : (
+                  <p className="contact-method-value">{method.value}</p>
+                )}
+              </>
+            );
+            const className = `strategy-rule-card contact-method-card contact-method-${method.colorClass}`;
+
+            // WhatsApp is reachable only by scanning the QR code - no clickable link
+            if (!method.link) {
+              return (
+                <div key={i} className={className} style={{ cursor: 'default' }}>
+                  {cardContent}
+                </div>
+              );
+            }
+
+            return (
+              <a
+                key={i}
+                href={method.link}
+                target={method.link.startsWith('mailto:') ? '_self' : '_blank'}
+                rel={method.link.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+                className={className}
+                style={{ textDecoration: 'none', cursor: 'pointer' }}
+              >
+                {cardContent}
+              </a>
+            );
+          })}
         </div>
       </section>
     </div>

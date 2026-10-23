@@ -1,11 +1,12 @@
 import { FaFileDownload, FaFileAlt } from "react-icons/fa";
 import CV from "../assets/files/cv.pdf";
 import "../styles/styles.css";
-import oferBlack from "../assets/images/oferBlack.jpg";
+import { useSelfImage } from "../services/selfImages";
 import { usePerformanceHistory } from "../App";
 
 const CTA = () => {
   const { performance, loading: perfLoading } = usePerformanceHistory();
+  const avatarSrc = useSelfImage(2); // selfimages/ofernewSelfimage2.jpg
 
   const experienceSince =
     performance?.experienceSince ?? "2009"; // fallback if not loaded
@@ -15,7 +16,7 @@ const CTA = () => {
       name: "Ofer Waron",
       role: "Lead Strategist & Founder",
       bio: `Investment specialist and architect of the 97% Gold strategy with 16 years of trading experience since ${experienceSince}.`,
-      avatar: oferBlack,
+      avatar: avatarSrc,
     },
   ];
 
@@ -49,11 +50,13 @@ const CTA = () => {
             {team.map((member, i) => (
               <div key={i} className="strategy-rule-card team-card">
                 <div className="team-avatar">
-                  <img
-                    src={member.avatar}
-                    alt={member.name}
-                    className="team-avatar-img"
-                  />
+                  {member.avatar && (
+                    <img
+                      src={member.avatar}
+                      alt={member.name}
+                      className="team-avatar-img"
+                    />
+                  )}
                 </div>
 
                 <h3 className="strategy-rule-title">{member.name}</h3>

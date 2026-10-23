@@ -15,13 +15,12 @@ import { Link } from 'react-router-dom';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import Seo from '../components/Seo';
 import { useAuth } from '../contexts/AuthContext';
-import { useOwnerDetails } from '../App';
+import { WhatsAppQrButton } from '../components/WhatsAppQr';
 import { db } from '../services/firebase';
 import '../styles/auth.css';
 
 export default function Members() {
   const { user, profile, subscription, expiresAt, isActive } = useAuth();
-  const { contact } = useOwnerDetails();
 
   const [tvUsername, setTvUsername] = useState('');
   const [saving, setSaving] = useState(false);
@@ -56,10 +55,6 @@ export default function Members() {
       setSaving(false);
     }
   };
-
-  const whatsappLink = contact.whatsapp
-    ? `https://wa.me/${contact.whatsapp.replace('+', '')}?text=Hi! I'd like to activate my 97% Gold membership.`
-    : '#';
 
   return (
     <div className="strategy-page">
@@ -121,14 +116,8 @@ export default function Members() {
                 activate it right away.
               </p>
               <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
-                <a
-                  href={whatsappLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="strategy-btn strategy-btn-primary"
-                >
-                  Activate on WhatsApp 💬
-                </a>
+                {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
+                <WhatsAppQrButton>Activate on WhatsApp 💬</WhatsAppQrButton>
                 <Link to="/pricing" className="strategy-btn strategy-btn-primary">
                   View Plans
                 </Link>

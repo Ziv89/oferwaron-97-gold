@@ -5414,3 +5414,96 @@ main,
     width: 100%;
   }
 }
+/* ============================================
+   WhatsApp QR code (Pricing - Still Have Questions)
+   ============================================ */
+.whatsapp-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.whatsapp-qr-image {
+  width: 180px;
+  max-width: 60vw;
+  height: auto;
+  padding: 0.5rem;
+  background: #fff;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(255, 215, 0, 0.25);
+}
+
+.whatsapp-qr-caption {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--gold-light);
+}
+
+/* Compact variant - inside the Contact page WhatsApp card, under the number */
+.whatsapp-qr--compact {
+  margin-top: 1rem;
+}
+
+.whatsapp-qr--compact .whatsapp-qr-image {
+  width: 130px;
+  padding: 0.4rem;
+  border-width: 1px;
+  border-radius: 10px;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.2);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.contact-method-whatsapp:hover .whatsapp-qr--compact .whatsapp-qr-image {
+  border-color: #25D366;
+  box-shadow: 0 0 16px rgba(37, 211, 102, 0.35);
+}
+
+.whatsapp-qr--compact .whatsapp-qr-caption {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+}
+
+/* Clickable QR - opens enlarged view */
+.whatsapp-qr-button {
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  line-height: 0;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+}
+
+.whatsapp-qr-button:hover,
+.whatsapp-qr-button:focus-visible {
+  transform: scale(1.04);
+}
+
+/* Enlarged QR overlay (reuses .video-modal-overlay / .video-modal / .close-modal) */
+.whatsapp-qr-lightbox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto;
+  max-width: 95vw;
+}
+
+.whatsapp-qr-lightbox-image {
+  display: block;
+  width: min(80vw, 70vh, 520px);
+  height: auto;
+  padding: 1rem;
+  background: #fff;
+  border: 3px solid var(--gold);
+  border-radius: var(--radius);
+  box-shadow: 0 0 40px rgba(255, 215, 0, 0.35);
+}
+
+.whatsapp-qr-lightbox-caption {
+  margin-top: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  color: var(--gold-light);
+}

@@ -548,16 +548,10 @@ const Footer = () => {
               📺 YouTube
             </a>
           )}
-          {contact.whatsapp && (
-            <a
-              href={`https://wa.me/${contact.whatsapp.replace('+', '')}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="footer-link"
-            >
-              💬 WhatsApp
-            </a>
-          )}
+          {/* WhatsApp is reachable only by scanning the QR code - link to Contact where it is shown */}
+          <NavLink to="/contact" className="footer-link">
+            💬 WhatsApp
+          </NavLink>
           {contact.email && (
             <a
               href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}&su=Contact%20from%20Website`}

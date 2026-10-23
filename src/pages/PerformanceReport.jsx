@@ -5,7 +5,7 @@
 // Clicking any image opens it fullscreen with prev/next navigation
 // ============================================
 import React, { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom'; // re-enable with the EmptyState buttons
 import Seo from '../components/Seo';
 import { fetchPerformanceImages } from '../services/performanceImages';
 

@@ -16,6 +16,7 @@ import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import Seo from '../components/Seo';
 import { useAuth } from '../contexts/AuthContext';
 import { WhatsAppQrButton } from '../components/WhatsAppQr';
+import { FaWhatsapp } from 'react-icons/fa';
 import { db } from '../services/firebase';
 import '../styles/auth.css';
 
@@ -117,7 +118,9 @@ export default function Members() {
               </p>
               <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
                 {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
-                <WhatsAppQrButton>Activate on WhatsApp 💬</WhatsAppQrButton>
+                <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon">
+                  Activate on WhatsApp <FaWhatsapp style={{ color: '#25D366' }} />
+                </WhatsAppQrButton>
                 <Link to="/pricing" className="strategy-btn strategy-btn-primary">
                   View Plans
                 </Link>

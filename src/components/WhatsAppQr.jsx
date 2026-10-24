@@ -7,11 +7,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useScancodeImage } from '../services/scancodeImages';
 
+const WHATSAPP_ALT = 'Scan to chat with Ofer on WhatsApp';
+const WHATSAPP_CAPTION = 'Scan with your phone camera to chat on WhatsApp';
+
 // ============================================
-// Enlarged QR overlay
+// Enlarged scan code overlay (WhatsApp, YouTube, ...)
 // Rendered into document.body so transformed parents (e.g. hovered cards) don't clip it
 // ============================================
-const QrLightbox = ({ src, onClose }) => {
+export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = WHATSAPP_CAPTION }) => {
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
@@ -34,10 +37,10 @@ const QrLightbox = ({ src, onClose }) => {
 
         <img
           src={src}
-          alt="Scan to chat with Ofer on WhatsApp"
+          alt={alt}
           className="whatsapp-qr-lightbox-image"
         />
-        <p className="whatsapp-qr-lightbox-caption">Scan with your phone camera to chat on WhatsApp</p>
+        {caption && <p className="whatsapp-qr-lightbox-caption">{caption}</p>}
       </div>
     </div>,
     document.body
@@ -69,7 +72,7 @@ const WhatsAppQr = ({ caption = 'Scan to chat on WhatsApp', compact = false }) =
       </button>
       {caption && <p className="whatsapp-qr-caption">{caption}</p>}
 
-      {isEnlarged && <QrLightbox src={qrImage} onClose={closeEnlarged} />}
+      {isEnlarged && <ScancodeLightbox src={qrImage} onClose={closeEnlarged} />}
     </div>
   );
 };
@@ -90,7 +93,7 @@ export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primar
         {children}
       </button>
 
-      {isEnlarged && <QrLightbox src={qrImage} onClose={closeEnlarged} />}
+      {isEnlarged && <ScancodeLightbox src={qrImage} onClose={closeEnlarged} />}
     </>
   );
 };

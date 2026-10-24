@@ -7,6 +7,8 @@ import Seo from '../components/Seo';
 import { useOwnerDetails } from '../App';
 import { useScancodeImage } from '../services/scancodeImages';
 import { WhatsAppQrButton } from '../components/WhatsAppQr';
+import { SiGmail } from 'react-icons/si';
+import { FaWhatsapp } from 'react-icons/fa';
 import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
 
 function Pricing() {
@@ -112,15 +114,17 @@ function Pricing() {
           </p>
           <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
             {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
-            <WhatsAppQrButton />
+            <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon">
+              WhatsApp Me <FaWhatsapp style={{ color: '#25D366' }} />
+            </WhatsAppQrButton>
             {contact.email && (
               <a
                 href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="strategy-btn strategy-btn-primary"
+                className="strategy-btn strategy-btn-primary strategy-btn-with-icon"
               >
-                Email Me ✉️
+                Email Me <SiGmail style={{ color: '#EA4335' }} />
               </a>
             )}
           </div>

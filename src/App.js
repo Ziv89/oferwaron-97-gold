@@ -9,6 +9,8 @@ import './styles/responsive-overrides.css';
 // To revert to the old logo: import SantaLogoNew from './assets/images/SantaLogo.jpg';
 import SantaLogoNew from './assets/images/SantaLogoNew.webp';
 import { Analytics } from "@vercel/analytics/react";
+import { SiGmail } from 'react-icons/si';
+import { FaWhatsapp, FaYoutube } from 'react-icons/fa';
 
 // Page imports
 import Home from './pages/Home';
@@ -517,7 +519,7 @@ const Header = () => {
 const Footer = () => {
   const { stats } = useTradingStats();
   const { performance } = usePerformanceHistory();
-  const { contact, social } = useOwnerDetails();
+  const { contact } = useOwnerDetails();
   const { config } = useSiteConfig();
 
   return (
@@ -543,14 +545,12 @@ const Footer = () => {
 
         <div className="footer-section">
           <h4 className="footer-section-heading">Connect</h4>
-          {social.youtube && (
-            <a href={social.youtube} target="_blank" rel="noopener noreferrer" className="footer-link">
-              📺 YouTube
-            </a>
-          )}
-          {/* WhatsApp is reachable only by scanning the QR code - link to Contact where it is shown */}
+          {/* YouTube & WhatsApp are reachable only by scanning their scan codes - link to Contact where they are shown */}
           <NavLink to="/contact" className="footer-link">
-            💬 WhatsApp
+            <FaYoutube className="footer-link-icon" style={{ color: '#FF0000' }} />YouTube
+          </NavLink>
+          <NavLink to="/contact" className="footer-link">
+            <FaWhatsapp className="footer-link-icon" style={{ color: '#25D366' }} />WhatsApp
           </NavLink>
           {contact.email && (
             <a
@@ -559,7 +559,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="footer-link"
             >
-              ✉️ Email
+              <SiGmail className="footer-link-icon" style={{ color: '#EA4335' }} />Email
             </a>
           )}
         </div>

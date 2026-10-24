@@ -1,11 +1,14 @@
 // ============================================
 // Contact.jsx - Contact Page (Strategy Style)
 // ============================================
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { useOwnerDetails } from '../App';
 import Seo from '../components/Seo';
+import { SiGmail } from 'react-icons/si';
+import { FaWhatsapp, FaYoutube } from 'react-icons/fa';
 import { useSelfImage } from '../services/selfImages';
-import WhatsAppQr from '../components/WhatsAppQr';
+import { useScancodeImage } from '../services/scancodeImages';
+import { ScancodeLightbox } from '../components/WhatsAppQr';
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -17,8 +20,8 @@ function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  // Get contact and social data from Firebase
-  const { contact, social, loading } = useOwnerDetails();
+  // Get contact data from Firebase
+  const { contact, loading } = useOwnerDetails();
 
   // Hero image from Firebase Storage: selfimages/ofernewSelfimage.jpg
   const heroImageSrc = useSelfImage(0);
@@ -48,10 +51,17 @@ function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Scan codes from Firebase Storage: scancodes/ofernewScancode.jpg (WhatsApp), scancodes/ofernewScancode2.jpg (YouTube)
+  const whatsappScancode = useScancodeImage(0);
+  const youtubeScancode = useScancodeImage(2);
+  const [openScancode, setOpenScancode] = useState(null);
+  const closeScancode = useCallback(() => setOpenScancode(null), []);
+
   // Contact methods using Firebase data
+  // Cards with a `scancode` open it enlarged instead of linking out
   const contactMethods = [
     {
-      icon: '✉️',
+      icon: <SiGmail style={{ color: '#EA4335' }} />,
       title: 'Email',
       desc: 'Detailed inquiries',
       value: contact.email,
@@ -59,19 +69,28 @@ function Contact() {
       colorClass: 'email'
     },
     {
-      icon: '💬',
+      icon: <FaWhatsapp style={{ color: '#25D366' }} />,
       title: 'WhatsApp',
       desc: 'Fastest response',
+      value: 'Scan QR code',
       colorClass: 'whatsapp',
-      showQr: true
+      scancode: {
+        src: whatsappScancode,
+        alt: 'Scan to chat with Ofer on WhatsApp',
+        caption: 'Scan with your phone camera to chat on WhatsApp'
+      }
     },
     {
-      icon: '📺',
+      icon: <FaYoutube style={{ color: '#FF0000' }} />,
       title: 'YouTube',
       desc: 'Free education',
       value: 'OferWaron97Gold',
-      link: social.youtube,
-      colorClass: 'youtube'
+      colorClass: 'youtube',
+      scancode: {
+        src: youtubeScancode,
+        alt: 'Scan to open the OferWaron97Gold YouTube channel',
+        caption: 'Scan with your phone camera to open the YouTube channel'
+      }
     }
   ];
 
@@ -205,19 +224,33 @@ function Contact() {
                 <div className="strategy-rule-icon">{method.icon}</div>
                 <h3 className="strategy-rule-title">{method.title}</h3>
                 <p className="strategy-rule-desc">{method.desc}</p>
-                {method.showQr ? (
-                  <WhatsAppQr caption="Scan to chat" compact />
-                ) : (
-                  <p className="contact-method-value">{method.value}</p>
-                )}
+                <p className="contact-method-value">{method.value}</p>
               </>
             );
             const className = `strategy-rule-card contact-method-card contact-method-${method.colorClass}`;
 
-            // WhatsApp is reachable only by scanning the QR code - no clickable link
-            if (!method.link) {
+            // WhatsApp / YouTube are reachable only by scanning - the card opens the scan code enlarged
+            if (method.scancode) {
+              const openCard = () => {
+                if (method.scancode.src) setOpenScancode(method.scancode);
+              };
+
               return (
-                <div key={i} className={className} style={{ cursor: 'default' }}>
+                <div
+                  key={i}
+                  role="button"
+                  tabIndex={0}
+                  className={className}
+                  style={{ cursor: 'pointer' }}
+                  onClick={openCard}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      openCard();
+                    }
+                  }}
+                  aria-label={`Show ${method.title} scan code`}
+                >
                   {cardContent}
                 </div>
               );
@@ -238,6 +271,15 @@ function Contact() {
           })}
         </div>
       </section>
+
+      {openScancode && (
+        <ScancodeLightbox
+          src={openScancode.src}
+          alt={openScancode.alt}
+          caption={openScancode.caption}
+          onClose={closeScancode}
+        />
+      )}
     </div>
   );
 }

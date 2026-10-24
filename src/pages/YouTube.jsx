@@ -3,9 +3,11 @@
 // Videos loaded dynamically from Firebase youTubeids array
 // First video = featured/main, rest displayed in responsive grid
 // ============================================
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import { useSiteConfig, useOwnerDetails } from '../App';
 import Seo from '../components/Seo';
+import { ScancodeLightbox } from '../components/WhatsAppQr';
+import { useScancodeImage } from '../services/scancodeImages';
 
 // ============================================
 // VIDEO CARD COMPONENT
@@ -102,6 +104,9 @@ const EmptyState = ({ channelUrl }) => (
 
 function YouTube() {
   const [activeVideo, setActiveVideo] = useState(null);
+  const youtubeScancode = useScancodeImage(2);
+  const [showScancode, setShowScancode] = useState(false);
+  const closeScancode = useCallback(() => setShowScancode(false), []);
   
   // Get data from Firebase
   const { loading: configLoading } = useSiteConfig();
@@ -220,15 +225,15 @@ function YouTube() {
             Subscribe to get the latest trading signals, market analysis, and educational content.
             s</p>
           </p>
-          <a 
-            href={`${YOUTUBE_CHANNEL}?sub_confirmation=1`}
-            target="_blank"
-            rel="noopener noreferrer"
+          {/* Opens the YouTube scan code - no direct link to YouTube */}
+          <button
+            type="button"
             className="subscribe-btn"
+            onClick={() => youtubeScancode && setShowScancode(true)}
           >
             <span className="subscribe-icon">▶</span>
             Subscribe Now
-          </a>
+          </button>
         </div>
       </section>
 
@@ -237,6 +242,16 @@ function YouTube() {
         videoId={activeVideo}
         onClose={() => setActiveVideo(null)}
       />
+
+      {/* YouTube scan code (scancodes/ofernewScancode2.jpg) */}
+      {showScancode && (
+        <ScancodeLightbox
+          src={youtubeScancode}
+          alt="Scan to open the OferWaron97Gold YouTube channel"
+          caption="Scan with your phone camera to open the YouTube channel"
+          onClose={closeScancode}
+        />
+      )}
     </div>
   );
 }

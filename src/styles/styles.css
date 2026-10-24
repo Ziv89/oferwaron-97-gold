@@ -5507,3 +5507,33 @@ main,
   text-align: center;
   color: var(--gold-light);
 }
+
+/* Buttons with a trailing brand icon (Pricing - WhatsApp Me / Email Me)
+   Same font + line-height for <button> and <a> so both render the same height */
+.strategy-btn-with-icon {
+  gap: 0.5em;
+  font-family: inherit;
+  line-height: 1.2;
+}
+
+.strategy-btn-with-icon svg {
+  flex-shrink: 0;
+  width: 1.1em;
+  height: 1.1em;
+}
+
+/* Footer brand icons - same footprint as the emoji they replaced (1em + a space) */
+.footer-link-icon {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.35em;
+  vertical-align: -0.125em;
+  flex-shrink: 0;
+}
+
+/* Subscribe Now is a <button> (opens the YouTube scan code) - reset native button styles */
+button.subscribe-btn {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}

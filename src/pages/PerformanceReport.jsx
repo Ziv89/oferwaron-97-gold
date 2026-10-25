@@ -7,6 +7,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 // import { Link } from 'react-router-dom'; // re-enable with the EmptyState buttons
 import Seo from '../components/Seo';
+import CoinLoader from '../components/CoinLoader';
+import { LoadingImage } from '../components/LoadingMedia';
 import { fetchPerformanceImages } from '../services/performanceImages';
 
 // ============================================
@@ -16,11 +18,12 @@ import { fetchPerformanceImages } from '../services/performanceImages';
 const ReportCard = ({ src, index, onOpen, onError }) => (
   <div className="video-card" onClick={() => onOpen(index)}>
     <div className="video-thumbnail">
-      <img
+      <LoadingImage
         src={src}
         alt={`97% Gold performance report ${index + 1}`}
         onError={() => onError(src)}
         loading="lazy"
+        coinSize={64}
       />
       <div className="play-overlay">
         <span className="play-icon">⤢</span>
@@ -75,11 +78,14 @@ const Lightbox = ({ images, index, onClose, onChange }) => {
       <div className="video-modal report-lightbox" onClick={e => e.stopPropagation()}>
         <button className="close-modal" onClick={onClose} aria-label="Close report">✕</button>
 
-        <img
-          src={images[index]}
-          alt={`97% Gold performance report ${index + 1}`}
-          className="report-lightbox-image"
-        />
+        <div className="report-lightbox-image-wrapper">
+          <LoadingImage
+            src={images[index]}
+            alt={`97% Gold performance report ${index + 1}`}
+            className="report-lightbox-image"
+            coinSize={110}
+          />
+        </div>
 
         {hasMany && (
           <>
@@ -92,24 +98,6 @@ const Lightbox = ({ images, index, onClose, onChange }) => {
     </div>
   );
 };
-
-// ============================================
-// LOADING SKELETON COMPONENT
-// ============================================
-const LoadingSkeleton = () => (
-  <div className="youtube-loading">
-    <div className="youtube-loading-featured">
-      <div className="skeleton-shimmer" />
-    </div>
-    <div className="youtube-loading-grid">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="skeleton-card">
-          <div className="skeleton-shimmer" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 // ============================================
 // EMPTY STATE COMPONENT
@@ -178,7 +166,7 @@ function PerformanceReport() {
       </section>
 
       {loading ? (
-        <LoadingSkeleton />
+        <CoinLoader label="Loading reports…" size={120} />
       ) : !featuredImage ? (
         <EmptyState />
       ) : (
@@ -189,11 +177,12 @@ function PerformanceReport() {
               <span className="featured-badge">⭐ Latest Report</span>
             </div>
             <div className="featured-video-container report-featured" onClick={() => setActiveIndex(0)}>
-              <img
+              <LoadingImage
                 src={featuredImage}
                 alt="97% Gold latest performance report"
                 className="report-featured-image"
                 onError={() => handleImageError(featuredImage)}
+                coinSize={110}
               />
             </div>
           </section>

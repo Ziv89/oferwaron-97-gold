@@ -10,7 +10,10 @@ import './styles/responsive-overrides.css';
 import SantaLogoNew from './assets/images/SantaLogoNew.webp';
 import { Analytics } from "@vercel/analytics/react";
 import { SiGmail } from 'react-icons/si';
-import { FaWhatsapp, FaYoutube } from 'react-icons/fa';
+import {
+  FaWhatsapp, FaYoutube, FaInstagram, FaTiktok, FaHome, FaChessKnight,
+  FaMoneyBillWave, FaChartBar, FaUser, FaAddressCard
+} from 'react-icons/fa';
 
 // Page imports
 import Home from './pages/Home';
@@ -25,6 +28,7 @@ import Login from './pages/Login';
 import Members from './pages/Members';
 import Core from './pages/Core';
 import LiveStream from './pages/LiveStream';
+import VipLounge from './pages/VipLounge';
 
 // Auth
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -70,7 +74,7 @@ const LOADING_PERFORMANCE = {
 
 const LOADING_OWNER = {
   contact: { email: '', whatsapp: '' },
-  social: { youtube: '', tradingview: '' },
+  social: { youtube: '', tradingview: '', instagram: '', tiktok: '' },
   youTubeids: []
 };
 
@@ -303,12 +307,16 @@ const images = Array.isArray(data.tradeViewChartImages)
           if (data.social) {
             setSocial({
               youtube: data.social.youtube || '',
-              tradingview: data.social.tradingview || ''
+              tradingview: data.social.tradingview || '',
+              instagram: data.social.instagram || '',
+              tiktok: data.social.tiktok || ''
             });
           } else {
             setSocial({
               youtube: data.youtube || '',
-              tradingview: data.tradingview || ''
+              tradingview: data.tradingview || '',
+              instagram: data.instagram || '',
+              tiktok: data.tiktok || ''
             });
           }
 
@@ -416,6 +424,8 @@ const Header = () => {
     { to: '/performance', label: 'Performance Report' },
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
+    // Signed-in members only
+    ...(user ? [{ to: '/vip', label: 'WhatsApp group', member: true }] : []),
     user
       ? { to: '/members', label: 'My Account', member: true }
       : { to: '/login', label: 'Member Login', member: true }
@@ -516,6 +526,28 @@ const Header = () => {
 // ============================================
 // FOOTER COMPONENT
 // ============================================
+// Every footer icon has its own color - links with the same text share one (e.g. both "YouTube" links)
+const FOOTER_ICON_COLORS = {
+  home: '#D4AF37',
+  strategy: '#9B7EDE',
+  pricing: '#85BB65',
+  youtube: '#FF0000',
+  performance: '#FFA726',
+  contact: '#4285F4',
+  whatsapp: '#25D366',
+  email: '#EA4335',
+  instagram: '#E1306C',
+  tiktok: '#25F4EE',
+  about: '#B0BEC5',
+};
+
+// Connect links open the matching scan code on the Contact page (see Contact.jsx)
+const ScancodeFooterLink = ({ scan, label, Icon }) => (
+  <NavLink to={`/contact?scan=${scan}`} className="footer-link">
+    <Icon className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS[scan] }} />{label}
+  </NavLink>
+);
+
 const Footer = () => {
   const { stats } = useTradingStats();
   const { performance } = usePerformanceHistory();
@@ -536,22 +568,30 @@ const Footer = () => {
 
         <div className="footer-section">
           <h4 className="footer-section-heading">Quick Links</h4>
-          <NavLink to="/" className="footer-link">Home</NavLink>
-          <NavLink to="/strategy" className="footer-link">Strategy</NavLink>
-          <NavLink to="/pricing" className="footer-link">Pricing</NavLink>
-          <NavLink to="/youtube" className="footer-link">YouTube</NavLink>
-          <NavLink to="/performance" className="footer-link">Performance Report</NavLink>
+          <NavLink to="/" className="footer-link">
+            <FaHome className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.home }} />Home
+          </NavLink>
+          <NavLink to="/strategy" className="footer-link">
+            <FaChessKnight className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.strategy }} />Strategy
+          </NavLink>
+          <NavLink to="/pricing" className="footer-link">
+            <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
+          </NavLink>
+          <NavLink to="/youtube" className="footer-link">
+            <FaYoutube className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.youtube }} />YouTube
+          </NavLink>
+          <NavLink to="/performance" className="footer-link">
+            <FaChartBar className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.performance }} />Performance Report
+          </NavLink>
+          <NavLink to="/contact" className="footer-link">
+            <FaAddressCard className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.contact }} />Contact
+          </NavLink>
         </div>
 
         <div className="footer-section">
           <h4 className="footer-section-heading">Connect</h4>
-          {/* YouTube & WhatsApp are reachable only by scanning their scan codes - link to Contact where they are shown */}
-          <NavLink to="/contact" className="footer-link">
-            <FaYoutube className="footer-link-icon" style={{ color: '#FF0000' }} />YouTube
-          </NavLink>
-          <NavLink to="/contact" className="footer-link">
-            <FaWhatsapp className="footer-link-icon" style={{ color: '#25D366' }} />WhatsApp
-          </NavLink>
+          <ScancodeFooterLink scan="youtube" label="YouTube" Icon={FaYoutube} />
+          <ScancodeFooterLink scan="whatsapp" label="WhatsApp" Icon={FaWhatsapp} />
           {contact.email && (
             <a
               href={`https://mail.google.com/mail/?view=cm&fs=1&to=${contact.email}&su=Contact%20from%20Website`}
@@ -559,14 +599,18 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="footer-link"
             >
-              <SiGmail className="footer-link-icon" style={{ color: '#EA4335' }} />Email
+              <SiGmail className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.email }} />Email
             </a>
           )}
+          <ScancodeFooterLink scan="instagram" label="Instagram" Icon={FaInstagram} />
+          <ScancodeFooterLink scan="tiktok" label="TikTok" Icon={FaTiktok} />
         </div>
 
         <div className="footer-section">
           <h4 className="footer-section-heading">Legal</h4>
-          <NavLink to="/about" className="footer-link">About Me</NavLink>
+          <NavLink to="/about" className="footer-link">
+            <FaUser className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.about }} />About Me
+          </NavLink>
         </div>
       </div>
 
@@ -626,6 +670,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <LiveStream autoSelectLive />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/vip"
+                element={
+                  <ProtectedRoute>
+                    <VipLounge />
                   </ProtectedRoute>
                 }
               />

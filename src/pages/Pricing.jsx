@@ -7,6 +7,7 @@ import Seo from '../components/Seo';
 import { useOwnerDetails } from '../App';
 import { useScancodeImage } from '../services/scancodeImages';
 import { WhatsAppQrButton } from '../components/WhatsAppQr';
+import { LoadingImage } from '../components/LoadingMedia';
 import { SiGmail } from 'react-icons/si';
 import { FaWhatsapp } from 'react-icons/fa';
 import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
@@ -84,11 +85,12 @@ function Pricing() {
           <div className="coming-soon-image-section">
             <div className="coming-soon-image-wrapper">
               {comingSoonImage ? (
-                <img
+                <LoadingImage
                   src={comingSoonImage}
                   alt="97% Gold Pricing"
                   className="coming-soon-hero-image"
                   loading="lazy"
+                  coinSize={110}
                 />
               ) : (
                 <div className="coming-soon-image-placeholder">

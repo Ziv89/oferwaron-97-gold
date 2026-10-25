@@ -24,6 +24,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
+import CoinLoader from '../components/CoinLoader';
+import { LoadingImage } from '../components/LoadingMedia';
 import { useAuth } from '../contexts/AuthContext';
 import { useTradingStats } from '../App';
 import LiveSignalsChart from '../components/LiveSignalsChart';
@@ -76,17 +78,18 @@ export default function Core() {
           </p>
 
           {loading ? (
-            <p className="strategy-subtitle">Loading…</p>
+            <CoinLoader label="Loading snapshots…" />
           ) : strategyImages.length ? (
             <div className="core-snapshot-grid">
               {strategyImages.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt={`97% Gold strategy chart snapshot ${i + 1}`}
-                  className="core-snapshot-image"
-                  loading="lazy"
-                />
+                <div key={i} className="media-loading-box core-snapshot-item">
+                  <LoadingImage
+                    src={src}
+                    alt={`97% Gold strategy chart snapshot ${i + 1}`}
+                    className="core-snapshot-image"
+                    loading="lazy"
+                  />
+                </div>
               ))}
             </div>
           ) : (

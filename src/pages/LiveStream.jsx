@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import Seo from '../components/Seo';
+import CoinLoader from '../components/CoinLoader';
+import { LoadingFrame } from '../components/LoadingMedia';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/firebase';
 import '../styles/live-stream.css';
@@ -254,7 +256,7 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
             </div>
           </div>
           <div ref={playerRef} className="live-player-frame">
-            {playerLoading && <p className="live-player-message">Authorizing secure playback…</p>}
+            {playerLoading && <CoinLoader label="Authorizing secure playback…" />}
             {playerError && (
               <div className="live-player-message live-frame-error" role="alert">
                 <strong>Secure stream unavailable</strong>
@@ -262,7 +264,7 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
               </div>
             )}
             {embedUrl && (
-              <iframe
+              <LoadingFrame
                 src={embedUrl}
                 title={playerTitle}
                 allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"

@@ -3,11 +3,11 @@
 // Videos loaded dynamically from Firebase youTubeids array
 // First video = featured/main, rest displayed in responsive grid
 // ============================================
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useSiteConfig, useOwnerDetails } from '../App';
 import Seo from '../components/Seo';
-import { ScancodeLightbox } from '../components/WhatsAppQr';
-import { useScancodeImage } from '../services/scancodeImages';
+import CoinLoader from '../components/CoinLoader';
+import { LoadingImage, LoadingFrame } from '../components/LoadingMedia';
 
 // ============================================
 // VIDEO CARD COMPONENT
@@ -21,11 +21,12 @@ const VideoCard = ({ videoId, index, onPlay }) => {
   return (
     <div className="video-card" onClick={() => onPlay(videoId)}>
       <div className="video-thumbnail">
-        <img 
-          src={imgSrc} 
+        <LoadingImage
+          src={imgSrc}
           alt={`Video ${index + 1}`}
           onError={() => setImgSrc(fallbackUrl)}
           loading="lazy"
+          coinSize={64}
         />
         <div className="play-overlay">
           <span className="play-icon">▶</span>
@@ -49,7 +50,7 @@ const VideoModal = ({ videoId, onClose }) => {
     <div className="video-modal-overlay" onClick={onClose}>
       <div className="video-modal" onClick={e => e.stopPropagation()}>
         <button className="close-modal" onClick={onClose} aria-label="Close video">✕</button>
-        <iframe
+        <LoadingFrame
           src={`https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`}
           title="YouTube Video"
           frameBorder="0"
@@ -60,25 +61,6 @@ const VideoModal = ({ videoId, onClose }) => {
     </div>
   );
 };
-
-// ============================================
-// LOADING SKELETON COMPONENT
-// Shows while videos are loading
-// ============================================
-const LoadingSkeleton = () => (
-  <div className="youtube-loading">
-    <div className="youtube-loading-featured">
-      <div className="skeleton-shimmer" />
-    </div>
-    <div className="youtube-loading-grid">
-      {[1, 2, 3].map(i => (
-        <div key={i} className="skeleton-card">
-          <div className="skeleton-shimmer" />
-        </div>
-      ))}
-    </div>
-  </div>
-);
 
 // ============================================
 // EMPTY STATE COMPONENT
@@ -104,9 +86,6 @@ const EmptyState = ({ channelUrl }) => (
 
 function YouTube() {
   const [activeVideo, setActiveVideo] = useState(null);
-  const youtubeScancode = useScancodeImage(2);
-  const [showScancode, setShowScancode] = useState(false);
-  const closeScancode = useCallback(() => setShowScancode(false), []);
   
   // Get data from Firebase
   const { loading: configLoading } = useSiteConfig();
@@ -140,7 +119,7 @@ function YouTube() {
           description="Watch trading insights, market analysis and tutorials from 97% Gold on YouTube."
           path="/youtube"
         />
-        <LoadingSkeleton />
+        <CoinLoader label="Loading videos…" size={120} />
       </div>
     );
   }
@@ -186,7 +165,7 @@ function YouTube() {
           </div>
           <div className="featured-video-container">
             <div className="featured-video-wrapper">
-              <iframe
+              <LoadingFrame
                 src={`https://www.youtube.com/embed/${featuredVideo}?rel=0`}
                 title="Featured Video"
                 frameBorder="0"
@@ -225,15 +204,16 @@ function YouTube() {
             Subscribe to get the latest trading signals, market analysis, and educational content.
             s</p>
           </p>
-          {/* Opens the YouTube scan code - no direct link to YouTube */}
-          <button
-            type="button"
+          <a
+            href={`${YOUTUBE_CHANNEL}?sub_confirmation=1`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="subscribe-btn"
-            onClick={() => youtubeScancode && setShowScancode(true)}
+            style={{ textDecoration: 'none' }}
           >
             <span className="subscribe-icon">▶</span>
             Subscribe Now
-          </button>
+          </a>
         </div>
       </section>
 
@@ -243,15 +223,6 @@ function YouTube() {
         onClose={() => setActiveVideo(null)}
       />
 
-      {/* YouTube scan code (scancodes/ofernewScancode2.jpg) */}
-      {showScancode && (
-        <ScancodeLightbox
-          src={youtubeScancode}
-          alt="Scan to open the OferWaron97Gold YouTube channel"
-          caption="Scan with your phone camera to open the YouTube channel"
-          onClose={closeScancode}
-        />
-      )}
     </div>
   );
 }

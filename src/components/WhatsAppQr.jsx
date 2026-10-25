@@ -6,6 +6,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useScancodeImage } from '../services/scancodeImages';
+import { LoadingImage } from './LoadingMedia';
 
 const WHATSAPP_ALT = 'Scan to chat with Ofer on WhatsApp';
 const WHATSAPP_CAPTION = 'Scan with your phone camera to chat on WhatsApp';
@@ -14,7 +15,8 @@ const WHATSAPP_CAPTION = 'Scan with your phone camera to chat on WhatsApp';
 // Enlarged scan code overlay (WhatsApp, YouTube, ...)
 // Rendered into document.body so transformed parents (e.g. hovered cards) don't clip it
 // ============================================
-export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = WHATSAPP_CAPTION }) => {
+// `missing` = the image does not exist in Storage (yet) - shows a placeholder instead of the coin
+export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = WHATSAPP_CAPTION, missing = false }) => {
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
@@ -35,12 +37,19 @@ export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = W
       <div className="video-modal whatsapp-qr-lightbox" onClick={e => e.stopPropagation()}>
         <button className="close-modal" onClick={onClose} aria-label="Close QR code">✕</button>
 
-        <img
-          src={src}
-          alt={alt}
-          className="whatsapp-qr-lightbox-image"
-        />
-        {caption && <p className="whatsapp-qr-lightbox-caption">{caption}</p>}
+        {missing ? (
+          <div className="whatsapp-qr-lightbox-missing">Scan code coming soon</div>
+        ) : (
+          <div className="media-loading-box whatsapp-qr-lightbox-box">
+            <LoadingImage
+              src={src}
+              alt={alt}
+              className="whatsapp-qr-lightbox-image"
+              coinSize={110}
+            />
+          </div>
+        )}
+        {caption && !missing && <p className="whatsapp-qr-lightbox-caption">{caption}</p>}
       </div>
     </div>,
     document.body
@@ -63,12 +72,15 @@ const WhatsAppQr = ({ caption = 'Scan to chat on WhatsApp', compact = false }) =
         aria-label="Enlarge WhatsApp QR code"
         title="Click to enlarge"
       >
-        <img
-          src={qrImage}
-          alt="Scan to chat with Ofer on WhatsApp"
-          className="whatsapp-qr-image"
-          loading="lazy"
-        />
+        <span className="media-loading-box">
+          <LoadingImage
+            src={qrImage}
+            alt="Scan to chat with Ofer on WhatsApp"
+            className="whatsapp-qr-image"
+            loading="lazy"
+            coinSize={56}
+          />
+        </span>
       </button>
       {caption && <p className="whatsapp-qr-caption">{caption}</p>}
 

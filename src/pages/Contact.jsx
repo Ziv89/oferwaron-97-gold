@@ -1,14 +1,16 @@
 // ============================================
 // Contact.jsx - Contact Page (Strategy Style)
 // ============================================
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useOwnerDetails } from '../App';
 import Seo from '../components/Seo';
 import { SiGmail } from 'react-icons/si';
-import { FaWhatsapp, FaYoutube } from 'react-icons/fa';
+import { FaWhatsapp, FaYoutube, FaInstagram, FaTiktok } from 'react-icons/fa';
 import { useSelfImage } from '../services/selfImages';
-import { useScancodeImage } from '../services/scancodeImages';
+import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
 import { ScancodeLightbox } from '../components/WhatsAppQr';
+import { LoadingImage } from '../components/LoadingMedia';
 
 function Contact() {
   const [formData, setFormData] = useState({
@@ -51,11 +53,16 @@ function Contact() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Scan codes from Firebase Storage: scancodes/ofernewScancode.jpg (WhatsApp), scancodes/ofernewScancode2.jpg (YouTube)
-  const whatsappScancode = useScancodeImage(0);
-  const youtubeScancode = useScancodeImage(2);
-  const [openScancode, setOpenScancode] = useState(null);
-  const closeScancode = useCallback(() => setOpenScancode(null), []);
+  // Scan codes from Firebase Storage (.jpg or .jpeg):
+  // scancodes/ofernewScancode (WhatsApp), ofernewScancode2 (TikTok), ofernewScancode3 (Instagram),
+  // ofernewScancode4 (YouTube - the window shows "coming soon" until it is uploaded)
+  const whatsappScancode = useScancodeImageState(SCANCODE.whatsapp);
+  const youtubeScancode = useScancodeImageState(SCANCODE.youtube);
+  const tiktokScancode = useScancodeImageState(SCANCODE.tiktok);
+  const instagramScancode = useScancodeImageState(SCANCODE.instagram);
+  // Key (colorClass) of the open card - its scan code is read live so the window updates once the image loads
+  const [openScancodeKey, setOpenScancodeKey] = useState(null);
+  const closeScancode = useCallback(() => setOpenScancodeKey(null), []);
 
   // Contact methods using Firebase data
   // Cards with a `scancode` open it enlarged instead of linking out
@@ -75,7 +82,8 @@ function Contact() {
       value: 'Scan QR code',
       colorClass: 'whatsapp',
       scancode: {
-        src: whatsappScancode,
+        src: whatsappScancode.url,
+        missing: whatsappScancode.failed,
         alt: 'Scan to chat with Ofer on WhatsApp',
         caption: 'Scan with your phone camera to chat on WhatsApp'
       }
@@ -84,15 +92,58 @@ function Contact() {
       icon: <FaYoutube style={{ color: '#FF0000' }} />,
       title: 'YouTube',
       desc: 'Free education',
-      value: 'OferWaron97Gold',
+      value: 'Scan QR code',
       colorClass: 'youtube',
       scancode: {
-        src: youtubeScancode,
+        src: youtubeScancode.url,
+        missing: youtubeScancode.failed,
         alt: 'Scan to open the OferWaron97Gold YouTube channel',
         caption: 'Scan with your phone camera to open the YouTube channel'
       }
+    },
+    {
+      icon: <FaInstagram style={{ color: '#E4405F' }} />,
+      title: 'Instagram',
+      desc: 'Daily updates',
+      value: 'Scan QR code',
+      colorClass: 'instagram',
+      scancode: {
+        src: instagramScancode.url,
+        missing: instagramScancode.failed,
+        alt: 'Scan to open Ofer on Instagram',
+        caption: 'Scan with your phone camera to open Instagram'
+      }
+    },
+    {
+      icon: <FaTiktok style={{ color: '#000000' }} />,
+      title: 'TikTok',
+      desc: 'Short clips',
+      value: 'Scan QR code',
+      colorClass: 'tiktok',
+      scancode: {
+        src: tiktokScancode.url,
+        missing: tiktokScancode.failed,
+        alt: 'Scan to open Ofer on TikTok',
+        caption: 'Scan with your phone camera to open TikTok'
+      }
     }
   ];
+
+  const openScancode = contactMethods.find((m) => m.colorClass === openScancodeKey)?.scancode;
+
+  // Footer "Connect" links land here as /contact?scan=<whatsapp|youtube|instagram|tiktok>:
+  // open that scan code window (the coin shows until the image loads), then drop the param
+  const [searchParams, setSearchParams] = useSearchParams();
+  const requestedScan = searchParams.get('scan');
+
+  useEffect(() => {
+    if (!requestedScan) return;
+    if (contactMethods.some((m) => m.colorClass === requestedScan && m.scancode)) {
+      setOpenScancodeKey(requestedScan);
+    }
+    setSearchParams({}, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [requestedScan]);
 
   if (loading) {
     return (
@@ -198,13 +249,12 @@ function Contact() {
         {/* Contact Hero Image */}
         <div className="contact-hero-image-wrapper">
           <div className="contact-hero-image-container">
-            {heroImageSrc && (
-              <img
-                src={heroImageSrc}
-                alt="Ofer Waron - Ready to help"
-                className="contact-hero-image"
-              />
-            )}
+            <LoadingImage
+              src={heroImageSrc}
+              alt="Ofer Waron - Ready to help"
+              className="contact-hero-image"
+              coinSize={90}
+            />
             <div className="contact-hero-image-glow"></div>
           </div>
         </div>
@@ -229,11 +279,9 @@ function Contact() {
             );
             const className = `strategy-rule-card contact-method-card contact-method-${method.colorClass}`;
 
-            // WhatsApp / YouTube are reachable only by scanning - the card opens the scan code enlarged
+            // Cards with a loaded scan code (WhatsApp / YouTube / Instagram / TikTok) open it - the card opens the scan code enlarged
             if (method.scancode) {
-              const openCard = () => {
-                if (method.scancode.src) setOpenScancode(method.scancode);
-              };
+              const openCard = () => setOpenScancodeKey(method.colorClass);
 
               return (
                 <div
@@ -251,6 +299,14 @@ function Contact() {
                   }}
                   aria-label={`Show ${method.title} scan code`}
                 >
+                  {cardContent}
+                </div>
+              );
+            }
+
+            if (!method.link) {
+              return (
+                <div key={i} className={className}>
                   {cardContent}
                 </div>
               );
@@ -277,6 +333,7 @@ function Contact() {
           src={openScancode.src}
           alt={openScancode.alt}
           caption={openScancode.caption}
+          missing={openScancode.missing}
           onClose={closeScancode}
         />
       )}

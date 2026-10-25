@@ -20,6 +20,18 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // VIP Lounge - each member's own WhatsApp groups to scan
+    match /users/{uid}/whatsappGroups/{groupId} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['name', 'inviteLink', 'status', 'lastScannedAt', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
+        && request.resource.data.inviteLink.matches('https://chat\\.whatsapp\\.com/[A-Za-z0-9]{10,}')
+        && request.resource.data.status == 'pending';
+      allow update: if false;
+    }
+
     // Entitlement record. Read-only to its owner; only admin/add-member.js
     // (Admin SDK, bypasses rules) may write it.
     match /subscriptions/{uid} {

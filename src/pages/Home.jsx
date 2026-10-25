@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { useTradingStats, useSiteConfig, usePerformanceHistory } from '../App';
 import { useAuth } from '../contexts/AuthContext';
+import CoinLoader from '../components/CoinLoader';
 
 // SantaLogo shimmer sweep only (no glitter dots/stars)
 const StatCardShimmer = () => (
@@ -27,7 +28,7 @@ const StrategyChart = () => {
   if (loading) {
     return (
       <div className="chart-container chart-wrapper">
-        <div className="chart-loading">Loading chart...</div>
+        <div className="chart-loading"><CoinLoader label="Loading chart…" /></div>
       </div>
     );
   }
@@ -54,8 +55,9 @@ const StrategyChart = () => {
   }
 
   return (
-    <div className="chart-container chart-wrapper">
-      {!isLoaded && <div className="chart-loading">Loading chart...</div>}
+    // Container shrinks to the image once loaded so the chart fills its border edge to edge
+    <div className={`chart-container chart-wrapper strategy-chart-container ${isLoaded ? 'loaded' : ''}`}>
+      {!isLoaded && <div className="chart-loading"><CoinLoader label="Loading chart…" /></div>}
 
       <div className="strategy-chart-showcase">
         <img
@@ -64,16 +66,6 @@ const StrategyChart = () => {
           className={`strategy-chart-image ${isLoaded ? 'loaded' : ''}`}
           onLoad={() => setIsLoaded(true)}
         />
-        <div className="chart-overlay-info">
-          <a
-            href="https://www.tradingview.com/u/oferwv/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="chart-tradingview-link"
-          >
-            📺 View Live on TradingView
-          </a>
-        </div>
       </div>
     </div>
   );

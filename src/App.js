@@ -413,19 +413,21 @@ const Header = () => {
     setGlitters(dots);
   }, []);
 
-  const { user, logout } = useAuth();
+  const { user, isApproved, logout } = useAuth();
+  // Registered but not yet approved: hide the member-only tabs
+  const pendingMember = user && !isApproved;
 
   const navLinks = [
     { to: '/', label: 'Home' },
     { to: '/strategy', label: 'Strategy' },
-    { to: '/trading', label: 'Live Trading' },
+    ...(pendingMember ? [] : [{ to: '/trading', label: 'Live Trading' }]),
     { to: '/pricing', label: 'Pricing' },
     { to: '/youtube', label: 'YouTube' },
     { to: '/performance', label: 'Performance Report' },
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
     // Signed-in members only
-    ...(user ? [{ to: '/vip', label: 'WhatsApp group', member: true }] : []),
+    ...(user && isApproved ? [{ to: '/vip', label: 'WhatsApp group', member: true, whatsapp: true }] : []),
     user
       ? { to: '/members', label: 'My Account', member: true }
       : { to: '/login', label: 'Member Login', member: true }
@@ -466,7 +468,7 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''}`}
             >
               {link.label}
             </NavLink>
@@ -498,7 +500,7 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''}`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
@@ -638,7 +640,7 @@ function App() {
               <Route
                 path="/trading"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireApproved>
                     <TradingDashboard />
                   </ProtectedRoute>
                 }
@@ -660,7 +662,7 @@ function App() {
               <Route
                 path="/core"
                 element={
-                  <ProtectedRoute requireActive>
+                  <ProtectedRoute requireApproved>
                     <Core />
                   </ProtectedRoute>
                 }
@@ -668,7 +670,7 @@ function App() {
               <Route
                 path="/live"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireApproved>
                     <LiveStream autoSelectLive />
                   </ProtectedRoute>
                 }
@@ -676,7 +678,7 @@ function App() {
               <Route
                 path="/vip"
                 element={
-                  <ProtectedRoute>
+                  <ProtectedRoute requireApproved>
                     <VipLounge />
                   </ProtectedRoute>
                 }

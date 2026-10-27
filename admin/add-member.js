@@ -14,6 +14,9 @@
  * Other commands:
  *   node admin/add-member.js --list
  *   node admin/add-member.js --pending      (TradingView access requests)
+ *   node admin/add-member.js --registrations   (sign-ups waiting for approval)
+ *   node admin/add-member.js --approve a@b.com
+ *   node admin/add-member.js --reject a@b.com
  *   node admin/add-member.js --revoke a@b.com
  *   node admin/add-member.js --reset-password a@b.com
  *
@@ -131,6 +134,12 @@ async function addMember(email, days, displayName) {
     { merge: true }
   );
 
+  // Adding a member also approves their registration
+  await db.collection('users').doc(user.uid).set(
+    { email, approval: 'approved', approvedAt: Timestamp.now() },
+    { merge: true }
+  );
+
   console.log('');
   console.log('  uid       ', user.uid);
   console.log('  email     ', email);
@@ -142,7 +151,7 @@ async function addMember(email, days, displayName) {
     console.log('  Sign in at /login with the above, then use');
     console.log('  "Forgot password?" so only they know the password.');
   }
-  console.log('  users/{uid} appears by itself on first sign-in.');
+  console.log('  users/{uid} is marked approved; the rest fills in on first sign-in.');
 }
 
 async function listMembers() {
@@ -187,6 +196,31 @@ async function listPending() {
   });
 }
 
+async function listRegistrations() {
+  const snap = await db.collection('users').where('approval', '==', 'pending').get();
+  if (snap.empty) return console.log('No registrations waiting for approval.');
+
+  console.table(
+    snap.docs.map((d) => ({
+      email: d.data().email,
+      name: d.data().displayName || '',
+      born: d.data().dateOfBirth || '',
+      registered: fmt(d.data().createdAt?.toDate()),
+    }))
+  );
+  console.log('Approve:  node admin/add-member.js --approve <email>');
+  console.log('Reject:   node admin/add-member.js --reject <email>');
+}
+
+async function setApproval(email, approval) {
+  const user = await auth.getUserByEmail(email);
+  await db.collection('users').doc(user.uid).set(
+    { approval, [`${approval}At`]: Timestamp.now() },
+    { merge: true }
+  );
+  console.log(`${email} is now ${approval}. Their menu updates immediately.`);
+}
+
 async function resetPassword(email) {
   const user = await auth.getUserByEmail(email);
   const password = genPassword();
@@ -219,6 +253,11 @@ async function revoke(email) {
   try {
     if (a === '--list') await listMembers();
     else if (a === '--pending') await listPending();
+    else if (a === '--registrations') await listRegistrations();
+    else if (a === '--approve' || a === '--reject') {
+      if (!b) throw new Error(`Usage: ${a} <email>`);
+      await setApproval(b, a === '--approve' ? 'approved' : 'rejected');
+    }
     else if (a === '--revoke') {
       if (!b) throw new Error('Usage: --revoke <email>');
       await revoke(b);
@@ -233,6 +272,9 @@ async function revoke(email) {
       console.log('  node admin/add-member.js <email> [days] ["Name"]');
       console.log('  node admin/add-member.js --list');
       console.log('  node admin/add-member.js --pending');
+      console.log('  node admin/add-member.js --registrations');
+      console.log('  node admin/add-member.js --approve <email>');
+      console.log('  node admin/add-member.js --reject <email>');
       console.log('  node admin/add-member.js --revoke <email>');
       console.log('  node admin/add-member.js --reset-password <email>');
     }

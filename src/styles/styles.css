@@ -5451,6 +5451,18 @@ main,
   color: var(--gold-light);
 }
 
+/* Home hero - "Questions? Message me on WhatsApp" under the CTAs */
+.home-whatsapp-qr {
+  margin-top: 2rem;
+}
+
+.home-whatsapp-qr-title {
+  margin: 0;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  font-weight: 700;
+  color: #25D366;
+}
+
 /* Compact variant - inside the Contact page WhatsApp card, under the number */
 .whatsapp-qr--compact {
   margin-top: 1rem;
@@ -5758,4 +5770,303 @@ span.media-loading-box {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+
+/* ============================================
+   Strategy - Strategy Overview (text of documents/osn.pdf)
+   About-style scrolling panel; slides styled like the PDF
+   ============================================ */
+.osn-panel {
+  max-width: 900px;
+  margin: var(--space-md) auto 0;
+  padding: clamp(0.75rem, 2.5vw, 1.25rem);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border-gold);
+  border-radius: var(--radius);
+  height: clamp(480px, 70vh, 720px);
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  animation: osn-open 0.35s ease;
+}
+
+@keyframes osn-open {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.osn-scroll {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  padding-left: 4px;
+  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+}
+
+/* One PDF's slides; slides in from the side when switching documents */
+.osn-doc {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.osn-doc--next { animation: osn-swap-next 0.45s ease; }
+.osn-doc--prev { animation: osn-swap-prev 0.45s ease; }
+
+@keyframes osn-swap-next {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes osn-swap-prev {
+  from { opacity: 0; transform: translateX(-60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .osn-doc--next,
+  .osn-doc--prev,
+  .osn-panel {
+    animation: none;
+  }
+}
+
+/* Switcher between PDFs - arrows, current title, dots */
+.osn-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+  margin-bottom: clamp(0.5rem, 2vw, 0.9rem);
+}
+
+.osn-switch-arrow {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #ffd700;
+  background: linear-gradient(135deg, #ffdf3a 0%, #d4a008 48%, #a96b00 100%);
+  color: #000;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.osn-switch-arrow:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
+}
+
+.osn-switch-center {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.osn-switch-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: 'Heebo', 'Segoe UI', Arial, sans-serif;
+  font-weight: 700;
+  color: var(--gold-light);
+}
+
+.osn-switch-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.osn-switch-dot {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid #ffd700;
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.osn-switch-dot.active {
+  background: #ffd700;
+  transform: scale(1.25);
+}
+
+.osn-scroll .coin-loader {
+  margin: auto;
+}
+
+.osn-message {
+  margin: auto;
+  color: var(--gold-light);
+}
+
+/* Content slide - white page, orange label, navy title */
+.osn-slide {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 14px;
+  padding: clamp(1.25rem, 4vw, 2.5rem);
+  text-align: right;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+.osn-eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: clamp(0.8rem, 2vw, 0.95rem);
+  font-weight: 700;
+  color: #d97706;
+}
+
+.osn-title {
+  margin: 0 0 clamp(1rem, 3vw, 1.75rem);
+  font-size: clamp(1.3rem, 4vw, 2rem);
+  font-weight: 800;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.osn-text {
+  margin: 0.75rem 0 0;
+  color: #64748b;
+  line-height: 1.7;
+}
+
+.osn-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.osn-column {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.osn-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  text-align: center;
+}
+
+/* A card that is just a line of text (e.g. a list of guidelines) */
+.osn-card--note {
+  text-align: right;
+}
+
+.osn-card--note .osn-card-text {
+  color: #0f172a;
+  font-weight: 500;
+}
+
+/* Step number above the card heading */
+.osn-card-badge {
+  width: 2.2rem;
+  height: 2.2rem;
+  margin: 0 auto 0.6rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fef3c7;
+  color: #b45309;
+  font-weight: 800;
+}
+
+.osn-card-icon {
+  font-size: clamp(1.4rem, 4vw, 2rem);
+  letter-spacing: 0.15em;
+  margin-bottom: 0.5rem;
+}
+
+.osn-card-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1rem, 2.6vw, 1.2rem);
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.osn-card-text {
+  margin: 0.25rem 0 0;
+  font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+  line-height: 1.65;
+  color: #64748b;
+}
+
+/* Card colours from the PDF */
+.osn-card--gold   { background: #fefae8; border-color: #fdecb0; }
+.osn-card--gold   .osn-card-title { color: #c2570c; }
+.osn-card--gold   .osn-card-text  { color: #92400e; }
+.osn-card--purple { background: #faf5ff; border-color: #ede4fb; }
+.osn-card--purple .osn-card-title { color: #7e22ce; }
+.osn-card--purple .osn-card-text  { color: #6b21a8; }
+.osn-card--orange { background: #fff7ed; border-color: #fde5cc; }
+.osn-card--orange .osn-card-title { color: #c2410c; }
+.osn-card--orange .osn-card-text  { color: #9a3412; }
+.osn-card--green  { background: #f0fdf4; border-color: #dcfce7; }
+.osn-card--green  .osn-card-title { color: #15803d; }
+.osn-card--green  .osn-card-text  { color: #166534; }
+.osn-card--red    { background: #fef2f2; border-color: #fee2e2; }
+.osn-card--red    .osn-card-title { color: #b91c1c; }
+.osn-card--red    .osn-card-text  { color: #991b1b; }
+
+/* Cover / closing slide - dark navy, centred */
+.osn-slide--hero {
+  background: #0f172a;
+  color: #ffffff;
+  text-align: center;
+  padding-block: clamp(2rem, 6vw, 3.5rem);
+}
+
+.osn-slide--hero .osn-eyebrow {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.35rem 1rem;
+  border: 1px solid #b45309;
+  border-radius: 999px;
+  background: #2a2118;
+  color: #fbbf24;
+}
+
+.osn-slide--hero .osn-title {
+  color: #ffffff;
+  font-size: clamp(1.5rem, 5vw, 2.4rem);
+}
+
+.osn-subtitle {
+  margin: 0 auto 1rem;
+  max-width: 640px;
+  color: #94a3b8;
+  font-size: clamp(0.95rem, 2.6vw, 1.15rem);
+  line-height: 1.6;
+}
+
+.osn-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1.5rem;
+  color: #cbd5e1;
+  font-size: clamp(0.85rem, 2.2vw, 0.95rem);
+}
+
+.osn-points li + li::before {
+  content: '•';
+  margin-left: 1.5rem;
+  color: #475569;
 }

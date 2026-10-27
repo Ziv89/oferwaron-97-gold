@@ -1,11 +1,12 @@
 // ============================================
 // AuthContext.jsx - Firebase Auth + live subscription state
 //
-// NO SELF-REGISTRATION. Accounts are created by the site owner in the
-// Firebase Console (Authentication -> Add user). This file only signs
-// people in and reads their entitlement.
+// Visitors can self-register. A new users/{uid} document always starts
+// with approval: 'pending'; only the site owner can change it to
+// 'approved' or 'rejected' (Firestore Console or admin/add-member.js).
+// Until approved, the person is signed in but only sees My Account.
 //
-// Because the account is created in the Console, there is no
+// Accounts created by the owner in the Firebase Console have no
 // users/{uid} document yet. ensureProfile() creates it on the first
 // successful sign-in.
 //
@@ -14,6 +15,8 @@
 //   profile         users/{uid} document
 //   subscription    subscriptions/{uid} document
 //   isActive        true when the subscription is live
+//   approval        'pending' | 'approved' | 'rejected' (null when signed out)
+//   isApproved      true when the owner approved this account
 //   loading         true until BOTH auth and the subscription resolve
 //
 // IMPORTANT: isActive is a UI convenience only. The real gate is the
@@ -23,6 +26,8 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
   sendPasswordResetEmail,
   signOut,
 } from 'firebase/auth';
@@ -46,24 +51,35 @@ export const useAuth = () => {
       profile: null,
       subscription: null,
       isActive: false,
+      approval: null,
+      isApproved: false,
       loading: true,
     };
   }
   return ctx;
 };
 
-// Create users/{uid} the first time an owner-provisioned account signs in.
-// Never touches subscriptions/{uid} - clients cannot write entitlements.
+// Name / date of birth typed into the register form, picked up by ensureProfile
+// when the new account's auth state fires (so only one place creates the doc).
+let pendingRegistration = null;
+
+// Create users/{uid} the first time an account signs in (or registers).
+// Never touches subscriptions/{uid} - clients cannot write entitlements,
+// and approval always starts as 'pending' (enforced by the rules).
 const ensureProfile = async (fbUser) => {
   try {
     const ref = doc(db, 'users', fbUser.uid);
     const snap = await getDoc(ref);
 
     if (!snap.exists()) {
+      const reg = pendingRegistration || {};
+      pendingRegistration = null;
       await setDoc(ref, {
         email: fbUser.email,
-        displayName: fbUser.displayName || '',
+        displayName: reg.displayName || fbUser.displayName || '',
         whatsapp: '',
+        dateOfBirth: reg.dateOfBirth || '',
+        approval: 'pending',
         locale: 'en',
         tvUsername: '',
         tvAccessRequestedAt: null,
@@ -73,10 +89,12 @@ const ensureProfile = async (fbUser) => {
     } else {
       await updateDoc(ref, { lastSeenAt: serverTimestamp() });
     }
+    return true;
   } catch (err) {
-    // Non-fatal: the member can still use the site, they just will not
-    // have a profile row until this succeeds.
+    // Non-fatal: the person stays signed in, but without a profile row
+    // they are treated as not approved until this succeeds.
     console.warn('Could not sync profile document');
+    return false;
   }
 };
 
@@ -86,6 +104,7 @@ export const AuthProvider = ({ children }) => {
   const [subscription, setSubscription] = useState(null);
   const [authResolved, setAuthResolved] = useState(false);
   const [dataResolved, setDataResolved] = useState(false);
+  const [profileResolved, setProfileResolved] = useState(false);
 
   useEffect(() => {
     let unsubProfile = () => {};
@@ -102,17 +121,30 @@ export const AuthProvider = ({ children }) => {
         setProfile(null);
         setSubscription(null);
         setDataResolved(true);
+        setProfileResolved(true);
         return;
       }
 
       setDataResolved(false);
-      ensureProfile(fbUser);
+      setProfileResolved(false);
+      // If the doc could not be written, stop waiting for it (the account is
+      // then treated as not approved)
+      ensureProfile(fbUser).then((ok) => {
+        if (!ok) setProfileResolved(true);
+      });
 
-      // users/{uid}
+      // users/{uid} - stays unresolved until the doc exists (ensureProfile
+      // creates it), so approval is never guessed from a missing doc
       unsubProfile = onSnapshot(
         doc(db, 'users', fbUser.uid),
-        (snap) => setProfile(snap.exists() ? { id: snap.id, ...snap.data() } : null),
-        () => setProfile(null)
+        (snap) => {
+          setProfile(snap.exists() ? { id: snap.id, ...snap.data() } : null);
+          if (snap.exists()) setProfileResolved(true);
+        },
+        () => {
+          setProfile(null);
+          setProfileResolved(true);
+        }
       );
 
       // subscriptions/{uid} - created by the owner, read-only here
@@ -141,6 +173,18 @@ export const AuthProvider = ({ children }) => {
   const login = (email, password) =>
     signInWithEmailAndPassword(auth, email.trim(), password);
 
+  const register = async ({ name, dateOfBirth, email, password }) => {
+    pendingRegistration = { displayName: name.trim(), dateOfBirth };
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      if (name.trim()) await updateProfile(cred.user, { displayName: name.trim() });
+      return cred;
+    } catch (err) {
+      pendingRegistration = null;
+      throw err;
+    }
+  };
+
   const resetPassword = (email) => sendPasswordResetEmail(auth, email.trim());
 
   const logout = () => signOut(auth);
@@ -157,14 +201,22 @@ export const AuthProvider = ({ children }) => {
       ['trial', 'active'].includes(subscription?.status)
   );
 
+  // Profiles created before registration existed have no approval field -
+  // those were owner-provisioned members, so they count as approved.
+  const approval = profile ? profile.approval || 'approved' : null;
+  const isApproved = approval === 'approved';
+
   const value = {
     user,
     profile,
     subscription,
     expiresAt,
     isActive,
-    loading: !authResolved || !dataResolved,
+    approval,
+    isApproved,
+    loading: !authResolved || !dataResolved || !profileResolved,
     login,
+    register,
     resetPassword,
     logout,
   };

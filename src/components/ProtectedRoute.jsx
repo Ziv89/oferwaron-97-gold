@@ -1,8 +1,10 @@
 // ============================================
 // ProtectedRoute.jsx - route guard
 //
-// requireActive=false -> just needs to be signed in
-// requireActive=true  -> needs a live subscription
+// requireApproved=false -> just needs to be signed in
+// requireApproved=true  -> also needs the owner's approval of the
+//                          registration (otherwise sent to /members)
+// requireActive is currently not enforced (see below)
 //
 // This only controls what renders. The data itself is protected by the
 // Firestore rules, which is the gate that actually matters.
@@ -11,8 +13,8 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
-export default function ProtectedRoute({ children, requireActive = false }) {
-  const { user, loading } = useAuth();
+export default function ProtectedRoute({ children, requireApproved = false }) {
+  const { user, isApproved, loading } = useAuth();
   const location = useLocation();
 
   if (loading) {
@@ -29,7 +31,12 @@ export default function ProtectedRoute({ children, requireActive = false }) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // Temporary access rule: any signed-in member can access protected pages
+  // Registered but not approved (pending or rejected): My Account only
+  if (requireApproved && !isApproved) {
+    return <Navigate to="/members" replace />;
+  }
+
+  // Temporary access rule: any approved member can access protected pages
   // while activation is handled manually. Logged-out users remain blocked.
   return children;
 }

@@ -76,7 +76,7 @@ export default function VipLounge() {
   return (
     <div className="strategy-page">
       <Seo
-        title="VIP Lounge — 97% Gold"
+        title="WhatsApp Group — 97% Gold"
         description="Member-only tools for 97% Gold members."
         path="/vip"
         noindex
@@ -85,7 +85,7 @@ export default function VipLounge() {
       <section className="strategy-section text-center">
         <h1 className="get-in-touch-title get-in-touch-title--shimmer">
           <span className="get-in-touch-shimmer">
-            VIP Lounge
+            WhatsApp Group Scanner  
             <span className="sparkle sparkle-1">✦</span>
             <span className="sparkle sparkle-2">✦</span>
           </span>

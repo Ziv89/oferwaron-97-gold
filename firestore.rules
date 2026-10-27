@@ -2,18 +2,50 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // Owner approved this account's registration. Profiles from before
+    // self-registration have no approval field and count as approved.
+    function isApproved(uid) {
+      return get(/databases/$(database)/documents/users/$(uid)).data
+        .get('approval', 'approved') == 'approved';
+    }
+
     // Public marketing data: read-only to the web app, no client writes.
     match /siteData/{docId} {
       allow read: if true;
       allow write: if false;   // edit these docs from the Firebase console only
     }
 
-    // A member's own profile. Created on first sign-in (ensureProfile) and
-    // updated for lastSeenAt / TradingView username requests only - never
-    // for entitlement fields (those don't live on this doc).
+    // Strategy page overviews - text of each documents/<name>.pdf, written
+    // only by the extractStrategyDocument Cloud Function (Admin SDK).
+    match /strategyDocuments/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Owner-only settings (WhatsApp number, CallMeBot key for registration
+    // alerts). Read only by Cloud Functions via the Admin SDK - never
+    // put these in siteData, which anyone can read.
+    match /adminData/{docId} {
+      allow read, write: if false;
+    }
+
+    // A member's own profile. Created on registration / first sign-in
+    // (ensureProfile) always as approval 'pending', and updated for
+    // lastSeenAt / TradingView username requests only. 'approval' is changed
+    // by the owner only (Firebase Console or admin/add-member.js).
     match /users/{uid} {
       allow read: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.approval == 'pending'
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'whatsapp', 'dateOfBirth', 'approval',
+             'locale', 'tvUsername', 'tvAccessRequestedAt', 'createdAt', 'lastSeenAt'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() <= 80
+        && request.resource.data.whatsapp is string
+        && request.resource.data.whatsapp.size() <= 30
+        && (!('dateOfBirth' in request.resource.data)
+            || request.resource.data.dateOfBirth == ''
+            || request.resource.data.dateOfBirth.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}'));
       allow update: if request.auth != null && request.auth.uid == uid
         && request.resource.data.diff(resource.data).affectedKeys()
              .hasOnly(['tvUsername', 'tvAccessRequestedAt', 'lastSeenAt']);
@@ -22,8 +54,8 @@ service cloud.firestore {
 
     // VIP Lounge - each member's own WhatsApp groups to scan
     match /users/{uid}/whatsappGroups/{groupId} {
-      allow read, delete: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null && request.auth.uid == uid
+      allow read, delete: if request.auth != null && request.auth.uid == uid && isApproved(uid);
+      allow create: if request.auth != null && request.auth.uid == uid && isApproved(uid)
         && request.resource.data.keys().hasOnly(['name', 'inviteLink', 'status', 'lastScannedAt', 'createdAt'])
         && request.resource.data.name is string
         && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 80
@@ -42,7 +74,7 @@ service cloud.firestore {
     // Active members can read the event schedule. Events are managed in the
     // Firebase Console; clients cannot publish or change broadcasts.
     match /streamEvents/{eventId} {
-      allow read: if request.auth != null
+      allow read: if request.auth != null && isApproved(request.auth.uid)
         && exists(/databases/$(database)/documents/subscriptions/$(request.auth.uid))
         && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.status in ['trial', 'active']
         && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.expiresAt > request.time;
@@ -54,7 +86,7 @@ service cloud.firestore {
     // rules). Readable only by signed-in members with a live subscription -
     // this is the actual invite-only gate for the live signal feed.
     match /signals/{signalId} {
-      allow read: if request.auth != null
+      allow read: if request.auth != null && isApproved(request.auth.uid)
         && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.status in ['trial', 'active']
         && get(/databases/$(database)/documents/subscriptions/$(request.auth.uid)).data.expiresAt > request.time;
       allow write: if false;

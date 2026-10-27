@@ -137,22 +137,7 @@ function Home() {
         </div>
 
         {/* CTAs */}
-        <div className="strategy-btn-group">
-          <a
-            href={whatsappTrialLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="strategy-btn strategy-btn-trial"
-          >
-             Try Free for 30 Days
-          </a>
-          <Link to="/pricing" className="strategy-btn strategy-btn-primary">
-            Start Trading Now
-          </Link>
-          <Link to="/youtube" className="strategy-btn strategy-btn-primary">
-            Watch Free Content
-          </Link>
-        </div>
+
       </section>
 
       {/* Live Strategy Chart Section */}

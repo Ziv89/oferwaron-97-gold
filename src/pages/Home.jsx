@@ -7,6 +7,7 @@ import Seo from '../components/Seo';
 import { useTradingStats, useSiteConfig, usePerformanceHistory } from '../App';
 import { useAuth } from '../contexts/AuthContext';
 import CoinLoader from '../components/CoinLoader';
+import WhatsAppQr from '../components/WhatsAppQr';
 
 // SantaLogo shimmer sweep only (no glitter dots/stars)
 const StatCardShimmer = () => (
@@ -140,16 +141,20 @@ function Home() {
           {' '}
           {user && <Link to="/trading">Full trade log →</Link>}
         </p>
-
         {/* CTAs */}
         <div className="strategy-btn-group">
-
           <Link to="/pricing" className="strategy-btn strategy-btn-primary">
             Start Trading Now
           </Link>
           <Link to="/youtube" className="strategy-btn strategy-btn-primary">
             Watch Free Content
           </Link>
+        </div>
+
+        {/* Direct line to Ofer - tap to enlarge the scan code */}
+        <div className="home-whatsapp-qr">
+          <p className="home-whatsapp-qr-title">Questions? Message me on WhatsApp</p>
+          <WhatsAppQr caption="" />
         </div>
       </section>
 

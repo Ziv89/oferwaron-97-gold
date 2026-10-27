@@ -1,9 +1,9 @@
 // ============================================
-// Login.jsx - member sign in
+// Login.jsx - member sign in, registration and password reset
 //
-// Sign in and password reset only. Accounts are provisioned by the
-// owner in the Firebase Console, so there is no self-registration
-// here - anyone wanting an account is sent to /contact.
+// Registering creates the account right away and signs the person in,
+// but it starts as 'pending': they only see My Account until the owner
+// approves them (see AuthContext).
 // ============================================
 import React, { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
@@ -12,12 +12,26 @@ import { useAuth } from '../contexts/AuthContext';
 import '../styles/auth.css';
 
 
+const MIN_PASSWORD = 8;
+
+// Today as YYYY-MM-DD (local time) - the latest valid date of birth
+const todayIso = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 const friendlyError = (code) => {
   switch (code) {
     case 'auth/invalid-credential':
     case 'auth/wrong-password':
     case 'auth/user-not-found':
-      return 'Email or password is incorrect. If you do not have an account yet, request access below.';
+      return 'Email or password is incorrect. If you do not have an account yet, register below.';
+    case 'auth/email-already-in-use':
+      return 'An account with this email already exists. Sign in instead.';
+    case 'auth/weak-password':
+      return `Password must be at least ${MIN_PASSWORD} characters.`;
+    case 'auth/operation-not-allowed':
+      return 'Registration is not enabled yet. Please contact us.';
     case 'auth/invalid-email':
       return 'That email address does not look right.';
     case 'auth/user-disabled':
@@ -32,27 +46,51 @@ const friendlyError = (code) => {
 };
 
 export default function Login() {
-  const [mode, setMode] = useState('login'); // 'login' | 'reset'
+  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'reset'
+  const [name, setName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
-  const { login, resetPassword } = useAuth();
+  const { login, register, resetPassword } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/members';
 
+  const switchMode = (next) => {
+    setMode(next);
+    setError('');
+    setNotice('');
+  };
+
   const submit = async () => {
     setError('');
     setNotice('');
+
+    if (mode === 'register') {
+      if (!dateOfBirth || dateOfBirth > todayIso()) {
+        setError('Please enter a valid date of birth.');
+        return;
+      }
+      if (password.length < MIN_PASSWORD) {
+        setError(`Password must be at least ${MIN_PASSWORD} characters.`);
+        return;
+      }
+    }
+
     setBusy(true);
 
     try {
       if (mode === 'login') {
         await login(email, password);
         navigate(from, { replace: true });
+      } else if (mode === 'register') {
+        await register({ name, dateOfBirth, email, password });
+        // New accounts are pending - My Account shows the approval status
+        navigate('/members', { replace: true });
       } else {
         await resetPassword(email);
         // Same message whether or not the account exists, so this
@@ -88,8 +126,22 @@ export default function Login() {
     }
   };
 
+  const canSubmit =
+    mode === 'login'
+      ? email && password
+      : mode === 'register'
+      ? name.trim() && dateOfBirth && email && password
+      : email;
+
+  const title = { login: 'Member Sign In', register: 'Register', reset: 'Reset Password' }[mode];
+  const subtitle = {
+    login: 'Sign in to your member account.',
+    register: 'Create your account. Member areas open once we approve your registration.',
+    reset: 'Enter your email and we will send you a reset link.',
+  }[mode];
+
   const onKeyDown = (e) => {
-    if (e.key === 'Enter' && !busy) submit();
+    if (e.key === 'Enter' && !busy && canSubmit) submit();
   };
 
   return (
@@ -103,17 +155,41 @@ export default function Login() {
 
       <section className="strategy-section">
         <div className="auth-card">
-          <h1 className="strategy-card-title text-center">
-            {mode === 'login' ? 'Member Sign In' : 'Reset Password'}
-          </h1>
+          <h1 className="strategy-card-title text-center">{title}</h1>
 
-          <p className="strategy-subtitle text-center auth-subtitle">
-            {mode === 'login'
-              ? 'Members only. Accounts are set up for you after you subscribe.'
-              : 'Enter your email and we will send you a reset link.'}
-          </p>
+          <p className="strategy-subtitle text-center auth-subtitle">{subtitle}</p>
 
           <div className="auth-form">
+            {mode === 'register' && (
+              <>
+                <input
+                  type="text"
+                  className="contact-input"
+                  placeholder="Full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  autoComplete="name"
+                  maxLength={80}
+                />
+                {/* Date inputs show no placeholder, so it gets a visible label */}
+                <label className="auth-field-label" htmlFor="register-dob">
+                  Date of birth
+                </label>
+                <input
+                  id="register-dob"
+                  type="date"
+                  className="contact-input"
+                  value={dateOfBirth}
+                  onChange={(e) => setDateOfBirth(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  autoComplete="bday"
+                  min="1900-01-01"
+                  max={todayIso()}
+                />
+              </>
+            )}
+
             <input
               type="email"
               className="contact-input"
@@ -124,15 +200,15 @@ export default function Login() {
               autoComplete="email"
             />
 
-            {mode === 'login' && (
+            {mode !== 'reset' && (
               <input
                 type="password"
                 className="contact-input"
-                placeholder="Password"
+                placeholder={mode === 'register' ? `Password (at least ${MIN_PASSWORD} characters)` : 'Password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 onKeyDown={onKeyDown}
-                autoComplete="current-password"
+                autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
               />
             )}
 
@@ -141,46 +217,53 @@ export default function Login() {
 
             <button
               type="button"
-              className="strategy-btn strategy-btn-primary"
+              className={`strategy-btn strategy-btn-primary${mode === 'register' ? ' strategy-btn-green' : ''}`}
               onClick={submit}
-              disabled={busy || !email || (mode === 'login' && !password)}
+              disabled={busy || !canSubmit}
             >
               {busy
                 ? 'Please wait…'
                 : mode === 'login'
                 ? 'Sign In'
+                : mode === 'register'
+                ? 'Register'
                 : 'Send Reset Link'}
             </button>
           </div>
 
           <div className="auth-links">
             {mode === 'login' ? (
-              <button type="button" className="auth-link" onClick={() => setMode('reset')}>
+              <button type="button" className="auth-link" onClick={() => switchMode('reset')}>
                 Forgot password?
               </button>
             ) : (
-              <button type="button" className="auth-link" onClick={() => setMode('login')}>
+              <button type="button" className="auth-link" onClick={() => switchMode('login')}>
                 Back to sign in
               </button>
             )}
           </div>
 
-          {/* No self-signup: accounts are created by the owner. */}
-          <div className="auth-request-box">
-            <p className="auth-request-title">Don't have an account yet?</p>
-            <p className="auth-request-text">
-              Member accounts are created manually after you subscribe. Get in
-              touch and we will set yours up, usually the same day.
-            </p>
-            <div className="strategy-btn-group">
-              <Link to="/contact" className="strategy-btn strategy-btn-primary">
-                Request Access
-              </Link>
-              <Link to="/pricing" className="auth-link auth-link-inline">
-                See plans →
-              </Link>
+          {mode === 'login' && (
+            <div className="auth-request-box">
+              <p className="auth-request-title">Don't have an account yet?</p>
+              <p className="auth-request-text">
+                Register in a minute. Once we approve your registration you get
+                access to Live Trading and the member areas.
+              </p>
+              <div className="strategy-btn-group">
+                <button
+                  type="button"
+                  className="strategy-btn strategy-btn-primary strategy-btn-green"
+                  onClick={() => switchMode('register')}
+                >
+                  Register
+                </button>
+                <Link to="/pricing" className="auth-link auth-link-inline">
+                  See plans →
+                </Link>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>

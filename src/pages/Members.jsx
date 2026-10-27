@@ -1,7 +1,8 @@
 // ============================================
 // Members.jsx - the member area
 //
-// Two states:
+// States:
+//   registration pending / rejected -> show the approval status only
 //   no active subscription -> show how to subscribe
 //   active subscription    -> show status + TradingView access request
 //
@@ -21,7 +22,7 @@ import { db } from '../services/firebase';
 import '../styles/auth.css';
 
 export default function Members() {
-  const { user, profile, subscription, expiresAt, isActive } = useAuth();
+  const { user, profile, subscription, expiresAt, isActive, approval, isApproved } = useAuth();
 
   const [tvUsername, setTvUsername] = useState('');
   const [saving, setSaving] = useState(false);
@@ -79,7 +80,49 @@ export default function Members() {
         </p>
       </section>
 
+      {/* ---------- Registration approval (not yet approved) ---------- */}
+      {!isApproved && (
+        <section className="strategy-section">
+          <div className="strategy-principle-card">
+            <h2 className="strategy-card-title">Registration Status</h2>
+
+            {approval === 'rejected' ? (
+              <>
+                <div className="member-status member-status-rejected">
+                  <span className="member-status-dot" />
+                  Not approved
+                </div>
+                <p className="strategy-principle-text">
+                  Your registration was not approved. If you think this is a
+                  mistake, message us on WhatsApp.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="member-status member-status-pending">
+                  <span className="member-status-dot" />
+                  Pending approval
+                </div>
+                <p className="strategy-principle-text">
+                  Thanks for registering! Your account is waiting for approval.
+                  Once approved, Live Trading and the member areas open up here
+                  automatically - no need to sign in again.
+                </p>
+              </>
+            )}
+
+            <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
+              {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
+              <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon">
+                Message us on WhatsApp <FaWhatsapp style={{ color: '#25D366' }} />
+              </WhatsAppQrButton>
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* ---------- Subscription status ---------- */}
+      {isApproved && (
       <section className="strategy-section">
         <div className="strategy-principle-card">
           <h2 className="strategy-card-title">Membership Status</h2>
@@ -129,9 +172,10 @@ export default function Members() {
           )}
         </div>
       </section>
+      )}
 
       {/* ---------- TradingView access (active members only) ---------- */}
-      {isActive && (
+      {isApproved && isActive && (
         <section className="strategy-section">
           <div className="strategy-principle-card">
             <h2 className="strategy-card-title">Private Indicator Access</h2>

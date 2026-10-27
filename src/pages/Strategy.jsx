@@ -5,6 +5,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { usePerformanceHistory, useTradingStats } from '../App';
+import StrategyOverview from '../components/StrategyOverview';
 
 // SantaLogo shimmer sweep (no glitter dots)
 const StatCardShimmer = () => (
@@ -77,6 +78,9 @@ function Strategy() {
           by data since {loading ? '...' : (performance?.backtestedSince ?? performance?.experienceSince ?? 'N/A')}, and enhanced with AI-powered filters.
         </p>
       </section>
+
+      {/* Strategy Overview - text of documents/osn.pdf, opens on demand */}
+      <StrategyOverview />
 
       {/* Core Principle */}
       <section className="strategy-section">

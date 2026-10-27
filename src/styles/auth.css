@@ -178,6 +178,26 @@
   background: #8a8a8a;
 }
 
+.member-status-pending {
+  color: #ffd76a;
+  background: rgba(255, 193, 7, 0.12);
+  border: 1px solid rgba(255, 193, 7, 0.35);
+}
+
+.member-status-pending .member-status-dot {
+  background: #ffc107;
+}
+
+.member-status-rejected {
+  color: #ff8a80;
+  background: rgba(244, 67, 54, 0.12);
+  border: 1px solid rgba(244, 67, 54, 0.35);
+}
+
+.member-status-rejected .member-status-dot {
+  background: #f44336;
+}
+
 .member-hint {
   font-size: 0.87rem;
   line-height: 1.6;
@@ -193,6 +213,70 @@
 .app-nav-link.nav-member {
   color: #d4af37;
   font-weight: 600;
+}
+
+/* WhatsApp group tab - glossy green with glow and sparkles */
+.app-nav-link.nav-whatsapp {
+  position: relative;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.15) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #7dff6b 0%, #2ee82a 50%, #12b812 100%);
+  border-color: #b6ff9e;
+  box-shadow:
+    0 0 12px rgba(57, 255, 20, 0.85),
+    0 0 26px rgba(37, 211, 102, 0.6),
+    inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+  animation: nav-whatsapp-glow 2.4s ease-in-out infinite;
+}
+
+.app-nav-link.nav-whatsapp.active {
+  box-shadow:
+    0 0 20px rgba(57, 255, 20, 1),
+    0 0 40px rgba(37, 211, 102, 0.75),
+    inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+}
+
+/* Four-point sparkles on the left and right ends */
+.app-nav-link.nav-whatsapp::before,
+.app-nav-link.nav-whatsapp::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin-top: -11px;
+  background: radial-gradient(circle, #ffffff 0 2px, rgba(255, 255, 255, 0) 3px),
+    linear-gradient(90deg, transparent 45%, #ffffff 50%, transparent 55%),
+    linear-gradient(0deg, transparent 45%, #ffffff 50%, transparent 55%);
+  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+  filter: drop-shadow(0 0 4px #ffffff);
+  pointer-events: none;
+  animation: nav-whatsapp-sparkle 1.6s ease-in-out infinite;
+}
+
+.app-nav-link.nav-whatsapp::before { left: 4px; }
+
+.app-nav-link.nav-whatsapp::after {
+  right: 4px;
+  animation-delay: 0.8s;
+}
+
+@keyframes nav-whatsapp-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+
+@keyframes nav-whatsapp-sparkle {
+  0%, 100% { opacity: 0.35; transform: scale(0.6) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.1) rotate(45deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav-link.nav-whatsapp,
+  .app-nav-link.nav-whatsapp::before,
+  .app-nav-link.nav-whatsapp::after {
+    animation: none;
+  }
 }
 
 @media (max-width: 640px) {
@@ -308,4 +392,36 @@
 .vip-group-actions .strategy-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ---------- green call-to-action (Register) ---------- */
+
+/* Same glossy green as the WhatsApp group tab, so Register stands out */
+.strategy-btn.strategy-btn-green {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #7dff6b 0%, #2ee82a 50%, #12b812 100%);
+  color: #000;
+  border-color: #b6ff9e;
+  box-shadow:
+    0 0 14px rgba(57, 255, 20, 0.8),
+    0 0 28px rgba(37, 211, 102, 0.5),
+    inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+}
+
+.strategy-btn.strategy-btn-green:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.18) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #9cff8c 0%, #3df53a 50%, #18c818 100%);
+  box-shadow:
+    0 0 20px rgba(57, 255, 20, 1),
+    0 0 40px rgba(37, 211, 102, 0.65),
+    inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+}
+
+.auth-field-label {
+  margin-bottom: -0.5rem;
+  font-size: 0.85rem;
+  color: rgba(245, 245, 245, 0.75);
+  text-align: left;
 }

@@ -84,7 +84,8 @@ const WhatsAppQr = ({ caption = 'Scan to chat on WhatsApp', compact = false }) =
       </button>
       {caption && <p className="whatsapp-qr-caption">{caption}</p>}
 
-      {isEnlarged && <ScancodeLightbox src={qrImage} onClose={closeEnlarged} />}
+      {/* Enlarged view shows the same caption (none when the page hides it) */}
+      {isEnlarged && <ScancodeLightbox src={qrImage} onClose={closeEnlarged} caption={caption} />}
     </div>
   );
 };
@@ -92,7 +93,8 @@ const WhatsAppQr = ({ caption = 'Scan to chat on WhatsApp', compact = false }) =
 // ============================================
 // Button that opens the enlarged WhatsApp QR (no direct link to WhatsApp)
 // ============================================
-export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primary', children = 'WhatsApp Me 💬' }) => {
+// caption: text under the enlarged code ('' for none; left out = the default)
+export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primary', children = 'WhatsApp Me 💬', caption }) => {
   const qrImage = useScancodeImage(0);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const closeEnlarged = useCallback(() => setIsEnlarged(false), []);
@@ -105,7 +107,13 @@ export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primar
         {children}
       </button>
 
-      {isEnlarged && <ScancodeLightbox src={qrImage} onClose={closeEnlarged} />}
+      {isEnlarged && (
+        <ScancodeLightbox
+          src={qrImage}
+          onClose={closeEnlarged}
+          {...(caption !== undefined && { caption })}
+        />
+      )}
     </>
   );
 };

@@ -5456,11 +5456,59 @@ main,
   margin-top: 2rem;
 }
 
+/* Home hero Register button - soft mint green, same shape as the gold buttons */
+.strategy-btn-mint {
+  background: linear-gradient(135deg, #b8ecd3 0%, #7fd1ad 48%, #4fae86 100%);
+  color: #0b2b1d;
+  border: clamp(1.5px, 0.4vw, 2px) solid #a6e3c7;
+  box-shadow: 0 10px 28px rgba(79, 174, 134, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.strategy-btn-mint:hover {
+  background: linear-gradient(135deg, #c9f2de 0%, #8edab8 45%, #5cba92 100%);
+  color: #0b2b1d;
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 14px 34px rgba(79, 174, 134, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+/* Dark glass pill so the green reads clearly on the light silk background */
 .home-whatsapp-qr-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
   margin: 0;
-  font-size: clamp(1rem, 3vw, 1.2rem);
-  font-weight: 700;
+  padding: 0.7rem 1.5rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(10, 30, 18, 0.88) 0%, rgba(0, 0, 0, 0.82) 100%);
+  border: 2px solid #25D366;
+  box-shadow:
+    0 0 14px rgba(37, 211, 102, 0.45),
+    0 8px 20px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  font-size: clamp(1rem, 3vw, 1.25rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #2bff7a;
+  text-shadow: 0 0 8px rgba(37, 211, 102, 0.6);
+  animation: home-whatsapp-glow 2.6s ease-in-out infinite;
+}
+
+.home-whatsapp-qr-icon {
+  flex-shrink: 0;
+  font-size: 1.4em;
   color: #25D366;
+  filter: drop-shadow(0 0 6px rgba(37, 211, 102, 0.7));
+}
+
+@keyframes home-whatsapp-glow {
+  0%, 100% { box-shadow: 0 0 14px rgba(37, 211, 102, 0.45), 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+  50% { box-shadow: 0 0 24px rgba(37, 211, 102, 0.75), 0 8px 20px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-whatsapp-qr-title {
+    animation: none;
+  }
 }
 
 /* Compact variant - inside the Contact page WhatsApp card, under the number */

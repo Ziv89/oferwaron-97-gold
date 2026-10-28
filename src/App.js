@@ -421,13 +421,14 @@ const Header = () => {
     { to: '/', label: 'Home' },
     { to: '/strategy', label: 'Strategy' },
     ...(pendingMember ? [] : [{ to: '/trading', label: 'Live Trading' }]),
-    { to: '/pricing', label: 'Pricing' },
+    // Pricing is for approved members only
+    ...(user && isApproved ? [{ to: '/pricing', label: 'Pricing' }] : []),
     { to: '/youtube', label: 'YouTube' },
     { to: '/performance', label: 'Performance Report' },
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
     // Signed-in members only
-    ...(user && isApproved ? [{ to: '/vip', label: 'WhatsApp group', member: true, whatsapp: true }] : []),
+    ...(user && isApproved ? [{ to: '/vip', label: 'WhatsApp Group', member: true, whatsapp: true }] : []),
     user
       ? { to: '/members', label: 'My Account', member: true }
       : { to: '/login', label: 'Member Login', member: true }
@@ -551,6 +552,7 @@ const ScancodeFooterLink = ({ scan, label, Icon }) => (
 );
 
 const Footer = () => {
+  const { user, isApproved } = useAuth();
   const { stats } = useTradingStats();
   const { performance } = usePerformanceHistory();
   const { contact } = useOwnerDetails();
@@ -576,9 +578,11 @@ const Footer = () => {
           <NavLink to="/strategy" className="footer-link">
             <FaChessKnight className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.strategy }} />Strategy
           </NavLink>
-          <NavLink to="/pricing" className="footer-link">
-            <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
-          </NavLink>
+          {user && isApproved && (
+            <NavLink to="/pricing" className="footer-link">
+              <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
+            </NavLink>
+          )}
           <NavLink to="/youtube" className="footer-link">
             <FaYoutube className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.youtube }} />YouTube
           </NavLink>
@@ -645,7 +649,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              <Route path="/pricing" element={<Pricing />} />
+              <Route
+                path="/pricing"
+                element={
+                  <ProtectedRoute requireApproved>
+                    <Pricing />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/youtube" element={<YouTube />} />
               <Route path="/performance" element={<PerformanceReport />} />
               <Route path="/contact" element={<Contact />} />

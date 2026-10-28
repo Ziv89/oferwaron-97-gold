@@ -2,9 +2,7 @@
 // Strategy.jsx - Strategy Explanation Page (Clean Design)
 // ============================================
 import React from 'react';
-import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
-import PricingLink from '../components/PricingLink';
 import { usePerformanceHistory, useTradingStats } from '../App';
 import StrategyOverview from '../components/StrategyOverview';
 

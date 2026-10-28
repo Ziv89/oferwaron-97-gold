@@ -192,12 +192,15 @@ exports.tvWebhook = onRequest(
  * Approve or reject in Firestore -> users/{uid} -> approval, or with
  * node admin/add-member.js --approve / --reject <email>.
  *
- * The owner's number and CallMeBot key live in adminData/ownerDetails
- * (fields: whatsapp, callmebotApiKey). Unlike siteData that doc is closed
- * to every client by the Firestore rules - only this Admin SDK code reads it.
+ * The owner's number and the sending service's key live in
+ * adminData/ownerDetails. Unlike siteData that doc is closed to every
+ * client by the Firestore rules - only this Admin SDK code reads it.
+ *   whatsapp          the number that gets the alert, e.g. "+972..."
+ *   wassengerToken    Wassenger API token (used when set), or
+ *   callmebotApiKey   CallMeBot key (free, but often full)
  *
  * A failed send is logged and recorded on _debug/lastRegistrationAlert but
- * never retried, so a CallMeBot outage can't spam you later.
+ * never retried, so a provider outage can't spam you later.
  */
 exports.notifyNewRegistration = onDocumentCreated(
   "users/{uid}",
@@ -220,17 +223,34 @@ exports.notifyNewRegistration = onDocumentCreated(
 
     let stage = "SENT";
     let error = null;
-    if (!owner.whatsapp || !owner.callmebotApiKey) {
-      stage = "ERROR";
-      error = "adminData/ownerDetails needs whatsapp and callmebotApiKey";
-    } else {
-      const url =
+    let provider = null;
+    let request = null;
+    if (owner.whatsapp && owner.wassengerToken) {
+      provider = "wassenger";
+      request = fetch("https://api.wassenger.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Token": owner.wassengerToken,
+        },
+        body: JSON.stringify({phone: owner.whatsapp, message: text}),
+      });
+    } else if (owner.whatsapp && owner.callmebotApiKey) {
+      provider = "callmebot";
+      request = fetch(
         "https://api.callmebot.com/whatsapp.php" +
         `?phone=${encodeURIComponent(owner.whatsapp)}` +
         `&text=${encodeURIComponent(text)}` +
-        `&apikey=${encodeURIComponent(owner.callmebotApiKey)}`;
+        `&apikey=${encodeURIComponent(owner.callmebotApiKey)}`);
+    }
+
+    if (!request) {
+      stage = "ERROR";
+      error = "adminData/ownerDetails needs whatsapp and " +
+        "wassengerToken (or callmebotApiKey)";
+    } else {
       try {
-        const res = await fetch(url);
+        const res = await request;
         if (!res.ok) {
           stage = "ERROR";
           error = `HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`;
@@ -246,6 +266,7 @@ exports.notifyNewRegistration = onDocumentCreated(
     await admin.firestore().collection("_debug").doc("lastRegistrationAlert").set({
       at: admin.firestore.FieldValue.serverTimestamp(),
       uid: event.params.uid,
+      provider,
       stage,
       error,
     });

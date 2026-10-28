@@ -4,6 +4,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
+import PricingLink from '../components/PricingLink';
 import { usePerformanceHistory, useTradingStats } from '../App';
 import StrategyOverview from '../components/StrategyOverview';
 
@@ -209,14 +210,14 @@ function Strategy() {
       </section>
 
       {/* CTA */}
-      <section className="strategy-section text-center">
+      {/* <section className="strategy-section text-center">
         <h2 className="strategy-section-title">Ready to Trade with Me?</h2>
         <p className="strategy-subtitle">Get invite-only access to my signals and start your journey</p>
         <div className="strategy-btn-group">
-          <Link to="/pricing" className="strategy-btn strategy-btn-primary">View Pricing</Link>
+          <PricingLink />
           <Link to="/youtube" className="strategy-btn strategy-btn-primary">Free Demonstrations</Link>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

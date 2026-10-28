@@ -4,10 +4,12 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
+import PricingLink from '../components/PricingLink';
 import { useTradingStats, useSiteConfig, usePerformanceHistory } from '../App';
 import { useAuth } from '../contexts/AuthContext';
 import CoinLoader from '../components/CoinLoader';
-import WhatsAppQr from '../components/WhatsAppQr';
+import { WhatsAppQrButton } from '../components/WhatsAppQr';
+import { FaWhatsapp } from 'react-icons/fa';
 
 // SantaLogo shimmer sweep only (no glitter dots/stars)
 const StatCardShimmer = () => (
@@ -141,21 +143,21 @@ function Home() {
           {' '}
           {user && <Link to="/trading">Full trade log →</Link>}
         </p>
-        {/* CTAs */}
+        {/* CTAs - Register (signed-out visitors) + WhatsApp scan code */}
         <div className="strategy-btn-group">
-          <Link to="/pricing" className="strategy-btn strategy-btn-primary">
-            Start Trading Now
-          </Link>
-          <Link to="/youtube" className="strategy-btn strategy-btn-primary">
-            Watch Free Content
-          </Link>
+          {!user && (
+            <Link to="/login" state={{ mode: 'register' }} className="strategy-btn strategy-btn-mint">
+              Register
+            </Link>
+          )}
+          {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
+          <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon" caption="">
+            WhatsApp Me <FaWhatsapp style={{ color: '#128C7E' }} />
+          </WhatsAppQrButton>
         </div>
 
         {/* Direct line to Ofer - tap to enlarge the scan code */}
-        <div className="home-whatsapp-qr">
-          <p className="home-whatsapp-qr-title">Questions? Message me on WhatsApp</p>
-          <WhatsAppQr caption="" />
-        </div>
+   
       </section>
 
       <section className="strategy-section">
@@ -225,9 +227,7 @@ function Home() {
         <h2 className="strategy-section-title">Ready to Start Trading?</h2>
         <p className="strategy-subtitle">Join to successful traders today</p>
         <div className="strategy-btn-group">
-          <Link to="/pricing" className="strategy-btn strategy-btn-primary">
-            View Pricing Plan
-          </Link>
+          <PricingLink>View Pricing Plan</PricingLink>
         </div>
       </section>
     </div>

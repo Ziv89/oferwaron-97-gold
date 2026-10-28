@@ -6,7 +6,7 @@
 // approves them (see AuthContext).
 // ============================================
 import React, { useState } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/auth.css';
@@ -46,7 +46,11 @@ const friendlyError = (code) => {
 };
 
 export default function Login() {
-  const [mode, setMode] = useState('login'); // 'login' | 'register' | 'reset'
+  const location = useLocation();
+  // The Home page Register button opens this page on the register form
+  const [mode, setMode] = useState(
+    location.state?.mode === 'register' ? 'register' : 'login'
+  ); // 'login' | 'register' | 'reset'
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
   const [email, setEmail] = useState('');
@@ -57,7 +61,6 @@ export default function Login() {
 
   const { login, register, resetPassword } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
   const from = location.state?.from || '/members';
 
   const switchMode = (next) => {
@@ -258,9 +261,6 @@ export default function Login() {
                 >
                   Register
                 </button>
-                <Link to="/pricing" className="auth-link auth-link-inline">
-                  See plans →
-                </Link>
               </div>
             </div>
           )}

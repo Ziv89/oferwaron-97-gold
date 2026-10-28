@@ -5,6 +5,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
+import PricingLink from '../components/PricingLink';
 
 import CTA from '../info/CTA';
 import DirectCTA from '../info/directCTA';
@@ -91,7 +92,7 @@ function About() {
         <h2 className="strategy-section-title">Ready to Join?</h2>
         <p className="strategy-subtitle">Start your trading with a proven gold strategy</p>
         <div className="strategy-btn-group">
-          <Link to="/pricing" className="strategy-btn strategy-btn-primary">View Pricing</Link>
+          <PricingLink />
           <Link to="/contact" className="strategy-btn strategy-btn-primary">Contact Me</Link>
         </div>
       </section>

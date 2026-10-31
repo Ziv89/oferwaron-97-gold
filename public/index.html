@@ -6,6 +6,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b0b0d" />
 
+    <!-- A tab opened before a deploy asks for the old /static/js/main.*.js,
+         which no longer exists -> blank page. Reload once to pick up the new
+         version (sessionStorage guard so a real outage can't loop). -->
+    <script>
+      window.addEventListener('error', function (e) {
+        var el = e.target;
+        var url = el && (el.src || el.href);
+        if (!url || !/\/static\/(js|css)\//.test(url)) return;
+        var last = Number(sessionStorage.getItem('staleBundleReload') || 0);
+        if (Date.now() - last < 30000) return;
+        sessionStorage.setItem('staleBundleReload', String(Date.now()));
+        window.location.reload();
+      }, true);
+    </script>
+
     <!-- Default meta (per-page tags from <Seo> override these once React runs;
          these are what non-JS scrapers like WhatsApp/Facebook fall back to) -->
     <title>97% Gold — Professional XAUUSD Gold Trading Signals</title>

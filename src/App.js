@@ -6,8 +6,8 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './styles/styles.css';
 import './styles/responsive-overrides.css';
-// To revert to the old logo: import SantaLogoNew from './assets/images/SantaLogo.jpg';
-import SantaLogoNew from './assets/images/SantaLogoNew.webp';
+// To revert to the previous logo: import SantaLogoNew from './assets/images/SantaLogoNew.webp';
+import SantaLogoNew from './assets/images/SantaLogoDiamond.webp';
 import { Analytics } from "@vercel/analytics/react";
 import { SiGmail } from 'react-icons/si';
 import {

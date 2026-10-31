@@ -3,11 +3,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { log } from '../utils/logger';
 
-// siteData/cvContent - text of documents/cv.pdf, read by the extractCvContent
-// Cloud Function whenever cv.pdf is uploaded:
-//   blocks: [{ type: 'h1' | 'h2' | 'p', runs }, { type: 'ul', items: [{ runs, sub }] }]
-//   runs:   [{ text, bold }]
-//   footer: '© Ofer Waron | All rights reserved.'
+
 
 let cachedRequest = null;
 

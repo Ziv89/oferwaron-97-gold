@@ -1805,3 +1805,47 @@ margin-top: 150px !important;
     padding-left: 0 !important;
   }
 }
+
+/* =========================================================
+   FOOTER: icon stays left of its label when the label wraps
+   (e.g. "Performance Report" on phones) instead of sitting on
+   its own line above it
+   ========================================================= */
+.footer-link {
+  display: flex !important;
+  align-items: center;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+}
+
+.footer-link-icon {
+  flex-shrink: 0;
+  vertical-align: 0;
+}
+
+@media screen and (max-width: 600px) {
+  .footer-link {
+    font-size: clamp(0.68rem, 2.6vw, 0.85rem) !important;
+  }
+}
+
+/* =========================================================
+   STRATEGY: Historical Performance - 6 cards as an even 3 x 2
+   grid; every card the same height with its content centered
+   ========================================================= */
+.strategy-stats-grid.strategy-stats-grid-historical {
+  grid-template-columns: repeat(3, 1fr) !important;
+  grid-auto-rows: 1fr;
+}
+
+.strategy-stats-grid-historical .strategy-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.strategy-stats-grid-historical .strategy-stat-label {
+  overflow-wrap: normal;
+  word-break: normal;
+}

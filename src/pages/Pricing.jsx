@@ -2,7 +2,7 @@
 // Pricing.jsx - Pricing Page (Strategy-style golden design)
 // ============================================
 import React from 'react';
-import { Link } from 'react-router-dom';
+// import { Link } from 'react-router-dom'; // re-enable with the Final CTA section
 import Seo from '../components/Seo';
 import { useOwnerDetails } from '../App';
 import { useScancodeImage } from '../services/scancodeImages';
@@ -134,7 +134,7 @@ function Pricing() {
       </section>
 
       {/* Final CTA */}
-      <section className="strategy-section text-center">
+      {/* <section className="strategy-section text-center">
         <h2 className="strategy-section-title">Ready to Start Trading?</h2>
         <p className="strategy-subtitle">Join successful traders with proven signals</p>
         <div className="strategy-btn-group">
@@ -145,7 +145,7 @@ function Pricing() {
             Watch Free Content
           </Link>
         </div>
-      </section>
+      </section> */}
     </div>
   );
 }

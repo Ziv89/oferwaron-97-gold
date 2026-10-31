@@ -92,6 +92,21 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // TradingView alert messages for the WhatsApp Group page (/vip).
+    // Written only by the tvAlertMessage Cloud Function (Admin SDK);
+    // readable by any signed-in, approved member. Each tvMessages doc
+    // carries expireAt and is removed by the Firestore TTL policy on that
+    // field; tradingview/alerts itself holds only the latest alert.
+    match /tradingview/alerts {
+      allow read: if request.auth != null && isApproved(request.auth.uid);
+      allow write: if false;
+    }
+
+    match /tradingview/alerts/tvMessages/{alertId} {
+      allow read: if request.auth != null && isApproved(request.auth.uid);
+      allow write: if false;
+    }
+
     // Everything else denied by default.
     match /{document=**} {
       allow read, write: if false;

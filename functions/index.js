@@ -8,6 +8,7 @@ const { onObjectFinalized, onObjectDeleted } = require("firebase-functions/v2/st
 const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
+const { logger } = require("firebase-functions");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const vision = require("@google-cloud/vision");
@@ -184,53 +185,226 @@ exports.tvWebhook = onRequest(
     res.status(200).send("ok");
   }
 );
+
 /**
- * New registration -> WhatsApp message to the owner
+ * TradingView alert -> Firestore (+ WhatsApp via Wassenger)
+ *
+ * One TradingView alert hits this function. It always saves the alert to
+ *   tradingview/alerts                     latest alert (date, messagecontent, symbol);
+ *                                          other fields, e.g. groupName, are left as they are
+ *   tradingview/alerts/tvMessages/{autoId} one doc per alert, expireAt = +12h
+ * and, when the payload names a WhatsApp target, also forwards it to
+ * Wassenger. Firestore and Wassenger run in parallel - one failing never
+ * blocks the other.
+ *
+ * Accepts both payload styles in the TradingView "Message" box:
+ *   1) Firebase JSON:   {"secret":"...","symbol":"{{ticker}}","message":"Gold alert @ {{close}}"}
+ *      -> saved to Firestore only (no group/channel = nothing to forward)
+ *   2) Wassenger JSON:  {"group":"...@g.us","message":"..."}  (or "channel":"...@newsletter")
+ *      -> secret in the webhook URL instead:  ...run.app/?secret=YOUR_SECRET
+ *      -> saved to Firestore AND sent to that group / channel
+ * A message that isn't JSON at all is saved as plain text (secret must then
+ * be in the URL).
+ *
+ * Secrets (Cloud Secret Manager): TV_WEBHOOK_SECRET (shared with tvWebhook)
+ * and WASSENGER_TOKEN. A Firestore TTL policy on tvMessages.expireAt
+ * (firestore.indexes.json) deletes each alert automatically, usually within
+ * 24h after it expires; the /vip page also hides expired ones.
+ */
+const WASSENGER_TOKEN = defineSecret("WASSENGER_TOKEN");
+const ALERT_TTL_HOURS = 12;
+const DEFAULT_ALERT_SYMBOL = "XAUUSD";
+const tvAlertsDoc = () => admin.firestore().collection("tradingview").doc("alerts");
+
+exports.tvAlertMessage = onRequest(
+  { secrets: [TV_WEBHOOK_SECRET, WASSENGER_TOKEN], cors: false },
+  async (req, res) => {
+    if (req.method !== "POST") {
+      res.status(405).send("Method not allowed");
+      return;
+    }
+
+    // TradingView sends application/json only when the message box is valid
+    // JSON; otherwise text/plain, which Firebase hands over as a string.
+    let body = req.body;
+    if (typeof body === "string" || Buffer.isBuffer(body) || !body || !Object.keys(body).length) {
+      const raw = (req.rawBody || "").toString("utf8").trim();
+      try {
+        body = JSON.parse(raw);
+      } catch {
+        body = { message: raw };
+      }
+    }
+    if (!body || typeof body !== "object") body = {};
+
+    // Secret: JSON body or webhook URL (?secret=...). Copy/paste often adds
+    // spaces or a newline around it - ignore them.
+    const received = String(body.secret || req.query.secret || "").trim();
+    const expected = TV_WEBHOOK_SECRET.value().trim();
+    if (!received || received !== expected) {
+      // Never log the secret itself - only enough to tell what went wrong.
+      logger.warn("tvAlertMessage: secret mismatch", {
+        contentType: req.get("content-type") || "",
+        fields: Object.keys(body),
+        secretIn: body.secret ? "body" : req.query.secret ? "url" : "none",
+        receivedLength: received.length,
+        expectedLength: expected.length,
+        placeholderLeft: /YOUR_SECRET|PASTE/i.test(received),
+      });
+      res.status(401).send("Unauthorized");
+      return;
+    }
+
+    const message = String(body.message || "").trim().slice(0, 4000);
+    if (!message) {
+      res.status(400).send("Missing message");
+      return;
+    }
+
+    const symbol = String(body.symbol || req.query.symbol || DEFAULT_ALERT_SYMBOL).slice(0, 20);
+    const date = admin.firestore.Timestamp.now();
+
+    // Latest + 12h history written together, so they never disagree
+    const batch = admin.firestore().batch();
+    batch.create(tvAlertsDoc().collection("tvMessages").doc(), {
+      messagecontent: message,
+      symbol,
+      date,
+      expireAt: admin.firestore.Timestamp.fromMillis(date.toMillis() + ALERT_TTL_HOURS * 60 * 60 * 1000),
+    });
+    // merge: keep fields set by hand on this doc (e.g. groupName)
+    batch.set(tvAlertsDoc(), { messagecontent: message, symbol, date }, { merge: true });
+    const tasks = { firestore: batch.commit() };
+
+    // Forward to Wassenger only when the payload names a WhatsApp target
+    const channel = typeof body.channel === "string" && body.channel.endsWith("@newsletter") ? body.channel : "";
+    const group = typeof body.group === "string" && body.group.endsWith("@g.us") ? body.group : "";
+    const target = channel ? { channel } : group ? { group } : null;
+    if (target) {
+      tasks.wassenger = fetch("https://api.wassenger.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Token": WASSENGER_TOKEN.value() },
+        body: JSON.stringify({ ...target, message }),
+      }).then(async (r) => {
+        if (!r.ok) throw new Error(`Wassenger HTTP ${r.status}: ${(await r.text()).slice(0, 300)}`);
+      });
+    } else if (body.group || body.channel) {
+      logger.warn("tvAlertMessage: group/channel ignored - expected ...@g.us or ...@newsletter");
+    }
+
+    const names = Object.keys(tasks);
+    const results = await Promise.allSettled(Object.values(tasks));
+    const report = {};
+    results.forEach((r, i) => {
+      report[names[i]] = r.status === "fulfilled" ? "ok" : "failed";
+      if (r.status === "rejected") logger.error(`tvAlertMessage: ${names[i]} failed`, String(r.reason));
+    });
+
+    const allOk = results.every((r) => r.status === "fulfilled");
+    res.status(allOk ? 200 : 502).json(report);
+  }
+);
+
+/**
+ * New registration -> WhatsApp message to the owner, with Approve / Reject links
  *
  * Fires when users/{uid} is created as approval 'pending' (the site's
  * register form, or the first sign-in of an account made in the Console).
- * Approve or reject in Firestore -> users/{uid} -> approval, or with
- * node admin/add-member.js --approve / --reject <email>.
+ * The message carries two signed links to reviewRegistration (below); you
+ * can also still approve / reject in Firestore -> users/{uid} -> approval,
+ * or with node admin/add-member.js --approve / --reject <email>.
  *
- * The owner's number and CallMeBot key live in adminData/ownerDetails
- * (fields: whatsapp, callmebotApiKey). Unlike siteData that doc is closed
- * to every client by the Firestore rules - only this Admin SDK code reads it.
+ * The owner's number lives in adminData/ownerDetails.whatsapp (e.g.
+ * "+972..."). Unlike siteData that doc is closed to every client by the
+ * Firestore rules - only this Admin SDK code reads it. Sent with Wassenger
+ * (WASSENGER_TOKEN secret); adminData/ownerDetails.callmebotApiKey is used
+ * instead when there's no Wassenger token.
  *
  * A failed send is logged and recorded on _debug/lastRegistrationAlert but
- * never retried, so a CallMeBot outage can't spam you later.
+ * never retried, so a provider outage can't spam you later.
  */
+const crypto = require("crypto");
+
+const REVIEW_LINK_DAYS = 7;
+const REVIEW_ACTIONS = { approve: "approved", reject: "rejected" };
+
+// Review links are signed with a key derived from TV_WEBHOOK_SECRET (a
+// separate key per purpose, no extra secret to manage). Changing that secret
+// invalidates links already sent.
+const reviewSignature = (uid, action, exp) =>
+  crypto
+    .createHmac("sha256", crypto.createHmac("sha256", TV_WEBHOOK_SECRET.value()).update("registration-review").digest())
+    .update(`${uid}:${action}:${exp}`)
+    .digest("hex");
+
+const reviewSignatureValid = (uid, action, exp, sig) => {
+  const expected = Buffer.from(reviewSignature(uid, action, exp), "hex");
+  const given = Buffer.from(String(sig || ""), "hex");
+  return given.length === expected.length && crypto.timingSafeEqual(given, expected);
+};
+
+const reviewLink = (uid, action) => {
+  const exp = Date.now() + REVIEW_LINK_DAYS * 24 * 60 * 60 * 1000;
+  const project = process.env.GCLOUD_PROJECT || admin.app().options.projectId;
+  const qs = new URLSearchParams({ uid, action, exp: String(exp), sig: reviewSignature(uid, action, exp) });
+  return `https://europe-west1-${project}.cloudfunctions.net/reviewRegistration?${qs}`;
+};
+
 exports.notifyNewRegistration = onDocumentCreated(
-  "users/{uid}",
+  { document: "users/{uid}", secrets: [WASSENGER_TOKEN, TV_WEBHOOK_SECRET] },
   async (event) => {
     const user = event.data?.data();
     if (!user || user.approval !== "pending") return;
 
     const owner = (await admin.firestore()
       .collection("adminData").doc("ownerDetails").get()).data() || {};
+    const uid = event.params.uid;
 
     const text = [
       "🔔 New 97% Gold registration - awaiting approval",
       `Name: ${user.displayName || "-"}`,
       `Email: ${user.email || "-"}`,
+      `WhatsApp: ${user.whatsapp || "-"}`,
       `Date of birth: ${user.dateOfBirth || "-"}`,
       "",
-      "Approve in Firebase Console -> Firestore -> users -> " +
-        `${event.params.uid} -> approval = approved`,
+      `✅ Approve: ${reviewLink(uid, "approve")}`,
+      "",
+      `❌ Reject: ${reviewLink(uid, "reject")}`,
+      "",
+      `Links expire in ${REVIEW_LINK_DAYS} days.`,
     ].join("\n");
 
+    const wassengerToken = WASSENGER_TOKEN.value() || owner.wassengerToken;
     let stage = "SENT";
     let error = null;
-    if (!owner.whatsapp || !owner.callmebotApiKey) {
-      stage = "ERROR";
-      error = "adminData/ownerDetails needs whatsapp and callmebotApiKey";
-    } else {
-      const url =
+    let provider = null;
+    let request = null;
+    if (owner.whatsapp && wassengerToken) {
+      provider = "wassenger";
+      request = fetch("https://api.wassenger.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Token": wassengerToken,
+        },
+        body: JSON.stringify({phone: owner.whatsapp, message: text}),
+      });
+    } else if (owner.whatsapp && owner.callmebotApiKey) {
+      provider = "callmebot";
+      request = fetch(
         "https://api.callmebot.com/whatsapp.php" +
         `?phone=${encodeURIComponent(owner.whatsapp)}` +
         `&text=${encodeURIComponent(text)}` +
-        `&apikey=${encodeURIComponent(owner.callmebotApiKey)}`;
+        `&apikey=${encodeURIComponent(owner.callmebotApiKey)}`);
+    }
+
+    if (!request) {
+      stage = "ERROR";
+      error = "adminData/ownerDetails needs whatsapp (and a WASSENGER_TOKEN " +
+        "secret or callmebotApiKey)";
+    } else {
       try {
-        const res = await fetch(url);
+        const res = await request;
         if (!res.ok) {
           stage = "ERROR";
           error = `HTTP ${res.status}: ${(await res.text()).slice(0, 300)}`;
@@ -245,10 +419,106 @@ exports.notifyNewRegistration = onDocumentCreated(
 
     await admin.firestore().collection("_debug").doc("lastRegistrationAlert").set({
       at: admin.firestore.FieldValue.serverTimestamp(),
-      uid: event.params.uid,
+      uid,
+      provider,
       stage,
       error,
     });
+  }
+);
+
+/**
+ * Approve / Reject link from the registration WhatsApp message
+ *
+ * GET  shows who it is and a confirm button - nothing changes yet, so
+ *      WhatsApp's link preview (which opens links by itself) can't decide.
+ * POST (the button) checks the signature + expiry and sets
+ *      users/{uid}.approval = approved | rejected, plus approvedAt /
+ *      rejectedAt - the same as admin/add-member.js --approve / --reject.
+ */
+const escapeHtml = (s) =>
+  String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[c]));
+
+const reviewPage = (title, body) => `<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>${escapeHtml(title)} - 97% Gold</title>
+<style>
+  body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+         font-family: "Segoe UI", Helvetica, Arial, sans-serif; background: #0b141a; color: #e9edef; }
+  .card { width: min(92vw, 420px); padding: 28px 24px; border-radius: 16px; background: #202c33;
+          border: 1px solid rgba(255, 215, 0, 0.45); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5); text-align: center; }
+  h1 { margin: 0 0 16px; font-size: 1.35rem; color: #ffd700; }
+  dl { margin: 0 0 20px; text-align: left; display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; }
+  dt { color: #8696a0; } dd { margin: 0; overflow-wrap: anywhere; }
+  p { color: #8696a0; line-height: 1.5; }
+  button { width: 100%; padding: 14px; border: 0; border-radius: 10px; font-size: 1.05rem; font-weight: 700; cursor: pointer; }
+  .approve { background: #25d366; color: #0b141a; } .reject { background: #f15c6d; color: #fff; }
+</style></head>
+<body><main class="card">${body}</main></body></html>`;
+
+exports.reviewRegistration = onRequest(
+  { secrets: [TV_WEBHOOK_SECRET], cors: false },
+  async (req, res) => {
+    const src = req.method === "POST" ? { ...req.query, ...req.body } : req.query;
+    const uid = String(src.uid || "");
+    const action = String(src.action || "");
+    const exp = Number(src.exp);
+    const sig = String(src.sig || "");
+
+    res.set("Cache-Control", "no-store");
+
+    if (!uid || !REVIEW_ACTIONS[action] || !Number.isFinite(exp) || !reviewSignatureValid(uid, action, exp, sig)) {
+      res.status(403).send(reviewPage("Invalid link", "<h1>Invalid link</h1><p>This link is not valid. Use the link from the WhatsApp message.</p>"));
+      return;
+    }
+    if (Date.now() > exp) {
+      res.status(410).send(reviewPage("Link expired", "<h1>Link expired</h1><p>Approve or reject in Firebase Console, or with admin/add-member.js.</p>"));
+      return;
+    }
+
+    const userRef = admin.firestore().collection("users").doc(uid);
+    const snap = await userRef.get();
+    if (!snap.exists) {
+      res.status(404).send(reviewPage("Not found", "<h1>Registration not found</h1><p>This account no longer exists.</p>"));
+      return;
+    }
+    const user = snap.data();
+    const current = user.approval || "approved";
+    const target = REVIEW_ACTIONS[action];
+    const details = (status) => `<dl>
+      <dt>Name</dt><dd>${escapeHtml(user.displayName || "-")}</dd>
+      <dt>Email</dt><dd>${escapeHtml(user.email || "-")}</dd>
+      <dt>WhatsApp</dt><dd>${escapeHtml(user.whatsapp || "-")}</dd>
+      <dt>Status</dt><dd>${escapeHtml(status)}</dd>
+    </dl>`;
+
+    if (req.method === "GET") {
+      if (current === target) {
+        res.send(reviewPage("Already done", `<h1>Already ${escapeHtml(target)}</h1>${details(current)}`));
+        return;
+      }
+      const hidden = ["uid", "action", "exp", "sig"]
+        .map((k) => `<input type="hidden" name="${k}" value="${escapeHtml(src[k])}">`).join("");
+      const verb = action === "approve" ? "Approve" : "Reject";
+      res.send(reviewPage(`${verb} registration`, `<h1>${verb} this registration?</h1>${details(current)}
+        <form method="POST">${hidden}<button class="${action}" type="submit">${action === "approve" ? "✅" : "❌"} ${verb}</button></form>`));
+      return;
+    }
+
+    if (req.method !== "POST") {
+      res.status(405).send("Method not allowed");
+      return;
+    }
+
+    await userRef.set(
+      { approval: target, [`${target}At`]: admin.firestore.Timestamp.now() },
+      { merge: true }
+    );
+    logger.info(`reviewRegistration: ${uid} ${current} -> ${target}`);
+    res.send(reviewPage("Done", `<h1>${target === "approved" ? "✅ Approved" : "❌ Rejected"}</h1>${details(target)}
+      <p>${target === "approved" ? "Their member menu updates immediately." : "They will not get member access."}</p>`));
   }
 );
 

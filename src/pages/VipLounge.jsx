@@ -10,8 +10,9 @@
 // ============================================
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import {
-  FaWhatsapp, FaTrashAlt, FaSearch, FaBell, FaPlus, FaVolumeUp, FaVolumeMute,
-  FaSun, FaMoon, FaClock, FaChevronDown, FaBan, FaUsers, FaMusic,
+  FaBell, FaVolumeUp, FaVolumeMute, FaSun, FaMoon, FaClock, FaChevronDown, FaBan, FaUsers,
+  // re-enable with the Group Scanner section / Test sound button:
+  // FaWhatsapp, FaTrashAlt, FaSearch, FaPlus, FaMusic,
 } from 'react-icons/fa';
 import Seo from '../components/Seo';
 import { useStorageImage } from '../services/storageImages';
@@ -20,16 +21,18 @@ import {
   subscribeToAlerts, subscribeToChatSettings, isAlertExpired, ALERT_TTL_HOURS,
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
-import {
-  subscribeToGroups,
-  addGroup,
-  removeGroup,
-  WHATSAPP_INVITE_PATTERN,
-  SCAN_STATUS,
-} from '../services/whatsappGroups';
+// Group Scanner is hidden for now - re-enable with its section below
+// import {
+//   subscribeToGroups,
+//   addGroup,
+//   removeGroup,
+//   WHATSAPP_INVITE_PATTERN,
+//   SCAN_STATUS,
+// } from '../services/whatsappGroups';
 import '../styles/auth.css';
 
-const COMING_SOON = ['Scan results & insights', 'Scheduled re-scans', 'More member tools'];
+// re-enable with the Coming Soon section
+// const COMING_SOON = ['Scan results & insights', 'Scheduled re-scans', 'More member tools'];
 
 // "14:05"
 const formatAlertTime = (date) =>
@@ -60,13 +63,14 @@ const EXPIRY_RECHECK_MS = 60 * 1000;
 const NEW_HIGHLIGHT_MS = 6000;
 // Within this many px of the bottom counts as "reading the latest"
 const STICK_TO_BOTTOM_PX = 80;
-// How long the "Test sound" result stays on screen
-const SOUND_TEST_MSG_MS = 4000;
-const SOUND_TEST_MESSAGES = {
-  played: 'Sound played - this is what new alerts sound like',
-  'not-loaded': 'Sound file not available - check soundeffect/alertEffect.mp3 in Storage',
-  blocked: 'Your browser blocked the sound - check the tab is not muted',
-};
+// Test sound button is hidden for now - re-enable these with it
+// // How long the "Test sound" result stays on screen
+// const SOUND_TEST_MSG_MS = 4000;
+// const SOUND_TEST_MESSAGES = {
+//   played: 'Sound played - this is what new alerts sound like',
+//   'not-loaded': 'Sound file not available - check soundeffect/alertEffect.mp3 in Storage',
+//   blocked: 'Your browser blocked the sound - check the tab is not muted',
+// };
 
 const initialChatTheme = () =>
   localStorage.getItem(THEME_PREF_KEY) ||
@@ -86,7 +90,7 @@ function AlertFeed() {
   const [editedIds, setEditedIds] = useState([]);
   const [deletedAlerts, setDeletedAlerts] = useState([]);
   const [groupName, setGroupName] = useState(DEFAULT_GROUP_NAME);
-  const [soundTest, setSoundTest] = useState(null); // 'played' | 'not-loaded' | 'blocked'
+  // const [soundTest, setSoundTest] = useState(null); // 'played' | 'not-loaded' | 'blocked'
 
   const { play, unlock } = useSoundEffect(ALERT_SOUND);
   // Group picture: logos/SantaLogo.jpeg in Firebase Storage
@@ -210,15 +214,15 @@ function AlertFeed() {
     });
   };
 
-  // Plays the alert sound on demand (even when muted) and says whether it worked
-  const soundTestTimer = useRef(null);
-  const testSound = async () => {
-    const result = await play();
-    setSoundTest(result);
-    clearTimeout(soundTestTimer.current);
-    soundTestTimer.current = setTimeout(() => setSoundTest(null), SOUND_TEST_MSG_MS);
-  };
-  useEffect(() => () => clearTimeout(soundTestTimer.current), []);
+  // // Plays the alert sound on demand (even when muted) and says whether it worked
+  // const soundTestTimer = useRef(null);
+  // const testSound = async () => {
+  //   const result = await play();
+  //   setSoundTest(result);
+  //   clearTimeout(soundTestTimer.current);
+  //   soundTestTimer.current = setTimeout(() => setSoundTest(null), SOUND_TEST_MSG_MS);
+  // };
+  // useEffect(() => () => clearTimeout(soundTestTimer.current), []);
 
   const toggleChatTheme = () => {
     setChatTheme((t) => {
@@ -273,12 +277,13 @@ function AlertFeed() {
           </div>
         </div>
 
+        {/* Test sound result - re-enable with the Test sound button
         <p
           className={`vip-sound-test${soundTest && soundTest !== 'played' ? ' vip-sound-test--error' : ''}`}
           role="status"
         >
           {soundTest && SOUND_TEST_MESSAGES[soundTest]}
-        </p>
+        </p> */}
 
         {open && (
           <div id="vip-alert-panel" className={`vip-alert-panel wa-chat wa-chat--${chatTheme}`}>
@@ -364,57 +369,58 @@ function AlertFeed() {
 export default function VipLounge() {
   const { user, profile } = useAuth();
 
-  const [groups, setGroups] = useState([]);
-  const [groupsLoading, setGroupsLoading] = useState(true);
-  const [name, setName] = useState('');
-  const [inviteLink, setInviteLink] = useState('');
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState('');
+  // Group Scanner state + handlers - hidden for now, re-enable with its section below
+  // const [groups, setGroups] = useState([]);
+  // const [groupsLoading, setGroupsLoading] = useState(true);
+  // const [name, setName] = useState('');
+  // const [inviteLink, setInviteLink] = useState('');
+  // const [saving, setSaving] = useState(false);
+  // const [error, setError] = useState('');
 
-  useEffect(() => {
-    if (!user) return undefined;
+  // useEffect(() => {
+  //   if (!user) return undefined;
 
-    return subscribeToGroups(
-      user.uid,
-      (list) => {
-        setGroups(list);
-        setGroupsLoading(false);
-      },
-      () => {
-        setError('Could not load your groups. Please refresh the page.');
-        setGroupsLoading(false);
-      }
-    );
-  }, [user]);
+  //   return subscribeToGroups(
+  //     user.uid,
+  //     (list) => {
+  //       setGroups(list);
+  //       setGroupsLoading(false);
+  //     },
+  //     () => {
+  //       setError('Could not load your groups. Please refresh the page.');
+  //       setGroupsLoading(false);
+  //     }
+  //   );
+  // }, [user]);
 
-  const linkIsValid = WHATSAPP_INVITE_PATTERN.test(inviteLink.trim());
+  // const linkIsValid = WHATSAPP_INVITE_PATTERN.test(inviteLink.trim());
 
-  const handleAdd = async (e) => {
-    e.preventDefault();
-    if (!name.trim() || !linkIsValid) return;
+  // const handleAdd = async (e) => {
+  //   e.preventDefault();
+  //   if (!name.trim() || !linkIsValid) return;
 
-    setSaving(true);
-    setError('');
+  //   setSaving(true);
+  //   setError('');
 
-    try {
-      await addGroup(user.uid, { name, inviteLink });
-      setName('');
-      setInviteLink('');
-    } catch (err) {
-      setError('Could not save the group. Please try again.');
-    } finally {
-      setSaving(false);
-    }
-  };
+  //   try {
+  //     await addGroup(user.uid, { name, inviteLink });
+  //     setName('');
+  //     setInviteLink('');
+  //   } catch (err) {
+  //     setError('Could not save the group. Please try again.');
+  //   } finally {
+  //     setSaving(false);
+  //   }
+  // };
 
-  const handleRemove = async (group) => {
-    if (!window.confirm(`Remove "${group.name}" from your groups?`)) return;
-    try {
-      await removeGroup(user.uid, group.id);
-    } catch (err) {
-      setError('Could not remove the group. Please try again.');
-    }
-  };
+  // const handleRemove = async (group) => {
+  //   if (!window.confirm(`Remove "${group.name}" from your groups?`)) return;
+  //   try {
+  //     await removeGroup(user.uid, group.id);
+  //   } catch (err) {
+  //     setError('Could not remove the group. Please try again.');
+  //   }
+  // };
 
   return (
     <div className="strategy-page">

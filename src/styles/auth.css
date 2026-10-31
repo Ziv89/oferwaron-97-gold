@@ -355,43 +355,568 @@
   }
 }
 
-/* ---------- VIP Lounge ---------- */
+/* ---------- VIP Lounge (WhatsApp Group page) ---------- */
+.vip-card {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.vip-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  flex-wrap: wrap;
+}
+
+.vip-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem !important;
+}
+
+.vip-card-header .strategy-btn {
+  margin: 0;
+}
+
+.vip-card-intro {
+  margin: 0.25rem 0 0;
+}
+
+/* Name + invite link side by side on wide screens, stacked on phones */
+.vip-add-form {
+  margin-top: 1.1rem;
+}
+
+.vip-add-fields {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 0.75rem;
+}
+
+.vip-add-form .strategy-btn svg {
+  vertical-align: -0.125em;
+}
+
+@media (max-width: 600px) {
+  .vip-add-fields {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vip-subheading {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1.6rem 0 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.vip-subheading h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #FFD700;
+}
+
+.vip-count {
+  min-width: 1.6rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(212, 175, 55, 0.18);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  color: #FFD700;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.vip-empty {
+  margin: 0.9rem 0 0;
+  padding: 1rem;
+  text-align: center;
+  border: 1px dashed rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+  color: rgba(245, 245, 245, 0.6);
+}
+
 .vip-group-list {
   list-style: none;
   padding: 0;
-  margin: 1rem 0 0;
+  margin: 0.9rem 0 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.6rem;
 }
 
 .vip-group-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding: 0.75rem 1rem;
+  gap: 0.85rem;
+  padding: 0.7rem 0.9rem;
   border: 1px solid rgba(212, 175, 55, 0.3);
   border-radius: 10px;
+  background: rgba(0, 0, 0, 0.2);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.vip-group-item:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.vip-group-avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(37, 211, 102, 0.15);
+  color: #25D366;
+  font-size: 1.15rem;
 }
 
 .vip-group-info {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  align-items: flex-start;
+  gap: 0.3rem;
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
+/* Scan status pill */
+.vip-status {
+  padding: 0.05rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid currentColor;
+}
+
+.vip-status--pending { color: rgba(245, 245, 245, 0.6); }
+.vip-status--scanning { color: #FFD700; }
+.vip-status--done { color: #25D366; }
+.vip-status--failed { color: #ff6b6b; }
+
 .vip-group-actions {
+  flex-shrink: 0;
   display: flex;
   gap: 0.5rem;
+}
+
+.vip-group-actions .strategy-btn {
+  padding: 0.45rem 0.8rem;
+  margin: 0;
 }
 
 .vip-group-actions .strategy-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.vip-remove-btn:hover {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+/* Coming Soon chips */
+.vip-chips {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.vip-chip {
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(212, 175, 55, 0.5);
+  color: rgba(245, 245, 245, 0.8);
+  font-size: 0.85rem;
+}
+
+/* Live Alerts header: sound toggle + open/close button */
+.vip-alert-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.vip-alert-controls .strategy-btn {
+  margin: 0;
+}
+
+.vip-sound-btn {
+  padding: 0.55rem 0.7rem;
+  line-height: 1;
+}
+
+.vip-sound-btn[aria-pressed='false'] {
+  opacity: 0.6;
+}
+
+/* Result of the "Test sound" button - empty (no height) until pressed */
+.vip-sound-test {
+  margin: 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: #25D366;
+  text-align: right;
+}
+
+.vip-sound-test:empty {
+  margin: 0;
+}
+
+.vip-sound-test--error {
+  color: #f15c6d;
+}
+
+/* "3 new" count on the collapsed Live Alerts button */
+.vip-alert-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  animation: vipAlertPulse 1.6s ease-in-out infinite;
+}
+
+/* Live TradingView alerts - opens inside its card, below the header */
+.vip-alert-panel {
+  margin-top: 0.75rem;
+  text-align: left;
+  animation: vipAlertOpen 0.3s ease-out;
+}
+
+@keyframes vipAlertOpen {
+  from { opacity: 0; transform: translateY(-8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.vip-alert-live-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: 0.5rem;
+  border-radius: 50%;
+  background: #25D366;
+  vertical-align: middle;
+  animation: vipAlertPulse 1.6s ease-in-out infinite;
+}
+
+@keyframes vipAlertPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(37, 211, 102, 0); }
+}
+
+/* ---------- Live Alerts as a WhatsApp-style group chat ----------
+   Colors come from the variables below, so light / dark only swap values */
+.wa-chat {
+  --wa-header-bg: #f0f2f5;
+  --wa-header-text: #111b21;
+  --wa-header-sub: #667781;
+  --wa-wallpaper: #efeae2;
+  --wa-doodle: rgba(17, 27, 33, 0.06);
+  --wa-bubble: #ffffff;
+  --wa-bubble-text: #111b21;
+  --wa-bubble-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.13);
+  --wa-sender: #b07a00;
+  --wa-meta: #667781;
+  --wa-chip-bg: #ffffff;
+  --wa-chip-text: #54656f;
+  --wa-system-bg: #ffeecd;
+  --wa-system-text: #54656f;
+  --wa-new-glow: rgba(37, 211, 102, 0.55);
+  --wa-border: rgba(17, 27, 33, 0.12);
+
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid var(--wa-border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  font-family: "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.wa-chat--dark {
+  --wa-header-bg: #202c33;
+  --wa-header-text: #e9edef;
+  --wa-header-sub: #8696a0;
+  --wa-wallpaper: #0b141a;
+  --wa-doodle: rgba(233, 237, 239, 0.05);
+  --wa-bubble: #202c33;
+  --wa-bubble-text: #e9edef;
+  --wa-bubble-shadow: 0 1px 0.5px rgba(11, 20, 26, 0.5);
+  --wa-sender: #ffd279;
+  --wa-meta: #8696a0;
+  --wa-chip-bg: #182229;
+  --wa-chip-text: #8696a0;
+  --wa-system-bg: #182229;
+  --wa-system-text: #ffd279;
+  --wa-border: rgba(233, 237, 239, 0.08);
+}
+
+.wa-chat-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.9rem;
+  background: var(--wa-header-bg);
+  color: var(--wa-header-text);
+  border-bottom: 1px solid var(--wa-border);
+}
+
+.wa-chat-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #111;
+  flex-shrink: 0;
+}
+
+/* Shown while the logo loads from Storage (or if it fails) - like WhatsApp default group icon */
+.wa-chat-avatar--placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #dfe5e7;
+  color: #ffffff;
+  font-size: 1.2rem;
+}
+
+.wa-chat--dark .wa-chat-avatar--placeholder {
+  background: #6a7175;
+  color: #cfd4d6;
+}
+
+.wa-chat-heading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+}
+
+.wa-chat-heading strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.wa-chat-heading span {
+  font-size: 0.8rem;
+  color: var(--wa-header-sub);
+}
+
+.wa-chat-icon-btn {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--wa-header-sub);
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.wa-chat-icon-btn:hover,
+.wa-chat-icon-btn:focus-visible {
+  background: var(--wa-border);
+  color: var(--wa-header-text);
+  outline: none;
+}
+
+/* Chat area: wallpaper with a subtle dotted doodle pattern */
+.wa-chat-body {
+  height: clamp(320px, 55vh, 480px);
+  overflow-y: auto;
+  padding: 0.75rem clamp(0.6rem, 3vw, 1.5rem) 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background-color: var(--wa-wallpaper);
+  background-image:
+    radial-gradient(var(--wa-doodle) 1.2px, transparent 1.3px),
+    radial-gradient(var(--wa-doodle) 1.2px, transparent 1.3px);
+  background-size: 22px 22px;
+  background-position: 0 0, 11px 11px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--wa-meta) transparent;
+}
+
+/* "Today" / "Yesterday" separators */
+.wa-chat-date {
+  align-self: center;
+  margin: 0.6rem 0 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 8px;
+  background: var(--wa-chip-bg);
+  color: var(--wa-chip-text);
+  font-size: 0.75rem;
+  font-weight: 500;
+  box-shadow: var(--wa-bubble-shadow);
+}
+
+/* "Messages disappear after 12 hours", loading, empty and error notices */
+.wa-chat-system {
+  align-self: center;
+  max-width: 90%;
+  margin: 0.25rem 0 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  background: var(--wa-system-bg);
+  color: var(--wa-system-text);
+  font-size: 0.75rem;
+  text-align: center;
+  box-shadow: var(--wa-bubble-shadow);
+}
+
+.wa-chat-system svg {
+  vertical-align: -0.1em;
+  margin-right: 0.3rem;
+}
+
+.wa-chat-system--error {
+  color: #d93025;
+}
+
+/* Incoming message bubble */
+.wa-bubble {
+  position: relative;
+  align-self: flex-start;
+  max-width: min(85%, 520px);
+  margin-left: 8px;
+  padding: 0.35rem 0.55rem 0.3rem 0.6rem;
+  border-radius: 8px;
+  background: var(--wa-bubble);
+  color: var(--wa-bubble-text);
+  box-shadow: var(--wa-bubble-shadow);
+}
+
+/* First bubble of a day gets the little tail, like WhatsApp's first-in-group */
+.wa-bubble--tail {
+  border-top-left-radius: 0;
+}
+
+.wa-bubble--tail::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -8px;
+  border-style: solid;
+  border-width: 0 8px 10px 0;
+  border-color: transparent var(--wa-bubble) transparent transparent;
+}
+
+.wa-bubble-sender {
+  display: block;
+  margin-bottom: 0.1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--wa-sender);
+}
+
+.wa-bubble-text {
+  margin: 0;
+  font-size: 0.93rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Time sits bottom-right, under the text */
+.wa-bubble-meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.1rem;
+  font-size: 0.68rem;
+  color: var(--wa-meta);
+}
+
+/* Deleted in Firestore - kept as a WhatsApp-style placeholder */
+.wa-bubble--deleted .wa-bubble-text {
+  font-style: italic;
+  color: var(--wa-meta);
+}
+
+.wa-bubble--deleted .wa-bubble-text svg {
+  vertical-align: -0.1em;
+  margin-right: 0.3rem;
+}
+
+/* Edited in Firestore - small label before the time */
+.wa-bubble-edited {
+  font-style: italic;
+}
+
+/* Just arrived - pops in, then a green glow fades out */
+.wa-bubble.is-new {
+  animation: waBubbleIn 0.35s ease-out, waBubbleGlow 6s ease-out;
+}
+
+@keyframes waBubbleIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes waBubbleGlow {
+  0% { box-shadow: 0 0 0 2px var(--wa-new-glow), var(--wa-bubble-shadow); }
+  100% { box-shadow: var(--wa-bubble-shadow); }
+}
+
+/* Round "jump to latest" button, shown when scrolled up and a new alert arrives */
+.wa-chat-jump {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 42px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: var(--wa-header-bg);
+  color: var(--wa-meta);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.wa-chat-jump::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #25D366;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vip-alert-live-dot,
+  .vip-alert-badge,
+  .wa-bubble.is-new,
+  .vip-alert-panel {
+    animation: none;
+  }
 }
 
 /* ---------- green call-to-action (Register) ---------- */

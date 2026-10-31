@@ -32,6 +32,18 @@ service firebase.storage {
       allow write: if false;
     }
 
+    // public read only for the logo (SantaLogo.jpeg - Live Alerts group picture)
+    match /logos/{fileName} {
+      allow read: if fileName.matches('SantaLogo\\.(jpg|jpeg|png|webp)$');
+      allow write: if false;
+    }
+
+    // public read only for UI sound effects (alertEffect.mp3 - played on new Live Alerts)
+    match /soundeffect/{fileName} {
+      allow read: if fileName.matches('alertEffect\\.(mp3|wav|ogg)$');
+      allow write: if false;
+    }
+
     // block everything else
     match /{allPaths=**} {
       allow read, write: if false;

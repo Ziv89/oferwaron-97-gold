@@ -149,7 +149,7 @@ function Strategy() {
       <section className="strategy-section">
         <h2 className="strategy-section-title text-center">📈 Historical Performance</h2>
 
-        <div className="strategy-stats-grid">
+        <div className="strategy-stats-grid strategy-stats-grid-historical">
           <div className="strategy-stat-card">
             <StatCardShimmer />
             <span className="strategy-stat-value">

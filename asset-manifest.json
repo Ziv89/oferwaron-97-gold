@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "./static/css/main.27891728.css",
-    "main.js": "./static/js/main.36e3dd26.js",
+    "main.css": "./static/css/main.8ddf0d15.css",
+    "main.js": "./static/js/main.21404642.js",
     "static/js/453.40b2967d.chunk.js": "./static/js/453.40b2967d.chunk.js",
     "static/media/goldenface.png": "./static/media/goldenface.b5e3d5de30bcf87f3b44.png",
     "static/media/SantaLogoSparkle.webp": "./static/media/SantaLogoSparkle.8e4fba28aa8659691697.webp",
@@ -10,12 +10,12 @@
     "static/media/SantaLogoNew.webp": "./static/media/SantaLogoNew.1ad386eaadb8b9e047fa.webp",
     "static/media/cv.pdf": "./static/media/cv.5eaab91b1c3e0f9b378c.pdf",
     "index.html": "./index.html",
-    "main.27891728.css.map": "./static/css/main.27891728.css.map",
-    "main.36e3dd26.js.map": "./static/js/main.36e3dd26.js.map",
+    "main.8ddf0d15.css.map": "./static/css/main.8ddf0d15.css.map",
+    "main.21404642.js.map": "./static/js/main.21404642.js.map",
     "453.40b2967d.chunk.js.map": "./static/js/453.40b2967d.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.27891728.css",
-    "static/js/main.36e3dd26.js"
+    "static/css/main.8ddf0d15.css",
+    "static/js/main.21404642.js"
   ]
 }

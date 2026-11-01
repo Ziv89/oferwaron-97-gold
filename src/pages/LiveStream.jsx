@@ -19,7 +19,8 @@ const eventDate = (value) => {
   }).format(date);
 };
 
-export default function LiveStream({ autoSelectLive = false, pagePath = '/live' }) {
+// children: extra sections shown under the page header (Live Alerts on /trading)
+export default function LiveStream({ autoSelectLive = false, pagePath = '/live', children }) {
   const { user, isActive } = useAuth();
   const [isLive, setIsLive] = useState(false);
   const [replays, setReplays] = useState([]);
@@ -222,6 +223,8 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live' 
           Strategy walkthroughs and market sessions streamed live from TradingView.
         </p>
       </header>
+
+      {children}
 
       <section className="live-now-bar" aria-live="polite">
         {!statusLoaded && <p className="live-empty-state">Checking for a live session…</p>}

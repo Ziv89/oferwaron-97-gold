@@ -2,13 +2,13 @@
 // LiveAlertNotifier.jsx - sitewide "new Live Alert" pop-ups
 //
 // For signed-in, approved members only. Listens to the same TradingView
-// alert feed as the Live Alerts chat on the WhatsApp Group page (/vip), and
+// alert feed as the Live Alerts chat on the Live Trading page (/trading), and
 // whenever a new alert arrives while the member is NOT looking at the chat -
-// on any other page, or on /vip with Live Alerts hidden - it shows a
+// on any other page, or on /trading with Live Alerts hidden - it shows a
 // WhatsApp-style toast. While the chat is open (normal or full screen) the
 // alert just lands in the chat, so no toast.
 // Sound (soundeffect/alertEffect.mp3, honouring the chat's mute button) is
-// played here on other pages; on /vip the chat itself plays it.
+// played here on other pages; on /trading the chat itself plays it.
 // ============================================
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ import {
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
 
-const ALERTS_PATH = '/vip';
+const ALERTS_PATH = '/trading';
 // Toasts close by themselves after this long
 const TOAST_MS = 12000;
 // Older toasts drop off when more arrive at once

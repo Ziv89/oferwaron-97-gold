@@ -1069,7 +1069,7 @@
   animation-delay: 0.8s;
 }
 
-/* Group icon in a glossy green circle with a small WhatsApp badge */
+/* WhatsApp logo in a glossy green circle - the button that opens the scan code */
 .vip-group-card-icon {
   position: relative;
   display: flex;
@@ -1107,30 +1107,6 @@
 .vip-group-card-icon:focus-visible {
   outline: 2px solid #ffffff;
   outline-offset: 3px;
-}
-
-/* Group picture (logos/SantaLogo.jpeg) fills the circle; green icon shows while it loads */
-.vip-group-card-avatar {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.vip-group-card-badge {
-  position: absolute;
-  right: -4px;
-  bottom: -4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  font-size: 1rem;
-  color: #fff;
-  background: #25D366;
-  border: 2px solid #fff;
 }
 
 @keyframes vip-group-card-glow {

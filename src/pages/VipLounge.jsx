@@ -6,13 +6,12 @@
 // ============================================
 import React, { useState, useCallback } from 'react';
 import {
-  FaUsers, FaWhatsapp,
+  FaWhatsapp,
   // re-enable with the Group Scanner section:
   // FaTrashAlt, FaSearch, FaPlus,
 } from 'react-icons/fa';
 import Seo from '../components/Seo';
 import { ScancodeLightbox } from '../components/WhatsAppQr';
-import { useStorageImage } from '../services/storageImages';
 import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/auth.css';
@@ -27,12 +26,11 @@ const GROUP_QR_CAPTION = 'Scan with your phone camera to join the WhatsApp group
 
 function WhatsAppGroupQr() {
   const { url, failed } = useScancodeImageState(SCANCODE.whatsappGroup);
-  const groupAvatarUrl = useStorageImage('logos', 'SantaLogo', 0);
   const [enlarged, setEnlarged] = useState(false);
   const close = useCallback(() => setEnlarged(false), []);
 
   // Same card as WhatsApp on the Contact page, in glowing WhatsApp green.
-  // Only the group logo opens the scan code enlarged (not the card around it);
+  // Only the WhatsApp logo opens the scan code enlarged (not the card around it);
   // "coming soon" window until it is uploaded.
   return (
     <section className="strategy-section">
@@ -43,12 +41,9 @@ function WhatsAppGroupQr() {
           onClick={() => setEnlarged(true)}
           aria-label="Show WhatsApp group scan code"
         >
-          {groupAvatarUrl ? <img className="vip-group-card-avatar" src={groupAvatarUrl} alt="" /> : <FaUsers />}
-          <span className="vip-group-card-badge"><FaWhatsapp /></span>
+          <FaWhatsapp />
         </button>
-        <h3 className="strategy-rule-title">WhatsApp Group</h3>
-        <p className="strategy-rule-desc">Members-only community</p>
-        <p className="contact-method-value">Scan QR code</p>
+
       </div>
 
       {enlarged && (

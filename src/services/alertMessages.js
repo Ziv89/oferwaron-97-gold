@@ -13,6 +13,28 @@ export const subscribeToChatSettings = (onChange, onError) =>
     onError
   );
 
+// localStorage key for the Live Alerts sound on / off toggle - shared by the
+// chat on /vip and the sitewide new-alert notifier ('off' = muted)
+export const ALERT_SOUND_PREF_KEY = 'liveAlertsSound';
+
+// Whether the member is looking at the Live Alerts chat right now (open on
+// /vip, normal or full screen). Set by the chat, read by the sitewide
+// notifier: pop-ups only show while the chat is NOT on screen.
+let alertChatVisible = false;
+const visibilityListeners = new Set();
+
+export const setAlertChatVisible = (visible) => {
+  alertChatVisible = visible;
+  visibilityListeners.forEach((fn) => fn(visible));
+};
+export const isAlertChatVisible = () => alertChatVisible;
+
+// onChange(visible) whenever the chat is opened / hidden. Returns the unsubscribe fn.
+export const subscribeToAlertChatVisible = (onChange) => {
+  visibilityListeners.add(onChange);
+  return () => visibilityListeners.delete(onChange);
+};
+
 // tradingview/alerts/tvMessages/{id} - TradingView alerts written by the
 // tvAlertMessage Cloud Function. Read-gated by Firestore rules to approved members.
 const MAX_ALERTS = 50;
@@ -63,8 +85,7 @@ export const subscribeToAlerts = (onChange, onError) => {
         snap.docChanges().forEach((c) => {
           const alert = { id: c.doc.id, ...c.doc.data() };
           if (c.type === 'added') {
-            // Newer than anything seen before - not an older alert sliding
-            // back into the top MAX_ALERTS after one is deleted
+        
             if (dateOf(alert) > newestSeen) changes.added.push(alert);
           } else if (c.type === 'modified') {
             changes.modified.push(alert);

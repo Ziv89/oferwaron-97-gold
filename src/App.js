@@ -6,8 +6,9 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './styles/styles.css';
 import './styles/responsive-overrides.css';
-// To revert to the previous logo: import SantaLogoNew from './assets/images/SantaLogoNew.webp';
-import SantaLogoNew from './assets/images/SantaLogoDiamond.webp';
+// To revert to the previous logo: import SantaLogoNew from './assets/images/SantaLogoDiamond.webp';
+// SantaLogoSparkle = SantaLogoDiamond brightened / saturated / sharpened for more gold & diamond sparkle
+import SantaLogoNew from './assets/images/SantaLogoSparkle.webp';
 import { Analytics } from "@vercel/analytics/react";
 import { SiGmail } from 'react-icons/si';
 import {
@@ -33,6 +34,7 @@ import VipLounge from './pages/VipLounge';
 // Auth
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import LiveAlertNotifier from './components/LiveAlertNotifier';
 
 // ✅ Firebase
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
@@ -391,27 +393,10 @@ const images = Array.isArray(data.tradeViewChartImages)
 // ============================================
 // HEADER COMPONENT
 // ============================================
+// Logo effect: Liquid Gold (option 3 in logo-sparkle-demo.html) - two shine bands
+// roll across the gold while it brightens and warms in a slow pulse (CSS only)
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // ✨ Effect #7: Glitter + Shimmer Hybrid
-  const [glitters, setGlitters] = useState([]);
-
-  useEffect(() => {
-    const COUNT = 28;
-    const dots = Array.from({ length: COUNT }, (_, i) => {
-      const size = 3 + Math.random() * 3;
-      return {
-        id: i,
-        x: Math.random() * 100,
-        y: Math.random() * 100,
-        size,
-        delay: Math.random() * 3,
-        duration: 0.8 + Math.random() * 0.8,
-      };
-    });
-    setGlitters(dots);
-  }, []);
 
   const { user, isApproved, logout } = useAuth();
   // Registered but not yet approved: hide the member-only tabs
@@ -437,27 +422,14 @@ const Header = () => {
   return (
     <header className="app-header">
       <NavLink to="/" className="logo-container logo-glitter-field" aria-label="Go to home">
-        {/* Layer 1: Shimmer sweep (below logo) */}
-        <div className="shimmer-layer" aria-hidden="true">
+        {/* Two shine bands, masked to the logo's own shape so only the gold & diamonds light up */}
+        <div
+          className="shimmer-layer shimmer-layer--masked"
+          aria-hidden="true"
+          style={{ WebkitMaskImage: `url(${SantaLogo})`, maskImage: `url(${SantaLogo})` }}
+        >
           <div className="shimmer-sweep" />
-        </div>
-
-        {/* Layer 2: Glitter dots (above logo) */}
-        <div className="glitter-layer" aria-hidden="true">
-          {glitters.map(g => (
-            <span
-              key={g.id}
-              className="glitter"
-              style={{
-                left: `${g.x}%`,
-                top: `${g.y}%`,
-                width: `${g.size}px`,
-                height: `${g.size}px`,
-                animationDelay: `${g.delay}s`,
-                animationDuration: `${g.duration}s`,
-              }}
-            />
-          ))}
+          <div className="shimmer-sweep shimmer-sweep--late" />
         </div>
 
         <img src={SantaLogo} className="app-logo" alt="97% Gold Logo" />
@@ -698,6 +670,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <LiveAlertNotifier />
         </div>
         <Analytics />
       </BrowserRouter>

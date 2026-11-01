@@ -26,20 +26,10 @@ import {
   setAlertChatVisible,
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
-// Group Scanner is hidden for now - re-enable with its section below
-// import {
-//   subscribeToGroups,
-//   addGroup,
-//   removeGroup,
-//   WHATSAPP_INVITE_PATTERN,
-//   SCAN_STATUS,
-// } from '../services/whatsappGroups';
+
 import '../styles/auth.css';
 
-// re-enable with the Coming Soon section
-// const COMING_SOON = ['Scan results & insights', 'Scheduled re-scans', 'More member tools'];
-
-// "14:05"
+//
 const formatAlertTime = (date) =>
   date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
 
@@ -63,6 +53,7 @@ const GROUP_QR_CAPTION = 'Scan with your phone camera to join the WhatsApp group
 
 function WhatsAppGroupQr() {
   const { url, failed } = useScancodeImageState(SCANCODE.whatsappGroup);
+  const groupAvatarUrl = useStorageImage('logos', 'SantaLogo', 0);
   const [enlarged, setEnlarged] = useState(false);
   const close = useCallback(() => setEnlarged(false), []);
 
@@ -77,7 +68,7 @@ function WhatsAppGroupQr() {
         aria-label="Show WhatsApp group scan code"
       >
         <span className="vip-group-card-icon" aria-hidden="true">
-          <FaUsers />
+          {groupAvatarUrl ? <img className="vip-group-card-avatar" src={groupAvatarUrl} alt="" /> : <FaUsers />}
           <span className="vip-group-card-badge"><FaWhatsapp /></span>
         </span>
         <h3 className="strategy-rule-title">WhatsApp Group</h3>

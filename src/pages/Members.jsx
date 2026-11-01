@@ -21,6 +21,38 @@ import { FaWhatsapp } from 'react-icons/fa';
 import { db } from '../services/firebase';
 import '../styles/auth.css';
 
+// Registration status badge - hover / focus shows what the status means
+const APPROVAL_STATUS = {
+  approved: {
+    label: 'Approved',
+    tooltip: 'Your registration is approved - Live Trading and the member areas are open to you.',
+  },
+  rejected: {
+    label: 'Rejected',
+    tooltip: 'Your registration was not approved. If you think this is a mistake, message us on WhatsApp.',
+  },
+  pending: {
+    label: 'Pending',
+    tooltip: 'Your registration is waiting for review. Once approved, the member areas open up here automatically.',
+  },
+};
+
+function ApprovalStatus({ status }) {
+  const { label, tooltip } = APPROVAL_STATUS[status] || APPROVAL_STATUS.pending;
+  const tooltipId = `approval-tooltip-${status}`;
+  return (
+    <span
+      className={`member-status member-status-${status in APPROVAL_STATUS ? status : 'pending'} member-status-tip`}
+      tabIndex={0}
+      aria-describedby={tooltipId}
+    >
+      <span className="member-status-dot" />
+      {label}
+      <span id={tooltipId} role="tooltip" className="member-status-tooltip">{tooltip}</span>
+    </span>
+  );
+}
+
 export default function Members() {
   const { user, profile, subscription, expiresAt, isActive, approval, isApproved } = useAuth();
 
@@ -88,10 +120,7 @@ export default function Members() {
 
             {approval === 'rejected' ? (
               <>
-                <div className="member-status member-status-rejected">
-                  <span className="member-status-dot" />
-                  Not approved
-                </div>
+                <ApprovalStatus status="rejected" />
                 <p className="strategy-principle-text">
                   Your registration was not approved. If you think this is a
                   mistake, message us on WhatsApp.
@@ -99,10 +128,7 @@ export default function Members() {
               </>
             ) : (
               <>
-                <div className="member-status member-status-pending">
-                  <span className="member-status-dot" />
-                  Pending approval
-                </div>
+                <ApprovalStatus status="pending" />
                 <p className="strategy-principle-text">
                   Thanks for registering! Your account is waiting for approval.
                   Once approved, Live Trading and the member areas open up here
@@ -149,26 +175,7 @@ export default function Members() {
               </div>
             </>
           ) : (
-            <>
-              <div className="member-status member-status-inactive">
-                <span className="member-status-dot" />
-                {subscription ? 'Expired' : 'No active subscription'}
-              </div>
-              <p className="strategy-principle-text">
-                Your account is created but there is no active membership on it yet.
-                Message us on WhatsApp to start your free 30-day trial and we will
-                activate it right away.
-              </p>
-              <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
-                {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
-                <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon">
-                  Activate on WhatsApp <FaWhatsapp style={{ color: '#25D366' }} />
-                </WhatsAppQrButton>
-                <Link to="/pricing" className="strategy-btn strategy-btn-primary">
-                  View Plans
-                </Link>
-              </div>
-            </>
+            <ApprovalStatus status="approved" />
           )}
         </div>
       </section>

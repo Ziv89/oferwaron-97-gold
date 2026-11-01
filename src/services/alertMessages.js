@@ -14,11 +14,11 @@ export const subscribeToChatSettings = (onChange, onError) =>
   );
 
 // localStorage key for the Live Alerts sound on / off toggle - shared by the
-// chat on /vip and the sitewide new-alert notifier ('off' = muted)
+// chat on /trading and the sitewide new-alert notifier ('off' = muted)
 export const ALERT_SOUND_PREF_KEY = 'liveAlertsSound';
 
 // Whether the member is looking at the Live Alerts chat right now (open on
-// /vip, normal or full screen). Set by the chat, read by the sitewide
+// /trading, normal or full screen). Set by the chat, read by the sitewide
 // notifier: pop-ups only show while the chat is NOT on screen.
 let alertChatVisible = false;
 const visibilityListeners = new Set();

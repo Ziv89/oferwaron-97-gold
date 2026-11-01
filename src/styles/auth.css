@@ -178,24 +178,85 @@
   background: #8a8a8a;
 }
 
+.member-status-approved {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.14);
+  border: 1px solid rgba(34, 197, 94, 0.45);
+}
+
+.member-status-approved .member-status-dot {
+  background: #22c55e;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.8);
+}
+
 .member-status-pending {
-  color: #ffd76a;
-  background: rgba(255, 193, 7, 0.12);
-  border: 1px solid rgba(255, 193, 7, 0.35);
+  color: #fdba74;
+  background: rgba(249, 115, 22, 0.14);
+  border: 1px solid rgba(249, 115, 22, 0.45);
 }
 
 .member-status-pending .member-status-dot {
-  background: #ffc107;
+  background: #f97316;
+  box-shadow: 0 0 8px rgba(249, 115, 22, 0.7);
 }
 
 .member-status-rejected {
-  color: #ff8a80;
-  background: rgba(244, 67, 54, 0.12);
-  border: 1px solid rgba(244, 67, 54, 0.35);
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.45);
 }
 
 .member-status-rejected .member-status-dot {
-  background: #f44336;
+  background: #ef4444;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+/* Approval status tooltip (ApprovalStatus in Members.jsx) - on hover / keyboard focus */
+.member-status-tip {
+  position: relative;
+  cursor: help;
+}
+
+.member-status-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 20;
+  width: max-content;
+  max-width: min(260px, 80vw);
+  padding: 0.55rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.45;
+  letter-spacing: normal;
+  text-align: center;
+  color: #f5f5f5;
+  background: rgba(20, 20, 20, 0.96);
+  border: 1px solid rgba(255, 215, 0, 0.35);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, 4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  pointer-events: none;
+}
+
+.member-status-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: rgba(20, 20, 20, 0.96);
+}
+
+.member-status-tip:hover .member-status-tooltip,
+.member-status-tip:focus-visible .member-status-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
 }
 
 .member-hint {
@@ -961,7 +1022,8 @@
   margin: 0 auto;
   font: inherit;
   color: inherit;
-  cursor: pointer;
+  /* Not clickable itself - only the group logo opens the scan code */
+  cursor: default;
   border-color: #25D366;
   background:
     radial-gradient(ellipse at top, rgba(57, 255, 20, 0.16), rgba(37, 211, 102, 0.06) 70%),
@@ -972,15 +1034,15 @@
   animation: vip-group-card-glow 2.4s ease-in-out infinite;
 }
 
-.vip-group-card:hover,
-.vip-group-card:focus-visible {
-  border-color: #7dff6b;
+/* No lift / highlight on the card - the logo reacts instead */
+.vip-group-card:hover {
+  transform: none;
   background:
-    radial-gradient(ellipse at top, rgba(57, 255, 20, 0.24), rgba(37, 211, 102, 0.1) 70%),
-    rgba(255, 255, 255, 0.08);
+    radial-gradient(ellipse at top, rgba(57, 255, 20, 0.16), rgba(37, 211, 102, 0.06) 70%),
+    rgba(255, 255, 255, 0.06);
   box-shadow:
-    0 0 20px rgba(57, 255, 20, 0.9),
-    0 0 40px rgba(37, 211, 102, 0.6);
+    0 0 12px rgba(57, 255, 20, 0.6),
+    0 0 26px rgba(37, 211, 102, 0.4);
 }
 
 /* Four-point sparkles on the top corners */
@@ -1025,6 +1087,26 @@
   box-shadow:
     0 0 14px rgba(57, 255, 20, 0.8),
     inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+  /* It is the button - reset button defaults */
+  padding: 0;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vip-group-card-icon:hover,
+.vip-group-card-icon:focus-visible {
+  transform: scale(1.08);
+  box-shadow:
+    0 0 22px rgba(57, 255, 20, 1),
+    0 0 40px rgba(37, 211, 102, 0.6),
+    inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+}
+
+.vip-group-card-icon:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
 }
 
 /* Group picture (logos/SantaLogo.jpeg) fills the circle; green icon shows while it loads */

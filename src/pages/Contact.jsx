@@ -55,7 +55,8 @@ function Contact() {
 
   // Scan codes from Firebase Storage (.jpg or .jpeg):
   // scancodes/ofernewScancode (WhatsApp), ofernewScancode2 (TikTok), ofernewScancode3 (Instagram),
-  // ofernewScancode4 (YouTube - the window shows "coming soon" until it is uploaded)
+  // ofernewScancode5 (YouTube - the window shows "coming soon" until it is uploaded)
+  // ofernewScancode4 (WhatsApp group) is members-only - shown on the WhatsApp Group page only
   const whatsappScancode = useScancodeImageState(SCANCODE.whatsapp);
   const youtubeScancode = useScancodeImageState(SCANCODE.youtube);
   const tiktokScancode = useScancodeImageState(SCANCODE.tiktok);

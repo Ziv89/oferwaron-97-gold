@@ -950,3 +950,343 @@
   color: rgba(245, 245, 245, 0.75);
   text-align: left;
 }
+
+/* ---------- WhatsApp Group page: group scan code card ----------
+   Same layout as the WhatsApp card on Contact, glowing WhatsApp green
+   with sparkles like the WhatsApp Group nav tab */
+.vip-group-card {
+  position: relative;
+  display: flex;
+  width: min(300px, 100%);
+  margin: 0 auto;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  border-color: #25D366;
+  background:
+    radial-gradient(ellipse at top, rgba(57, 255, 20, 0.16), rgba(37, 211, 102, 0.06) 70%),
+    rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 12px rgba(57, 255, 20, 0.6),
+    0 0 26px rgba(37, 211, 102, 0.4);
+  animation: vip-group-card-glow 2.4s ease-in-out infinite;
+}
+
+.vip-group-card:hover,
+.vip-group-card:focus-visible {
+  border-color: #7dff6b;
+  background:
+    radial-gradient(ellipse at top, rgba(57, 255, 20, 0.24), rgba(37, 211, 102, 0.1) 70%),
+    rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 0 20px rgba(57, 255, 20, 0.9),
+    0 0 40px rgba(37, 211, 102, 0.6);
+}
+
+/* Four-point sparkles on the top corners */
+.vip-group-card::before,
+.vip-group-card::after {
+  content: '';
+  position: absolute;
+  top: 10px;
+  width: 26px;
+  height: 26px;
+  background: radial-gradient(circle, #ffffff 0 2px, rgba(255, 255, 255, 0) 3px),
+    linear-gradient(90deg, transparent 45%, #ffffff 50%, transparent 55%),
+    linear-gradient(0deg, transparent 45%, #ffffff 50%, transparent 55%);
+  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+  filter: drop-shadow(0 0 4px #7dff6b);
+  pointer-events: none;
+  animation: nav-whatsapp-sparkle 1.6s ease-in-out infinite;
+}
+
+.vip-group-card::before { left: 10px; }
+
+.vip-group-card::after {
+  right: 10px;
+  animation-delay: 0.8s;
+}
+
+/* Group icon in a glossy green circle with a small WhatsApp badge */
+.vip-group-card-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(56px, 14vw, 72px);
+  height: clamp(56px, 14vw, 72px);
+  margin-bottom: clamp(8px, 2vw, 16px);
+  border-radius: 50%;
+  font-size: clamp(1.6rem, 5vw, 2.1rem);
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.12) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #7dff6b 0%, #2ee82a 50%, #12b812 100%);
+  box-shadow:
+    0 0 14px rgba(57, 255, 20, 0.8),
+    inset 0 -3px 6px rgba(0, 90, 0, 0.35);
+}
+
+.vip-group-card-badge {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  font-size: 1rem;
+  color: #fff;
+  background: #25D366;
+  border: 2px solid #fff;
+}
+
+@keyframes vip-group-card-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vip-group-card,
+  .vip-group-card::before,
+  .vip-group-card::after {
+    animation: none;
+  }
+}
+
+/* ---------- Live Alerts title bell (GoldBell in VipLounge.jsx) ----------
+   Idle: glowing gold bell that sways every few seconds with a twinkling glint.
+   .gold-bell--ringing (new alert): hard swings, clapper knocks, sound waves. */
+.gold-bell {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35em;
+  line-height: 0;
+}
+
+.gold-bell-svg {
+  position: relative;
+  z-index: 1;
+  overflow: visible;
+  filter:
+    drop-shadow(0 0 3px rgba(255, 215, 0, 0.75))
+    drop-shadow(0 1px 1px rgba(90, 60, 0, 0.45));
+}
+
+/* Swing from the hanger loop */
+.gold-bell-swing {
+  transform-origin: 32px 8px;
+  animation: goldBellIdle 6s ease-in-out infinite;
+}
+
+.gold-bell-clapper {
+  transform-origin: 32px 44px;
+  animation: goldBellClapperIdle 6s ease-in-out infinite;
+}
+
+.gold-bell-glint {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: goldBellGlint 2.4s ease-in-out infinite;
+}
+
+@keyframes goldBellIdle {
+  0%, 78%, 100% { transform: rotate(0deg); }
+  82% { transform: rotate(12deg); }
+  86% { transform: rotate(-10deg); }
+  90% { transform: rotate(6deg); }
+  94% { transform: rotate(-3deg); }
+}
+
+@keyframes goldBellClapperIdle {
+  0%, 78%, 100% { transform: rotate(0deg); }
+  82% { transform: rotate(-10deg); }
+  86% { transform: rotate(9deg); }
+  90% { transform: rotate(-5deg); }
+}
+
+@keyframes goldBellGlint {
+  0%, 60%, 100% { opacity: 0; transform: scale(0.3) rotate(0deg); }
+  75% { opacity: 1; transform: scale(1.2) rotate(45deg); }
+}
+
+/* ---- Ringing: a new alert arrived ---- */
+.gold-bell--ringing .gold-bell-svg {
+  animation: goldBellPop 2.7s ease-out;
+  filter:
+    drop-shadow(0 0 6px rgba(255, 230, 90, 1))
+    drop-shadow(0 0 14px rgba(255, 190, 30, 0.8));
+}
+
+.gold-bell--ringing .gold-bell-swing {
+  animation: goldBellRing 0.9s ease-in-out 3;
+}
+
+.gold-bell--ringing .gold-bell-clapper {
+  animation: goldBellClapperRing 0.9s ease-in-out 3;
+}
+
+.gold-bell--ringing .gold-bell-glint {
+  animation-duration: 0.6s;
+}
+
+@keyframes goldBellPop {
+  0% { transform: scale(1); }
+  10% { transform: scale(1.3); }
+  85% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes goldBellRing {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(28deg); }
+  35% { transform: rotate(-26deg); }
+  55% { transform: rotate(20deg); }
+  75% { transform: rotate(-14deg); }
+  90% { transform: rotate(6deg); }
+}
+
+@keyframes goldBellClapperRing {
+  0%, 100% { transform: rotate(0deg); }
+  15% { transform: rotate(-24deg); }
+  35% { transform: rotate(24deg); }
+  55% { transform: rotate(-18deg); }
+  75% { transform: rotate(12deg); }
+}
+
+/* Sound waves rippling out while it rings */
+.gold-bell-wave {
+  position: absolute;
+  inset: -10%;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 215, 0, 0.9);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gold-bell--ringing .gold-bell-wave {
+  animation: goldBellWave 0.9s ease-out 3;
+}
+
+.gold-bell--ringing .gold-bell-wave--late {
+  animation-delay: 0.45s;
+}
+
+@keyframes goldBellWave {
+  0% { opacity: 0.9; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gold-bell-swing,
+  .gold-bell-clapper,
+  .gold-bell-glint,
+  .gold-bell-svg,
+  .gold-bell-wave {
+    animation: none !important;
+  }
+}
+
+/* ---------- Live Alerts full screen (expand button in the chat header) ----------
+   The chat fills the window (a centred, wide column on big screens) with
+   larger text, avatar and buttons so alerts are easy to read from a distance */
+.wa-chat-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: waOverlayIn 0.2s ease-out;
+}
+
+.wa-chat-overlay-inner {
+  display: flex;
+  width: min(1100px, 100%);
+  height: 100%;
+  padding: clamp(0px, 2vh, 20px) clamp(0px, 2vw, 20px);
+}
+
+@keyframes waOverlayIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.wa-chat.wa-chat--fullscreen {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  margin: 0;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.wa-chat--fullscreen .wa-chat-header {
+  padding: 0.8rem 1.2rem;
+  gap: 1rem;
+}
+
+.wa-chat--fullscreen .wa-chat-avatar {
+  width: 52px;
+  height: 52px;
+}
+
+.wa-chat--fullscreen .wa-chat-heading strong {
+  font-size: 1.3rem;
+}
+
+.wa-chat--fullscreen .wa-chat-icon-btn {
+  width: 46px;
+  height: 46px;
+  font-size: 1.3rem;
+}
+
+.wa-chat--fullscreen .wa-chat-body {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  padding: 1rem clamp(0.75rem, 4vw, 3rem) 1.5rem;
+  gap: 0.4rem;
+}
+
+.wa-chat--fullscreen .wa-bubble {
+  max-width: min(90%, 760px);
+  padding: 0.55rem 0.8rem 0.45rem 0.85rem;
+}
+
+.wa-chat--fullscreen .wa-bubble-sender {
+  font-size: 1.05rem;
+}
+
+.wa-chat--fullscreen .wa-bubble-text {
+  font-size: clamp(1.1rem, 2.4vw, 1.35rem);
+  line-height: 1.5;
+}
+
+.wa-chat--fullscreen .wa-bubble-meta {
+  font-size: 0.85rem;
+}
+
+.wa-chat--fullscreen .wa-chat-system,
+.wa-chat--fullscreen .wa-chat-date {
+  font-size: 0.95rem;
+}
+
+/* Phones: edge to edge, no rounded frame */
+@media (max-width: 600px) {
+  .wa-chat.wa-chat--fullscreen {
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-chat-overlay {
+    animation: none;
+  }
+}

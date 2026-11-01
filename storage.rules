@@ -20,9 +20,20 @@ service firebase.storage {
       allow write: if false;
     }
 
+    // Signed in and approved by the owner (users/{uid}.approval in Firestore,
+    // same rule as isApproved in firestore.rules). Cross-service read: the
+    // first deploy asks to grant Storage access to Firestore - accept it.
+    function isApprovedMember() {
+      return request.auth != null
+        && firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data
+             .get('approval', 'approved') == 'approved';
+    }
+
     // public read only for scan code images (ofernewScancode.jpg, ofernewScancode1.jpg, ...)
+    // except ofernewScancode4 (WhatsApp group) - approved members only
     match /scancodes/{fileName} {
-      allow read: if fileName.matches('ofernewScancode(\\d+)?\\.(jpg|jpeg|png|webp)$');
+      allow read: if fileName.matches('ofernewScancode(\\d+)?\\.(jpg|jpeg|png|webp)$')
+        && (!fileName.matches('ofernewScancode4\\..*') || isApprovedMember());
       allow write: if false;
     }
 

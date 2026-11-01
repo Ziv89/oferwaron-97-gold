@@ -56,20 +56,22 @@ function Pricing() {
             <div className="faq-header">
               <h2 className="strategy-section-title text-center get-in-touch-title get-in-touch-title--shimmer">
                 <span className="get-in-touch-shimmer">
-                  Frequently Asked Questions
+                  Membership Pricing
                   <span className="sparkle sparkle-1">✦</span>
                   <span className="sparkle sparkle-2">✦</span>
                 </span>
 
                 <img
                   src={questionMarkCoin}
-                  alt="FAQ"
+                  alt=""
                   className="faq-coin"
                   loading="lazy"
                 />
               </h2>
 
-              <p className="strategy-subtitle text-center">Everything you need to know</p>
+              <p className="strategy-subtitle text-center">
+                Your plan and price are below — have a question? I'm one message away
+              </p>
             </div>
           </div>
 

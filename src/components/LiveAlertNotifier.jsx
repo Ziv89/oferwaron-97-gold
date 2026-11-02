@@ -13,6 +13,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaBell, FaTimes, FaUsers } from 'react-icons/fa';
+import { renderAlertText } from './AlertEmoji';
 import { useAuth } from '../contexts/AuthContext';
 import { useStorageImage } from '../services/storageImages';
 import {
@@ -114,9 +115,10 @@ function Notifier() {
             <span className="alert-toast-body">
               <span className="alert-toast-title">
                 <FaBell aria-hidden="true" /> New Live Alert
-                {alert.symbol && <span className="alert-toast-symbol">{alert.symbol}</span>}
+                {/* Symbol title hidden - alert.symbol is still saved on every alert */}
+                {/* {alert.symbol && <span className="alert-toast-symbol">{alert.symbol}</span>} */}
               </span>
-              <span className="alert-toast-text">{alert.messagecontent}</span>
+              <span className="alert-toast-text">{renderAlertText(alert.messagecontent)}</span>
               <span className="alert-toast-cta">Tap to open Live Alerts</span>
             </span>
           </button>

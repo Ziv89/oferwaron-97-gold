@@ -1849,3 +1849,41 @@ margin-top: 150px !important;
   overflow-wrap: normal;
   word-break: normal;
 }
+
+/* =========================================================
+   HOME PERFORMANCE ROW (Wins / Losses / Max Consecutive Wins)
+   Same value size + label height in all three cards, so they
+   stay in proportion on small screens
+   ========================================================= */
+.strategy-stats-grid-performance .strategy-stat-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.strategy-stats-grid-performance .strategy-performance-value {
+  font-size: clamp(1.6rem, 8vw, 2.6rem);
+  line-height: 1.1;
+  margin-bottom: clamp(4px, 1vw, 8px);
+}
+
+/* Two lines tall in every card - "Max Consecutive Wins" wraps, the others don't */
+.strategy-stats-grid-performance .strategy-stat-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.4em;
+  font-size: clamp(0.6rem, 2.6vw, 0.95rem) !important;
+}
+
+/* Gold value for the streak card (wins / losses have their own colors) */
+.strategy-stat-card.stat-card-streak .strategy-performance-value {
+  color: #DAA520;
+  -webkit-text-stroke: 1px #000;
+  paint-order: stroke fill;
+  text-shadow:
+    1px 1px 0 #000, -1px -1px 0 #000,
+    1px -1px 0 #000, -1px 1px 0 #000,
+    0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFA500;
+}

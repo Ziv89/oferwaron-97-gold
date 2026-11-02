@@ -1,23 +1,46 @@
 // ============================================
 // Pricing.jsx - Pricing Page (Strategy-style golden design)
 // ============================================
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 // import { Link } from 'react-router-dom'; // re-enable with the Final CTA section
 import Seo from '../components/Seo';
 import { useOwnerDetails } from '../App';
-import { useScancodeImage } from '../services/scancodeImages';
-import { WhatsAppQrButton } from '../components/WhatsAppQr';
-import { LoadingImage } from '../components/LoadingMedia';
+import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
+import { WhatsAppQrButton, ScancodeLightbox } from '../components/WhatsAppQr';
 import { SiGmail } from 'react-icons/si';
 import { FaWhatsapp } from 'react-icons/fa';
 import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
+import '../styles/auth.css';
+
+const PRICE_QR_ALT = 'Scan to pay with Bit';
+const PRICE_QR_CAPTION = 'Scan with your phone camera to pay with Bit';
+
+// Bit wordmark - white "bit" on the teal Bit button
+const BitLogo = () => (
+  <svg className="bit-logo" viewBox="0 0 64 40" width="1.6em" height="1em" aria-hidden="true">
+    <text
+      x="32"
+      y="31"
+      textAnchor="middle"
+      fill="currentColor"
+      fontFamily="'Arial Rounded MT Bold', 'Nunito', 'Varela Round', Arial, sans-serif"
+      fontWeight="800"
+      fontSize="34"
+      letterSpacing="-1"
+    >
+      bit
+    </text>
+  </svg>
+);
 
 function Pricing() {
   // Get contact data from Firebase
   const { contact, loading } = useOwnerDetails();
 
-  // Price image from Firebase Storage: scancodes/ofernewScancode1.jpg
-  const comingSoonImage = useScancodeImage(1);
+  // Price scan code from Firebase Storage: scancodes/ofernewScancode1.jpg
+  const priceScancode = useScancodeImageState(SCANCODE.price);
+  const [enlarged, setEnlarged] = useState(false);
+  const close = useCallback(() => setEnlarged(false), []);
 
   if (loading) {
     return (
@@ -81,32 +104,28 @@ function Pricing() {
         </div>
       </section>
 
-      {/* Trading Dashboard - Coming Soon */}
+      {/* Price scan code - only the Bit logo opens it enlarged (scancodes/ofernewScancode1) */}
       <section className="strategy-section text-center">
-        <div className="trading-dashboard trading-dashboard-coming-soon">
-          <div className="coming-soon-image-section">
-            <div className="coming-soon-image-wrapper">
-              {comingSoonImage ? (
-                <LoadingImage
-                  src={comingSoonImage}
-                  alt="97% Gold Pricing"
-                  className="coming-soon-hero-image"
-                  loading="lazy"
-                  coinSize={110}
-                />
-              ) : (
-                <div className="coming-soon-image-placeholder">
-                  Coming Soon
-                </div>
-              )}
-
-              <div className="coming-soon-image-overlay">
-                <div className="overlay-content">
-                </div>
-              </div>
-            </div>
-          </div>
+        <div className="strategy-rule-card contact-method-card vip-group-card bit-pay-card">
+          <button
+            type="button"
+            className="vip-group-card-icon bit-pay-card-icon"
+            onClick={() => setEnlarged(true)}
+            aria-label="Show Bit payment scan code"
+          >
+            <BitLogo />
+          </button>
         </div>
+
+        {enlarged && (
+          <ScancodeLightbox
+            src={priceScancode.url}
+            alt={PRICE_QR_ALT}
+            caption={PRICE_QR_CAPTION}
+            missing={priceScancode.failed}
+            onClose={close}
+          />
+        )}
       </section>
 
       {/* Contact CTA */}

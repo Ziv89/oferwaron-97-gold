@@ -1122,6 +1122,77 @@
   }
 }
 
+/* ---------- Bit variant (Pricing page) ----------
+   Same card as the WhatsApp group one, in Bit's teal with a ripple pulse */
+.bit-pay-card,
+.bit-pay-card:hover {
+  border-color: #00c2cb;
+  background:
+    radial-gradient(ellipse at top, rgba(0, 229, 255, 0.18), rgba(0, 166, 180, 0.06) 70%),
+    rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 0 12px rgba(0, 229, 255, 0.6),
+    0 0 26px rgba(0, 166, 180, 0.4);
+}
+
+.bit-pay-card::before,
+.bit-pay-card::after {
+  filter: drop-shadow(0 0 4px #5ff4ff);
+}
+
+.bit-pay-card-icon {
+  font-size: clamp(1.9rem, 6vw, 2.5rem);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.1) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #3fe6ef 0%, #00b8c4 50%, #00838f 100%);
+  box-shadow:
+    0 0 14px rgba(0, 229, 255, 0.8),
+    inset 0 -3px 6px rgba(0, 70, 80, 0.35);
+}
+
+/* Ripple rings around the Bit button */
+.bit-pay-card-icon::before,
+.bit-pay-card-icon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 229, 255, 0.7);
+  pointer-events: none;
+  animation: bit-pay-ripple 2.4s ease-out infinite;
+}
+
+.bit-pay-card-icon::after {
+  animation-delay: 1.2s;
+}
+
+.bit-pay-card-icon:hover,
+.bit-pay-card-icon:focus-visible {
+  box-shadow:
+    0 0 22px rgba(0, 229, 255, 1),
+    0 0 40px rgba(0, 166, 180, 0.6),
+    inset 0 -3px 6px rgba(0, 70, 80, 0.35);
+}
+
+.bit-logo {
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgba(0, 60, 70, 0.45));
+}
+
+@keyframes bit-pay-ripple {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bit-pay-card-icon::before,
+  .bit-pay-card-icon::after {
+    animation: none;
+    opacity: 0;
+  }
+}
+
 /* ---------- Live Alerts title bell (GoldBell in VipLounge.jsx) ----------
    Idle: glowing gold bell that sways every few seconds with a twinkling glint.
    .gold-bell--ringing (new alert): hard swings, clapper knocks, sound waves. */
@@ -1355,4 +1426,16 @@
   .wa-chat-overlay {
     animation: none;
   }
+}
+
+/* ---------- Alert emoji icons (components/AlertEmoji.jsx) ----------
+   🟨🟪🟧 / 💫🚀💥 / ❌ in Live Alerts, drawn the same on every device */
+.alert-emoji {
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  margin: 0 0.06em;
+  vertical-align: -0.3em;
+  overflow: visible;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
 }

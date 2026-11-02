@@ -39,19 +39,20 @@ export const subscribeToAlertChatVisible = (onChange) => {
 // tvAlertMessage Cloud Function. Read-gated by Firestore rules to approved members.
 const MAX_ALERTS = 50;
 
-// How long an alert stays in the chat - keep in step with ALERT_TTL_HOURS
-// in functions/index.js (which sets expireAt).
-export const ALERT_TTL_HOURS = 12;
-const ALERT_TTL_MS = ALERT_TTL_HOURS * 60 * 60 * 1000;
+// Alerts last until the end of the day they were sent: at 00:00 Israel time
+// the deleteDailyAlerts Cloud Function (functions/index.js) removes them all,
+// e.g. an alert from 01:00 or 22:00 is gone at the start of the next day.
+export const ALERT_TIME_ZONE = 'Asia/Jerusalem';
+const israelDay = new Intl.DateTimeFormat('en-CA', { timeZone: ALERT_TIME_ZONE });
 
-// The TTL policy may delete a doc up to ~24h after expireAt, so callers
-// should hide expired ones with this (re-checked as time passes). Also
-// expired once older than ALERT_TTL_HOURS, so alerts saved with a longer
-// expireAt (before the TTL was shortened) disappear on time too.
+// The scheduled delete may take a moment, so callers should hide expired
+// ones with this (re-checked as time passes): expired once it is no longer
+// the alert's day in Israel, or past its expireAt (older alerts were saved
+// with expireAt = +12h).
 export const isAlertExpired = (alert, now = Date.now()) =>
   Boolean(
     (alert.expireAt && alert.expireAt.toMillis() <= now) ||
-    (alert.date?.toMillis && alert.date.toMillis() + ALERT_TTL_MS <= now)
+    (alert.date?.toMillis && israelDay.format(alert.date.toMillis()) !== israelDay.format(now))
   );
 
 const dateOf = (a) => (a.date?.toMillis ? a.date.toMillis() : 0);

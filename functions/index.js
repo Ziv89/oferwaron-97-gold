@@ -7,6 +7,7 @@
 const { onObjectFinalized, onObjectDeleted } = require("firebase-functions/v2/storage");
 const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const { logger } = require("firebase-functions");
 const { defineSecret } = require("firebase-functions/params");
@@ -192,7 +193,7 @@ exports.tvWebhook = onRequest(
  * One TradingView alert hits this function. It always saves the alert to
  *   tradingview/alerts                     latest alert (date, messagecontent, symbol);
  *                                          other fields, e.g. groupName, are left as they are
- *   tradingview/alerts/tvMessages/{autoId} one doc per alert, expireAt = +12h
+ *   tradingview/alerts/tvMessages/{autoId} one doc per alert, expireAt = next 00:00 Israel time
  * and, when the payload names a WhatsApp target, also forwards it to
  * Wassenger. Firestore and Wassenger run in parallel - one failing never
  * blocks the other.
@@ -207,14 +208,30 @@ exports.tvWebhook = onRequest(
  * be in the URL).
  *
  * Secrets (Cloud Secret Manager): TV_WEBHOOK_SECRET (shared with tvWebhook)
- * and WASSENGER_TOKEN. A Firestore TTL policy on tvMessages.expireAt
- * (firestore.indexes.json) deletes each alert automatically, usually within
- * 24h after it expires; the /vip page also hides expired ones.
+ * and WASSENGER_TOKEN. Alerts last until the end of their day: at 00:00
+ * Israel time deleteDailyAlerts (below) deletes them all. The Firestore TTL
+ * policy on tvMessages.expireAt (firestore.indexes.json) is a backup, and
+ * the Live Alerts chat also hides yesterday's alerts by itself.
  */
 const WASSENGER_TOKEN = defineSecret("WASSENGER_TOKEN");
-const ALERT_TTL_HOURS = 12;
+const ALERT_TIME_ZONE = "Asia/Jerusalem";
 const DEFAULT_ALERT_SYMBOL = "XAUUSD";
 const tvAlertsDoc = () => admin.firestore().collection("tradingview").doc("alerts");
+
+// Millis of 00:00 Israel time on the day of `ms`, plus `addDays` days
+// (addDays = 1 -> the coming midnight). DST in Israel switches at 02:00,
+// so the current UTC offset is the one at midnight too.
+const israelMidnight = (ms, addDays = 0) => {
+  const p = Object.fromEntries(
+    new Intl.DateTimeFormat("en-US", {
+      timeZone: ALERT_TIME_ZONE, hourCycle: "h23",
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+    }).formatToParts(ms).map(({ type, value }) => [type, Number(value)])
+  );
+  const offset = Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(ms / 1000) * 1000;
+  return Date.UTC(p.year, p.month - 1, p.day + addDays) - offset;
+};
 
 exports.tvAlertMessage = onRequest(
   { secrets: [TV_WEBHOOK_SECRET, WASSENGER_TOKEN], cors: false },
@@ -270,7 +287,7 @@ exports.tvAlertMessage = onRequest(
       messagecontent: message,
       symbol,
       date,
-      expireAt: admin.firestore.Timestamp.fromMillis(date.toMillis() + ALERT_TTL_HOURS * 60 * 60 * 1000),
+      expireAt: admin.firestore.Timestamp.fromMillis(israelMidnight(date.toMillis(), 1)),
     });
     // merge: keep fields set by hand on this doc (e.g. groupName)
     batch.set(tvAlertsDoc(), { messagecontent: message, symbol, date }, { merge: true });
@@ -302,6 +319,38 @@ exports.tvAlertMessage = onRequest(
 
     const allOk = results.every((r) => r.status === "fulfilled");
     res.status(allOk ? 200 : 502).json(report);
+  }
+);
+
+
+
+exports.deleteDailyAlerts = onSchedule(
+  { schedule: "0 0 * * *", timeZone: ALERT_TIME_ZONE },
+  async () => {
+    const startOfToday = admin.firestore.Timestamp.fromMillis(israelMidnight(Date.now()));
+    const db = admin.firestore();
+    const writer = db.bulkWriter();
+    let deleted = 0;
+
+    // Whole collection (one day of alerts at most), so docs with no `date`
+    // (e.g. added by hand in the Console) go too - by their creation time
+    const all = await tvAlertsDoc().collection("tvMessages").get();
+    all.forEach((doc) => {
+      const sent = doc.get("date")?.toMillis?.() ?? doc.createTime.toMillis();
+      if (sent < startOfToday.toMillis()) {
+        writer.delete(doc.ref);
+        deleted++;
+      }
+    });
+
+    const latest = await tvAlertsDoc().get();
+    if (latest.exists && latest.get("date") && latest.get("date").toMillis() < startOfToday.toMillis()) {
+      const del = admin.firestore.FieldValue.delete();
+      writer.update(tvAlertsDoc(), { messagecontent: del, symbol: del, date: del });
+    }
+
+    await writer.close();
+    logger.info(`deleteDailyAlerts: deleted ${deleted} alert(s) from before ${startOfToday.toDate().toISOString()}`);
   }
 );
 

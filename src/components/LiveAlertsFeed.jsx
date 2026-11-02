@@ -2,7 +2,7 @@
 // LiveAlertsFeed.jsx - Live Alerts on the Live Trading page (/trading)
 //
 // The live TradingView alert feed (tradingview/alerts/tvMessages, kept
-// 12 hours) as a WhatsApp-style group chat with light / dark mode; new
+// until midnight Israel time) as a WhatsApp-style group chat with light / dark mode; new
 // alerts appear live and play soundeffect/alertEffect.mp3.
 // Approved members only - /trading is behind ProtectedRoute requireApproved.
 // ============================================
@@ -14,10 +14,11 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useStorageImage } from '../services/storageImages';
 import {
-  subscribeToAlerts, subscribeToChatSettings, isAlertExpired, ALERT_TTL_HOURS, ALERT_SOUND_PREF_KEY,
+  subscribeToAlerts, subscribeToChatSettings, isAlertExpired, ALERT_SOUND_PREF_KEY,
   setAlertChatVisible,
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
+import { renderAlertText } from './AlertEmoji';
 import '../styles/auth.css';
 
 // "14:05"
@@ -236,7 +237,7 @@ export default function LiveAlertsFeed() {
     []
   );
 
-  // Alerts older than ALERT_TTL_HOURS drop off the chat on their own while the page stays open
+  // Yesterday's alerts drop off the chat at midnight on their own while the page stays open
   useEffect(() => {
     const timer = setInterval(() => setNow(Date.now()), EXPIRY_RECHECK_MS);
     return () => clearInterval(timer);
@@ -386,7 +387,7 @@ export default function LiveAlertsFeed() {
 
       <div className="wa-chat-body" ref={chatRef} onScroll={handleChatScroll} aria-live="polite">
         <div className="wa-chat-system">
-          <FaClock /> Messages disappear after {ALERT_TTL_HOURS} hours
+          <FaClock /> Messages disappear at midnight (00:00)
         </div>
 
         {error ? (
@@ -394,7 +395,7 @@ export default function LiveAlertsFeed() {
         ) : loading ? (
           <div className="wa-chat-system">Loading…</div>
         ) : messages.length === 0 ? (
-          <div className="wa-chat-system">No alerts in the last {ALERT_TTL_HOURS} hours</div>
+          <div className="wa-chat-system">No alerts today</div>
         ) : (
           messages.map((msg, i) => {
             const day = formatAlertDay(msg.when);
@@ -410,13 +411,14 @@ export default function LiveAlertsFeed() {
                     highlighted.includes(msg.id) && 'is-new',
                   ].filter(Boolean).join(' ')}
                 >
-                  <span className="wa-bubble-sender">{msg.symbol || 'TradingView'}</span>
+                  {/* Symbol title hidden - msg.symbol is still saved on every alert */}
+                  {/* <span className="wa-bubble-sender">{msg.symbol || 'TradingView'}</span> */}
                   {msg.deleted ? (
                     <p className="wa-bubble-text">
                       <FaBan aria-hidden="true" /> This alert was deleted
                     </p>
                   ) : (
-                    <p className="wa-bubble-text">{msg.messagecontent}</p>
+                    <p className="wa-bubble-text">{renderAlertText(msg.messagecontent)}</p>
                   )}
                   <span className="wa-bubble-meta">
                     {msg.edited && <span className="wa-bubble-edited">Edited</span>}

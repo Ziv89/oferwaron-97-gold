@@ -152,7 +152,7 @@ function Home() {
           )}
           {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
           <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon" caption="">
-            WhatsApp Me <FaWhatsapp style={{ color: '#128C7E' }} />
+            WhatsApp  <FaWhatsapp style={{ color: '#128C7E' }} />
           </WhatsAppQrButton>
         </div>
 
@@ -163,7 +163,6 @@ function Home() {
       <section className="strategy-section">
         <StrategyChart />
         
-        {/* Performance Highlights — with shimmer sweep */}
         <div className="strategy-stats-grid strategy-stats-grid-performance">
           <div className="strategy-stat-card stat-card-emphasized stat-card-wins">
             <StatCardShimmer />
@@ -183,9 +182,9 @@ function Home() {
               Losses ({loading ? '...' : `${stats.tradingloseRate}%`})
             </span>
           </div>
-          <div className="strategy-stat-card stat-card-emphasized">
+          <div className="strategy-stat-card stat-card-emphasized stat-card-streak">
             <StatCardShimmer />
-            <span className="strategy-stat-value">
+            <span className="strategy-performance-value">
               {loading ? '...' : performance.maxConsecutiveWins}
             </span>
             <span className="strategy-stat-label">Max Consecutive Wins</span>

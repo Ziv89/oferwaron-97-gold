@@ -18,6 +18,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useStorageImage } from '../services/storageImages';
 import {
   subscribeToAlerts, isAlertChatVisible, subscribeToAlertChatVisible, ALERT_SOUND_PREF_KEY,
+  areAlertPopupsEnabled, subscribeToAlertPopups,
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
 
@@ -69,7 +70,8 @@ function Notifier() {
     () =>
       subscribeToAlerts(
         (_list, { added }) => {
-          if (!added.length || isAlertChatVisible()) return;
+          // Bell off in Live Alerts = no pop-ups (and no pop-up sound)
+          if (!added.length || isAlertChatVisible() || !areAlertPopupsEnabled()) return;
 
           if (pathRef.current !== ALERTS_PATH && soundEnabled()) play();
           setToasts((list) => [...list, ...added].slice(-MAX_TOASTS));
@@ -87,6 +89,15 @@ function Notifier() {
     () =>
       subscribeToAlertChatVisible((visible) => {
         if (visible) setToasts([]);
+      }),
+    []
+  );
+
+  // Notifications switched off - clear any pop-ups still on screen
+  useEffect(
+    () =>
+      subscribeToAlertPopups((enabled) => {
+        if (!enabled) setToasts([]);
       }),
     []
   );

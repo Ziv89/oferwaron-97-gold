@@ -37,12 +37,16 @@ service cloud.firestore {
       allow read: if request.auth != null && request.auth.uid == uid;
       allow create: if request.auth != null && request.auth.uid == uid
         && request.resource.data.approval == 'pending'
-        && request.resource.data.keys().hasOnly(['email', 'displayName', 'whatsapp', 'dateOfBirth', 'approval',
+        && request.resource.data.keys().hasOnly(['email', 'displayName', 'whatsapp', 'phone', 'dateOfBirth', 'approval',
              'locale', 'tvUsername', 'tvAccessRequestedAt', 'createdAt', 'lastSeenAt'])
         && request.resource.data.displayName is string
         && request.resource.data.displayName.size() <= 80
         && request.resource.data.whatsapp is string
         && request.resource.data.whatsapp.size() <= 30
+        // Phone from the register form: '' or 7-15 digits with an optional +
+        && (!('phone' in request.resource.data)
+            || request.resource.data.phone == ''
+            || request.resource.data.phone.matches('[+]?[0-9]{7,15}'))
         && (!('dateOfBirth' in request.resource.data)
             || request.resource.data.dateOfBirth == ''
             || request.resource.data.dateOfBirth.matches('[0-9]{4}-[0-9]{2}-[0-9]{2}'));

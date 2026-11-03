@@ -59,7 +59,20 @@ export const useAuth = () => {
   return ctx;
 };
 
-// Name / date of birth typed into the register form, picked up by ensureProfile
+// Name to greet someone with - never the full email. Accounts without a saved
+// name (e.g. older email sign-ups) get the part before the @, capitalised:
+// "ofer.waron@gmail.com" -> "Ofer Waron"
+export const getUserName = (profile, user) => {
+  const name = (profile?.displayName || user?.displayName || '').trim();
+  if (name) return name;
+  const local = (user?.email || '').split('@')[0];
+  const words = local.split(/[._\-+]+/).filter((w) => /[a-z]/i.test(w));
+  return words.length
+    ? words.map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : 'Member';
+};
+
+// Name / phone / date of birth typed into the register form, picked up by ensureProfile
 // when the new account's auth state fires (so only one place creates the doc).
 let pendingRegistration = null;
 
@@ -78,6 +91,7 @@ const ensureProfile = async (fbUser) => {
         email: fbUser.email,
         displayName: reg.displayName || fbUser.displayName || '',
         whatsapp: '',
+        phone: reg.phone || '',
         dateOfBirth: reg.dateOfBirth || '',
         approval: 'pending',
         locale: 'en',
@@ -173,8 +187,8 @@ export const AuthProvider = ({ children }) => {
   const login = (email, password) =>
     signInWithEmailAndPassword(auth, email.trim(), password);
 
-  const register = async ({ name, dateOfBirth, email, password }) => {
-    pendingRegistration = { displayName: name.trim(), dateOfBirth };
+  const register = async ({ name, phone, dateOfBirth, email, password }) => {
+    pendingRegistration = { displayName: name.trim(), phone, dateOfBirth };
     try {
       const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
       if (name.trim()) await updateProfile(cred.user, { displayName: name.trim() });

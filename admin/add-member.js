@@ -204,6 +204,7 @@ async function listRegistrations() {
     snap.docs.map((d) => ({
       email: d.data().email,
       name: d.data().displayName || '',
+      phone: d.data().phone || '',
       born: d.data().dateOfBirth || '',
       registered: fmt(d.data().createdAt?.toDate()),
     }))

@@ -447,11 +447,15 @@ img {
   align-items: center;
   justify-content: center;
   background: linear-gradient(180deg, #fff1a8 0%, #ffd700 35%, #d4a008 100%);
-  color: #000000;
+  /* Flat "sign out" red like popular sites (X, Discord, Google danger text),
+     dark enough to stay readable on the gold */
+  color: #b91c1c;
+  -webkit-text-fill-color: #b91c1c;
+  text-shadow: none;
   border: 2px solid #ffdf5a;
   border-radius: 999px;
   padding: clamp(7px, 1.7vw, 11px) clamp(14px, 2.8vw, 24px);
-  font-size: clamp(0.65rem, 1.8vw, 0.95rem);
+  font-size: clamp(0.72rem, 1.8vw, 0.95rem);
   font-weight: 800;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -461,6 +465,8 @@ img {
 }
 
 .nav-signout:hover {
+  color: #991b1b;
+  -webkit-text-fill-color: #991b1b;
   transform: translateY(-2px) scale(1.02);
   box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.4), 0 16px 26px rgba(255, 184, 0, 0.35);
 }
@@ -1745,6 +1751,107 @@ img {
 .youtube-empty-state .strategy-btn-group {
   justify-content: center;
   flex-wrap: wrap;
+}
+
+/* Performance Report - no reports yet: black-glass card in a gold frame */
+.youtube-empty-state.report-empty {
+  max-width: 460px;
+  margin: clamp(12px, 3vw, 28px) auto clamp(28px, 6vw, 56px);
+  padding: clamp(22px, 5vw, 36px) clamp(18px, 5vw, 36px);
+  border: 2px solid #d4af37;
+  border-radius: 20px;
+  background:
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 215, 0, 0.16), transparent 60%),
+    rgba(12, 10, 4, 0.86);
+  box-shadow: 0 0 0 1px rgba(255, 241, 168, 0.25) inset, 0 0 28px rgba(255, 215, 0, 0.3), 0 14px 30px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.report-empty-chart {
+  display: block;
+  width: min(220px, 70%);
+  margin: 0 auto 14px;
+  overflow: visible;
+}
+
+.report-empty-grid {
+  stroke: rgba(255, 215, 0, 0.14);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+}
+
+.report-empty-line {
+  fill: none;
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 220;
+  stroke-dashoffset: 220;
+  filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
+  animation: reportEmptyDraw 1.6s ease-out 0.2s forwards;
+}
+
+.report-empty-area {
+  opacity: 0;
+  animation: reportEmptyFade 0.8s ease-out 1.2s forwards;
+}
+
+.report-empty-dot {
+  fill: #fff6c9;
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  filter: drop-shadow(0 0 6px #ffd700);
+  animation: reportEmptyFade 0.3s ease-out 1.7s forwards, reportEmptyPulse 1.8s ease-in-out 2s infinite;
+}
+
+@keyframes reportEmptyDraw { to { stroke-dashoffset: 0; } }
+@keyframes reportEmptyFade { to { opacity: 1; } }
+@keyframes reportEmptyPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.6); }
+}
+
+.youtube-empty-state .report-empty-title {
+  margin: 0;
+  font-size: clamp(1.25rem, 4.5vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  background: linear-gradient(180deg, #fff6c9 0%, #ffd700 50%, #d4a008 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.35));
+}
+
+.report-empty-divider {
+  display: block;
+  width: 64px;
+  height: 2px;
+  margin: 12px auto;
+  border-radius: 2px;
+  background: linear-gradient(90deg, transparent, #ffd700, transparent);
+}
+
+.youtube-empty-state .report-empty-text {
+  margin: 0;
+  font-size: clamp(0.9rem, 2.8vw, 1.05rem);
+  font-weight: 600;
+  line-height: 1.5;
+  color: #f3e6b8;
+  -webkit-text-fill-color: #f3e6b8;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .report-empty-line { animation: none; stroke-dashoffset: 0; }
+  .report-empty-area,
+  .report-empty-dot { animation: none; opacity: 1; }
 }
 
 .report-featured {

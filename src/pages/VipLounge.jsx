@@ -13,7 +13,7 @@ import {
 import Seo from '../components/Seo';
 import { ScancodeLightbox } from '../components/WhatsAppQr';
 import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, getUserName } from '../contexts/AuthContext';
 import '../styles/auth.css';
 
 // ============================================
@@ -80,7 +80,7 @@ export default function VipLounge() {
           </span>
         </h1>
         <p className="strategy-subtitle">
-          Welcome, {profile?.displayName || user?.email} — your members-only benefits are below. 
+          Welcome, {getUserName(profile, user)} — your members-only benefits are below. 
         </p>
       </section>
 

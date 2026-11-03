@@ -1,8 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<!-- data-hybrid: classic | tabs | ink | panels | outline  (see src/styles/hybrid-theme.css) -->
+<html lang="en" data-hybrid="classic">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <!-- ?v= busts the browser's long-lived favicon cache; bump it when the icon changes -->
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico?v=2" sizes="any" />
+    <link rel="icon" type="image/png" sizes="192x192" href="%PUBLIC_URL%/logo192.png?v=2" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#0b0b0d" />
 
@@ -59,7 +62,7 @@
     }
     </script>
 
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="%PUBLIC_URL%/apple-touch-icon.png?v=2" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <!-- Heebo - Hebrew text of the Strategy page Alert System Overview -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />

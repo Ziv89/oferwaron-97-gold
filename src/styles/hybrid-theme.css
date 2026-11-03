@@ -1,0 +1,170 @@
+/* =========================================================
+   HYBRID THEME - current gold design + Emerald Trader accents
+   (design-options-demo.html -> Emerald Trader, used partly)
+
+   Only the nav tabs and the text change - the page background
+   (whiteBackground.jpg silk) stays as it is.
+
+   Pick a variant in public/index.html:  <html data-hybrid="ink">
+     classic  today's design, nothing changed
+     tabs     emerald tabs only (active tab stays gold)
+     ink      emerald tabs + dark-emerald body text + gold titles
+              with an emerald outline                  (default)
+     panels   like ink, plus the cards become emerald panels with
+              light text
+     outline  closest to today: gold tabs and text, emerald outline
+              instead of black
+   Preview them all in hybrid-options-demo.html
+   ========================================================= */
+
+:root {
+  --em-deep: #04211a;
+  --em-dark: #073328;
+  --em: #0b3a2e;
+  --em-light: #10483a;
+  --em-mint: #effaf5;
+  --em-muted: #a7cbbd;
+  --em-gold: #f0c85a;
+  --em-gold-light: #f6d77f;
+  --em-gold-dark: #c79a1e;
+}
+
+/* ---------------------------------------------------------
+   TABS - emerald pill, gold text; the active tab keeps
+   today's gold so it stands out (tabs / ink / panels)
+   --------------------------------------------------------- */
+html[data-hybrid="tabs"] .app-nav-link:not(.nav-whatsapp),
+html[data-hybrid="ink"] .app-nav-link:not(.nav-whatsapp),
+html[data-hybrid="panels"] .app-nav-link:not(.nav-whatsapp) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, var(--em-light) 0%, var(--em-dark) 100%);
+  border-color: var(--em-gold);
+  color: var(--em-gold-light);
+  -webkit-text-fill-color: var(--em-gold-light);
+  box-shadow:
+    0 0 8px rgba(240, 200, 90, 0.35),
+    0 4px 8px rgba(0, 0, 0, 0.25),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.3);
+}
+
+html[data-hybrid="tabs"] .app-nav-link:not(.nav-whatsapp):hover,
+html[data-hybrid="ink"] .app-nav-link:not(.nav-whatsapp):hover,
+html[data-hybrid="panels"] .app-nav-link:not(.nav-whatsapp):hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #16604d 0%, var(--em) 100%);
+  color: #fff3c4;
+  -webkit-text-fill-color: #fff3c4;
+}
+
+html[data-hybrid="tabs"] .app-nav-link.active:not(.nav-whatsapp),
+html[data-hybrid="ink"] .app-nav-link.active:not(.nav-whatsapp),
+html[data-hybrid="panels"] .app-nav-link.active:not(.nav-whatsapp) {
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 40%, #d4a008 100%);
+  border-color: #fff1a8;
+  color: var(--em-deep);
+  -webkit-text-fill-color: var(--em-deep);
+  box-shadow:
+    0 0 22px rgba(255, 215, 0, 0.8),
+    0 0 36px rgba(11, 58, 46, 0.45),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* outline: today's gold tabs, emerald text + border */
+html[data-hybrid="outline"] .app-nav-link:not(.nav-whatsapp) {
+  border-color: var(--em-dark);
+  color: var(--em-deep);
+  -webkit-text-fill-color: var(--em-deep);
+}
+
+html[data-hybrid="outline"] .app-nav-link.active:not(.nav-whatsapp) {
+  border-color: var(--em-gold-light);
+  box-shadow:
+    0 0 0 2px var(--em-dark),
+    0 0 24px rgba(255, 215, 0, 0.8),
+    0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+/* ---------------------------------------------------------
+   BODY TEXT - solid dark emerald with a soft white halo, so
+   it reads on every part of the silk (ink / panels)
+   --------------------------------------------------------- */
+html[data-hybrid="ink"] :is(.strategy-subtitle, .strategy-flow-content p, .strategy-stat-label,
+  .strategy-principle-text, .faq-answer p, .strategy-rule-highlight, .contact-method-value,
+  .footer-tagline, .footer-since),
+html[data-hybrid="panels"] :is(.strategy-subtitle, .faq-answer p, .footer-tagline, .footer-since) {
+  color: var(--em-dark) !important;
+  -webkit-text-fill-color: var(--em-dark) !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow:
+    0 0 2px rgba(255, 255, 255, 0.95),
+    0 0 8px rgba(255, 255, 255, 0.8) !important;
+  font-weight: 600;
+}
+
+/* Links inside body text stay gold-on-emerald readable */
+html[data-hybrid="ink"] .strategy-subtitle a,
+html[data-hybrid="panels"] .strategy-subtitle a {
+  color: var(--em-light);
+  -webkit-text-fill-color: var(--em-light);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------------------------------------------------------
+   TITLES + NUMBERS - stay gold, the black outline becomes a
+   deep-emerald one (ink / panels / outline)
+   The shimmering gold page titles are left as they are.
+   --------------------------------------------------------- */
+html[data-hybrid="ink"] :is(.strategy-section-title:not(.get-in-touch-title), .strategy-card-title,
+  .strategy-flow-content h3, .strategy-rule-title, .strategy-stat-value, .footer-section-heading,
+  .footer-brand-title, .footer-link),
+html[data-hybrid="panels"] :is(.strategy-section-title:not(.get-in-touch-title), .footer-section-heading,
+  .footer-brand-title, .footer-link),
+html[data-hybrid="outline"] :is(.strategy-section-title:not(.get-in-touch-title), .strategy-card-title,
+  .strategy-flow-content h3, .strategy-rule-title, .strategy-stat-value, .footer-section-heading,
+  .footer-brand-title, .footer-link, .strategy-subtitle, .strategy-flow-content p, .strategy-stat-label,
+  .strategy-principle-text, .faq-answer p) {
+  -webkit-text-stroke-color: var(--em-deep) !important;
+  text-shadow:
+    1px 1px 0 var(--em-deep),
+    -1px -1px 0 var(--em-deep),
+    1px -1px 0 var(--em-deep),
+    -1px 1px 0 var(--em-deep),
+    0 2px 8px rgba(4, 33, 26, 0.35) !important;
+}
+
+/* ---------------------------------------------------------
+   PANELS - cards turn into translucent emerald panels (the
+   page background around them is unchanged); text inside is light
+   --------------------------------------------------------- */
+html[data-hybrid="panels"] :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card),
+  .strategy-principle-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0)),
+    rgba(4, 33, 26, 0.82) !important;
+  border-color: var(--em-gold) !important;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+html[data-hybrid="panels"] :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card, .strategy-principle-card)
+  :is(.strategy-card-title, .strategy-flow-content h3, .strategy-rule-title, .strategy-stat-value) {
+  color: var(--em-gold) !important;
+  -webkit-text-fill-color: var(--em-gold) !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 0 0 12px rgba(240, 200, 90, 0.35) !important;
+}
+
+html[data-hybrid="panels"] :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card, .strategy-principle-card)
+  :is(.strategy-flow-content p, .strategy-stat-label, .strategy-principle-text, .strategy-rule-highlight, .contact-method-value) {
+  color: var(--em-mint) !important;
+  -webkit-text-fill-color: var(--em-mint) !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+}
+
+/* Wins / losses keep their green / red numbers in every variant */
+html[data-hybrid] .stat-card-wins .strategy-performance-value { color: #22c55e !important; }
+html[data-hybrid] .stat-card-losses .strategy-performance-value { color: #ef4444 !important; }

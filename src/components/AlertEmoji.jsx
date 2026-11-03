@@ -1,17 +1,4 @@
-// ============================================
-// AlertEmoji.jsx - the TradingView alert emojis drawn as icons
-//
-// Alerts arrive as text with emojis (see the alert system deck):
-//   🟨🟨🟨 Long entry   🟪🟪🟪 Short entry   🟧🟧🟧 Orange Alert (target progress)
-//   💫🚀💥 Closed in profit   ❌❌❌ Closed to protect from a loss
-// Native emoji fonts draw these differently on every phone / PC, so
-// renderAlertText() swaps them for these glossy icons - the same look on
-// every device. Any other emoji / text is left as it is.
-// Flat fills only (no gradient ids), so many copies on one page are safe.
-// ============================================
-import React from 'react';
 
-// Glossy rounded square: darker base edge, face, top-left shine
 const square = (face, edge, shine) => (
   <>
     <rect x="2" y="2.5" width="32" height="32" rx="5.5" fill={edge} />
@@ -21,7 +8,6 @@ const square = (face, edge, shine) => (
   </>
 );
 
-// Star polygon points around (cx, cy)
 const starPoints = (cx, cy, outer, inner, spikes, rotate = -90) =>
   Array.from({ length: spikes * 2 }, (_, i) => {
     const r = i % 2 ? inner : outer;

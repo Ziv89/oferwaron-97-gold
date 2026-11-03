@@ -199,8 +199,27 @@ const Lightbox = ({ images, index, onClose, onChange }) => {
 // Shown when no report images exist in Storage (or they failed to load)
 // ============================================
 const EmptyState = () => (
-  <div className="youtube-empty-state">
-    <h2>No Reports Published Yet</h2>
+  <div className="youtube-empty-state report-empty">
+    {/* Gold chart that draws itself, ending on a pulsing point */}
+    <svg className="report-empty-chart" viewBox="0 0 160 80" aria-hidden="true">
+      <defs>
+        <linearGradient id="reportEmptyLine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stopColor="#b8860b" />
+          <stop offset="55%" stopColor="#ffd700" />
+          <stop offset="100%" stopColor="#fff6c9" />
+        </linearGradient>
+        <linearGradient id="reportEmptyFill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffd700" stopOpacity="0.35" />
+          <stop offset="100%" stopColor="#ffd700" stopOpacity="0" />
+        </linearGradient>
+      </defs>
+      <path className="report-empty-grid" d="M8 20H152M8 40H152M8 60H152" />
+      <path className="report-empty-area" d="M8 66L34 54L58 60L84 38L108 44L134 22L152 14V72H8Z" fill="url(#reportEmptyFill)" />
+      <path className="report-empty-line" d="M8 66L34 54L58 60L84 38L108 44L134 22L152 14" stroke="url(#reportEmptyLine)" />
+      <circle className="report-empty-dot" cx="152" cy="14" r="4" />
+    </svg>
+    <h2 className="report-empty-title">Fresh Reports Coming Soon</h2>
+    <span className="report-empty-divider" aria-hidden="true" />
     {/* <div className="strategy-btn-group">
       <Link to="/" className="strategy-btn strategy-btn-primary">View Live Stats</Link>
       <Link to="/youtube" className="strategy-btn strategy-btn-primary">Watch on YouTube</Link>

@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const { HttpError } = require('./auth');
 
 const TOKEN_TTL_SECONDS = 60 * 60;
-const STATUS_CACHE_MS = 15 * 1000;
+const STATUS_CACHE_MS = 5 * 1000;
 
 function env(name) {
   const value = process.env[name];

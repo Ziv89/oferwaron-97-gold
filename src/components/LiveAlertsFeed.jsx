@@ -8,14 +8,14 @@
 // ============================================
 import React, { useState, useEffect, useLayoutEffect, useRef, useCallback } from 'react';
 import {
-  FaVolumeUp, FaVolumeMute, FaSun, FaMoon, FaExpand, FaCompress, FaClock, FaChevronDown, FaBan, FaUsers,
+  FaVolumeUp, FaVolumeMute, FaBell, FaBellSlash, FaSun, FaMoon, FaExpand, FaCompress, FaClock, FaChevronDown, FaBan, FaUsers,
 } from 'react-icons/fa';
 import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useStorageImage } from '../services/storageImages';
 import {
   subscribeToAlerts, subscribeToChatSettings, isAlertExpired, ALERT_SOUND_PREF_KEY,
-  setAlertChatVisible,
+  setAlertChatVisible, areAlertPopupsEnabled, setAlertPopupsEnabled,
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
 import { renderAlertText } from './AlertEmoji';
@@ -118,14 +118,6 @@ const EXPIRY_RECHECK_MS = 60 * 1000;
 const NEW_HIGHLIGHT_MS = 6000;
 // Within this many px of the bottom counts as "reading the latest"
 const STICK_TO_BOTTOM_PX = 80;
-// Test sound button is hidden for now - re-enable these with it
-// // How long the "Test sound" result stays on screen
-// const SOUND_TEST_MSG_MS = 4000;
-// const SOUND_TEST_MESSAGES = {
-//   played: 'Sound played - this is what new alerts sound like',
-//   'not-loaded': 'Sound file not available - check soundeffect/alertEffect.mp3 in Storage',
-//   blocked: 'Your browser blocked the sound - check the tab is not muted',
-// };
 
 const initialChatTheme = () =>
   localStorage.getItem(THEME_PREF_KEY) ||
@@ -146,6 +138,8 @@ export default function LiveAlertsFeed() {
   const [now, setNow] = useState(Date.now());
   const [soundOn, setSoundOn] = useState(() => localStorage.getItem(SOUND_PREF_KEY) !== 'off');
   const [chatTheme, setChatTheme] = useState(initialChatTheme);
+  // Sitewide new-alert pop-ups (LiveAlertNotifier) on / off
+  const [popupsOn, setPopupsOn] = useState(areAlertPopupsEnabled);
   const [showJump, setShowJump] = useState(false);
   const [editedIds, setEditedIds] = useState([]);
   const [deletedAlerts, setDeletedAlerts] = useState([]);
@@ -325,6 +319,11 @@ export default function LiveAlertsFeed() {
   // };
   // useEffect(() => () => clearTimeout(soundTestTimer.current), []);
 
+  const togglePopups = () => {
+    setAlertPopupsEnabled(!popupsOn);
+    setPopupsOn(!popupsOn);
+  };
+
   const toggleChatTheme = () => {
     setChatTheme((t) => {
       const next = t === 'dark' ? 'light' : 'dark';
@@ -458,6 +457,17 @@ export default function LiveAlertsFeed() {
             >
               {soundOn ? <FaVolumeUp /> : <FaVolumeMute />}
             </button>
+            {/* Pop-up notifications on other pages - the chat still gets every alert */}
+            <button
+              type="button"
+              className="strategy-btn vip-notify-btn"
+              onClick={togglePopups}
+              aria-pressed={popupsOn}
+              aria-label={popupsOn ? 'Stop alert notifications' : 'Turn on alert notifications'}
+              title={popupsOn ? 'Notifications on' : 'Notifications off'}
+            >
+              {popupsOn ? <FaBell /> : <FaBellSlash />}
+            </button>
             {/* <button
               type="button"
               className="strategy-btn vip-sound-btn"
@@ -484,14 +494,7 @@ export default function LiveAlertsFeed() {
           </div>
         </div>
 
-        {/* Test sound result - re-enable with the Test sound button
-        <p
-          className={`vip-sound-test${soundTest && soundTest !== 'played' ? ' vip-sound-test--error' : ''}`}
-          role="status"
-        >
-          {soundTest && SOUND_TEST_MESSAGES[soundTest]}
-        </p> */}
-
+  
         {open && !fullscreen && chatPanel}
         {open && fullscreen &&
           createPortal(

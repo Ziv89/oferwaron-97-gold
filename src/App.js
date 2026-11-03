@@ -6,9 +6,15 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import { BrowserRouter, Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import './styles/styles.css';
 import './styles/responsive-overrides.css';
-// To revert to the previous logo: import SantaLogoNew from './assets/images/SantaLogoDiamond.webp';
+// Emerald hybrid (tabs + text) - variant set by data-hybrid in public/index.html
+import './styles/hybrid-theme.css';
+// Readability fixes for tabs + gold text (keep last)
+import './styles/visibility.css';
+// Main logo: OferNewLogo = the jeweled Santa + "OferWaron" with the silk background removed
+// (transparent; OferNewLogo.png is the full-quality copy). To revert:
+//   import SantaLogoNew from './assets/images/SantaLogoSparkle.webp';
 // SantaLogoSparkle = SantaLogoDiamond brightened / saturated / sharpened for more gold & diamond sparkle
-import SantaLogoNew from './assets/images/SantaLogoSparkle.webp';
+import SantaLogoNew from './assets/images/OferNewLogo.webp';
 import { Analytics } from "@vercel/analytics/react";
 import { SiGmail } from 'react-icons/si';
 import {
@@ -415,8 +421,8 @@ const Header = () => {
     // Signed-in members only
     ...(user && isApproved ? [{ to: '/vip', label: 'WhatsApp Group', member: true, whatsapp: true }] : []),
     user
-      ? { to: '/members', label: 'My Account', member: true }
-      : { to: '/login', label: 'Member Login', member: true }
+      ? { to: '/members', label: 'My Account', member: true, account: true }
+      : { to: '/login', label: 'Member Login', member: true, account: true }
   ];
 
   return (
@@ -441,7 +447,7 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''} ${link.account ? 'nav-account' : ''}`}
             >
               {link.label}
             </NavLink>
@@ -473,7 +479,7 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''} ${link.account ? 'nav-account' : ''}`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}

@@ -7,7 +7,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/firebase';
 import '../styles/live-stream.css';
 
-const STATUS_POLL_MS = 20 * 1000;
+// How often to re-check while the page is open - Live / Offline switches by itself
+const STATUS_POLL_MS = 10 * 1000;
 
 const eventDate = (value) => {
   const date = value?.toDate ? value.toDate() : value ? new Date(value) : null;
@@ -66,11 +67,23 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
       }
     };
 
+    // Hidden tabs skip polls - re-check at once when the member comes back,
+    // so a stream that started meanwhile shows Live without a refresh
+    const pollWhenVisible = () => {
+      if (!document.hidden) poll();
+    };
+
     poll();
     const timer = window.setInterval(poll, STATUS_POLL_MS);
+    document.addEventListener('visibilitychange', pollWhenVisible);
+    window.addEventListener('focus', pollWhenVisible);
+    window.addEventListener('online', pollWhenVisible);
     return () => {
       cancelled = true;
       window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', pollWhenVisible);
+      window.removeEventListener('focus', pollWhenVisible);
+      window.removeEventListener('online', pollWhenVisible);
     };
   }, [streamFetch]);
 

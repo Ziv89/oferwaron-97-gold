@@ -218,6 +218,10 @@ const ALERT_TIME_ZONE = "Asia/Jerusalem";
 const DEFAULT_ALERT_SYMBOL = "XAUUSD";
 const tvAlertsDoc = () => admin.firestore().collection("tradingview").doc("alerts");
 
+// "{{strategy.order.alert_message}}", "{{ticker}}", ... left as text
+const UNFILLED_PLACEHOLDER = /\{\{[^{}]*\}\}/;
+const hasUnfilledPlaceholder = (text) => UNFILLED_PLACEHOLDER.test(String(text || ""));
+
 // Millis of 00:00 Israel time on the day of `ms`, plus `addDays` days
 // (addDays = 1 -> the coming midnight). DST in Israel switches at 02:00,
 // so the current UTC offset is the one at midnight too.
@@ -275,6 +279,14 @@ exports.tvAlertMessage = onRequest(
     const message = String(body.message || "").trim().slice(0, 4000);
     if (!message) {
       res.status(400).send("Missing message");
+      return;
+    }
+    // A TradingView placeholder that wasn't filled in (e.g. the alert used
+    // "{{strategy.order.alert_message}}" on a strategy with no alert_message)
+    // is not a real alert - don't save or forward it
+    if (hasUnfilledPlaceholder(message)) {
+      logger.warn("tvAlertMessage: ignored - unfilled placeholder", { message: message.slice(0, 200) });
+      res.status(200).json({ ignored: "unfilled placeholder" });
       return;
     }
 
@@ -337,7 +349,7 @@ exports.deleteDailyAlerts = onSchedule(
     const all = await tvAlertsDoc().collection("tvMessages").get();
     all.forEach((doc) => {
       const sent = doc.get("date")?.toMillis?.() ?? doc.createTime.toMillis();
-      if (sent < startOfToday.toMillis()) {
+      if (sent < startOfToday.toMillis() || hasUnfilledPlaceholder(doc.get("messagecontent"))) {
         writer.delete(doc.ref);
         deleted++;
       }
@@ -412,6 +424,7 @@ exports.notifyNewRegistration = onDocumentCreated(
     const text = [
       "🔔 New 97% Gold registration - awaiting approval",
       `Name: ${user.displayName || "-"}`,
+      `Phone: ${user.phone || "-"}`,
       `Email: ${user.email || "-"}`,
       `WhatsApp: ${user.whatsapp || "-"}`,
       `Date of birth: ${user.dateOfBirth || "-"}`,
@@ -538,6 +551,7 @@ exports.reviewRegistration = onRequest(
     const target = REVIEW_ACTIONS[action];
     const details = (status) => `<dl>
       <dt>Name</dt><dd>${escapeHtml(user.displayName || "-")}</dd>
+      <dt>Phone</dt><dd>${escapeHtml(user.phone || "-")}</dd>
       <dt>Email</dt><dd>${escapeHtml(user.email || "-")}</dd>
       <dt>WhatsApp</dt><dd>${escapeHtml(user.whatsapp || "-")}</dd>
       <dt>Status</dt><dd>${escapeHtml(status)}</dd>

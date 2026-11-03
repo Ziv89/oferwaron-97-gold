@@ -1,0 +1,80 @@
+/* =========================================================
+   VISIBILITY - small readability fixes on top of the gold design
+   (loaded last). Same colours and shapes; only what made text hard
+   to read changes:
+   - tabs: option A "Bright gold" from tabs-visibility-demo.html -
+     lighter gold pill (no dark bronze band behind the letters),
+     black 800 text, dark gold edge; the active tab stays gold with
+     a stronger edge + glow. No shrinking below ~11.5px on phones
+   - gold text: the soft yellow glow that blurred letter edges on
+     the light silk is dropped, and the black outline is drawn as a
+     full stroke under the letters, so it is even and crisp
+   ========================================================= */
+
+/* ---------- Nav tabs (A) ---------- */
+.app-nav-link:not(.nav-whatsapp):not(.nav-account) {
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
+  border-color: #8a6400;
+  color: #000000;
+  -webkit-text-fill-color: #000000;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  font-size: clamp(0.72rem, 1.8vw, 0.95rem) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.app-nav-link.active:not(.nav-whatsapp):not(.nav-account) {
+  background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
+  border-color: #5c4300;
+  box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Gold pill buttons ("Strategy Overview ▼", "Live Alerts ▼", ...)
+   Same look as the tabs (A). Buttons with their own design - green,
+   mint, trial, outlined secondary, round icon buttons - are untouched. */
+.strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial) {
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
+  border-color: #8a6400;
+  color: #000000;
+  -webkit-text-fill-color: #000000;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+}
+
+.strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial):hover {
+  background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
+  border-color: #5c4300;
+  box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* ---------- Gold text with a black outline ---------- */
+.strategy-subtitle,
+.strategy-stat-label,
+.stat-label,
+.strategy-principle-text,
+.strategy-rule-desc,
+.strategy-flow-content p,
+.faq-answer p {
+  -webkit-text-stroke: 2px #000000;
+  paint-order: stroke fill;
+  font-weight: 700;
+  text-shadow:
+    1px 1px 0 #000,
+    -1px -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 1px 0 #000,
+    0 1px 3px rgba(0, 0, 0, 0.35);
+}
+
+/* Small text no longer drops to ~10px on phones */
+.strategy-stat-label,
+.stat-label {
+  font-size: clamp(0.75rem, 1.8vw, 0.9rem) !important;
+}
+
+.strategy-principle-text,
+.strategy-rule-desc,
+.strategy-flow-content p {
+  font-size: clamp(0.85rem, 2.2vw, 1.2rem);
+}

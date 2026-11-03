@@ -11,6 +11,13 @@ import Seo from '../components/Seo';
 import { useAuth } from '../contexts/AuthContext';
 import '../styles/auth.css';
 
+// "+972 50-123 4567" -> "+972501234567"; '' if it isn't 7-15 digits
+// (an optional leading + is kept). Same format the Firestore rules accept.
+const normalizePhone = (value) => {
+  const trimmed = String(value || '').trim();
+  const digits = trimmed.replace(/[\s().-]/g, '');
+  return /^\+?[0-9]{7,15}$/.test(digits) ? digits : '';
+};
 
 const MIN_PASSWORD = 8;
 
@@ -53,6 +60,7 @@ export default function Login() {
   ); // 'login' | 'register' | 'reset'
   const [name, setName] = useState('');
   const [dateOfBirth, setDateOfBirth] = useState('');
+  const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -74,6 +82,10 @@ export default function Login() {
     setNotice('');
 
     if (mode === 'register') {
+      if (!normalizePhone(phone)) {
+        setError('Please enter a valid phone number, e.g. +972 50 123 4567.');
+        return;
+      }
       if (!dateOfBirth || dateOfBirth > todayIso()) {
         setError('Please enter a valid date of birth.');
         return;
@@ -91,7 +103,7 @@ export default function Login() {
         await login(email, password);
         navigate(from, { replace: true });
       } else if (mode === 'register') {
-        await register({ name, dateOfBirth, email, password });
+        await register({ name, phone: normalizePhone(phone), dateOfBirth, email, password });
         // New accounts are pending - My Account shows the approval status
         navigate('/members', { replace: true });
       } else {
@@ -133,7 +145,7 @@ export default function Login() {
     mode === 'login'
       ? email && password
       : mode === 'register'
-      ? name.trim() && dateOfBirth && email && password
+      ? name.trim() && phone.trim() && dateOfBirth && email && password
       : email;
 
   const title = { login: 'Member Sign In', register: 'Register', reset: 'Reset Password' }[mode];
@@ -174,6 +186,17 @@ export default function Login() {
                   onKeyDown={onKeyDown}
                   autoComplete="name"
                   maxLength={80}
+                />
+                <input
+                  type="tel"
+                  className="contact-input"
+                  placeholder="Phone number (e.g. +972 50 123 4567)"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  onKeyDown={onKeyDown}
+                  autoComplete="tel"
+                  inputMode="tel"
+                  maxLength={24}
                 />
                 {/* Date inputs show no placeholder, so it gets a visible label */}
                 <label className="auth-field-label" htmlFor="register-dob">

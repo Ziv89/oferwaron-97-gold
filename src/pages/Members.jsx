@@ -15,7 +15,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import Seo from '../components/Seo';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, getUserName } from '../contexts/AuthContext';
 import { WhatsAppQrButton } from '../components/WhatsAppQr';
 import { FaWhatsapp } from 'react-icons/fa';
 import { db } from '../services/firebase';
@@ -108,7 +108,7 @@ export default function Members() {
           </span>
         </h1>
         <p className="strategy-subtitle">
-          Signed in as {profile?.displayName || user?.email}
+          Signed in as {getUserName(profile, user)}
         </p>
       </section>
 

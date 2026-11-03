@@ -138,7 +138,7 @@ function Pricing() {
           <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
             {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
             <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon">
-              WhatsApp Me <FaWhatsapp style={{ color: '#25D366' }} />
+              WhatsApp  <FaWhatsapp style={{ color: '#25D366' }} />
             </WhatsAppQrButton>
             {contact.email && (
               <a
@@ -147,7 +147,7 @@ function Pricing() {
                 rel="noopener noreferrer"
                 className="strategy-btn strategy-btn-primary strategy-btn-with-icon"
               >
-                Email Me <SiGmail style={{ color: '#EA4335' }} />
+                Email <SiGmail style={{ color: '#EA4335' }} />
               </a>
             )}
           </div>

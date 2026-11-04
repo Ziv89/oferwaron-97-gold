@@ -19,7 +19,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SiGmail } from 'react-icons/si';
 import {
   FaWhatsapp, FaYoutube, FaInstagram, FaTiktok, FaHome, FaChessKnight,
-  FaMoneyBillWave, FaChartBar, FaUser, FaAddressCard, FaSignOutAlt
+  FaMoneyBillWave, FaChartBar, FaUser, FaAddressCard
 } from 'react-icons/fa';
 
 // Page imports
@@ -420,8 +420,9 @@ const Header = () => {
     { to: '/contact', label: 'Contact' },
     // Signed-in members only
     ...(user && isApproved ? [{ to: '/vip', label: 'WhatsApp Group', member: true, whatsapp: true }] : []),
-    // Signed in: no My Account tab (the Sign out button stays); signed out: Member Login
-    ...(user ? [] : [{ to: '/login', label: 'Member Login', member: true }]),
+    user
+      ? { to: '/members', label: 'My Account', member: true, account: true }
+      : { to: '/login', label: 'Member Login', member: true, account: true }
   ];
 
   return (
@@ -446,7 +447,7 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''} ${link.account ? 'nav-account' : ''}`}
             >
               {link.label}
             </NavLink>
@@ -458,7 +459,7 @@ const Header = () => {
               className="nav-signout"
               onClick={logout}
             >
-              <FaSignOutAlt aria-hidden="true" /> Sign out
+              Sign out
             </button>
           )}
         </div>
@@ -478,7 +479,7 @@ const Header = () => {
             <NavLink
               key={link.to}
               to={link.to}
-              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''}`}
+              className={({ isActive }) => `app-nav-link ${isActive ? 'active' : ''} ${link.member ? 'nav-member' : ''} ${link.whatsapp ? 'nav-whatsapp' : ''} ${link.account ? 'nav-account' : ''}`}
               onClick={() => setIsMobileMenuOpen(false)}
             >
               {link.label}
@@ -494,7 +495,7 @@ const Header = () => {
                 setIsMobileMenuOpen(false);
               }}
             >
-              <FaSignOutAlt aria-hidden="true" /> Sign out
+              Sign out
             </button>
           )}
         </nav>

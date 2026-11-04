@@ -340,6 +340,97 @@
   }
 }
 
+/* My Account / Member Login tab - the WhatsApp tab's sibling in the site's
+   own colours: glossy black onyx, gold text and edge, a gold glow, a light
+   sweep across it now and then and a gold sparkle on the right end */
+.app-nav-link.nav-account {
+  position: relative;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.06) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #3a3a3a 0%, #121212 55%, #000000 100%);
+  border-color: #ffd700;
+  color: #ffd700;
+  -webkit-text-fill-color: #ffd700;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  font-size: clamp(0.72rem, 1.8vw, 0.95rem) !important;
+  text-shadow: 0 0 6px rgba(255, 215, 0, 0.45);
+  box-shadow:
+    0 0 10px rgba(255, 215, 0, 0.6),
+    0 0 22px rgba(255, 170, 0, 0.35),
+    inset 0 1px 0 rgba(255, 241, 168, 0.4),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+  animation: nav-account-glow 2.8s ease-in-out infinite;
+}
+
+/* Phone menu keeps its bigger text */
+.nav-mobile .app-nav-link.nav-account {
+  font-size: clamp(0.85rem, 3vw, 1.1rem) !important;
+}
+
+.app-nav-link.nav-account.active {
+  box-shadow:
+    0 0 18px rgba(255, 215, 0, 0.95),
+    0 0 36px rgba(255, 170, 0, 0.6),
+    inset 0 1px 0 rgba(255, 241, 168, 0.4),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.6);
+}
+
+/* Gold light sweep */
+.app-nav-link.nav-account::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 241, 168, 0.55) 50%, transparent 100%);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  animation: nav-account-sweep 3.6s ease-in-out infinite;
+}
+
+/* Four-point gold sparkle on the right end (same shape as the WhatsApp ones) */
+.app-nav-link.nav-account::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  margin-top: -9px;
+  background: radial-gradient(circle, #fff6c9 0 2px, rgba(255, 246, 201, 0) 3px),
+    linear-gradient(90deg, transparent 45%, #ffe680 50%, transparent 55%),
+    linear-gradient(0deg, transparent 45%, #ffe680 50%, transparent 55%);
+  clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%);
+  filter: drop-shadow(0 0 4px #ffd700);
+  pointer-events: none;
+  animation: nav-whatsapp-sparkle 2s ease-in-out infinite;
+}
+
+@keyframes nav-account-glow {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(1.18); }
+}
+
+@keyframes nav-account-sweep {
+  0% { left: -60%; }
+  45%, 100% { left: 130%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav-link.nav-account,
+  .app-nav-link.nav-account::before,
+  .app-nav-link.nav-account::after {
+    animation: none;
+  }
+
+  .app-nav-link.nav-account::before {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .auth-card {
     padding: 1.75rem 1.25rem;

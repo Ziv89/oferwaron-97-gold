@@ -1,55 +1,186 @@
 /* =========================================================
-   VISIBILITY - small readability fixes on top of the gold design
-   (loaded last). Same colours and shapes; only what made text hard
-   to read changes:
-   - tabs: option A "Bright gold" from tabs-visibility-demo.html -
-     lighter gold pill (no dark bronze band behind the letters),
-     black 800 text, dark gold edge; the active tab stays gold with
-     a stronger edge + glow. No shrinking below ~11.5px on phones
-   - gold text: the soft yellow glow that blurred letter edges on
-     the light silk is dropped, and the black outline is drawn as a
-     full stroke under the letters, so it is even and crisp
+   VISIBILITY - design layer on top of the gold site (loaded last)
+   Chosen in gold-design-options.html:
+   - tabs, Sign out + gold pill buttons: "K4 Double gold rim" - black
+     with a gold rim and an inner thin gold line, gold text; the page you
+     are on is solid gold with black text. WhatsApp Group keeps its green;
+     Sign out keeps its own rounded-rectangle shape + exit icon
+   - containers: "C5 Gold bar plate" - metallic gold plates with engraved
+     black text, with "E1 Shine sweep" - a light band crossing each card
+   - text: "T5 Black ribbon" - subtitles sit on a black ribbon with gold
+     text; other gold text keeps a crisp full black outline
    ========================================================= */
 
-/* ---------- Nav tabs (A) ---------- */
-.app-nav-link:not(.nav-whatsapp):not(.nav-account) {
-  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
-  border-color: #8a6400;
-  color: #000000;
-  -webkit-text-fill-color: #000000;
+/* ---------- Tabs + Sign out (K4) ---------- */
+.app-nav-link:not(.nav-whatsapp),
+.nav-signout {
+  background: #0d0d0d;
+  border-color: #ffd700;
+  color: #ffe680;
+  -webkit-text-fill-color: #ffe680;
+  text-shadow: none;
   font-weight: 800;
   letter-spacing: 0.2px;
   font-size: clamp(0.72rem, 1.8vw, 0.95rem) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    inset 0 0 0 2px #0d0d0d,
+    inset 0 0 0 3px rgba(255, 215, 0, 0.55),
+    0 3px 8px rgba(0, 0, 0, 0.35);
 }
 
-.app-nav-link.active:not(.nav-whatsapp):not(.nav-account) {
-  background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
-  border-color: #5c4300;
-  box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
+.app-nav-link:not(.nav-whatsapp):hover,
+.nav-signout:hover {
+  background: #1a1608;
+  color: #fff3b0;
+  -webkit-text-fill-color: #fff3b0;
+  box-shadow:
+    inset 0 0 0 2px #1a1608,
+    inset 0 0 0 3px rgba(255, 215, 0, 0.8),
+    0 0 14px rgba(255, 215, 0, 0.55);
+}
+
+/* The page you are on: solid gold, black text, dark inner line */
+.app-nav-link.active:not(.nav-whatsapp) {
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 100%);
+  color: #000000;
+  -webkit-text-fill-color: #000000;
+  box-shadow:
+    inset 0 0 0 2px #ffd700,
+    inset 0 0 0 3px rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(255, 215, 0, 0.8);
+}
+
+/* Phone menu keeps its bigger text */
+.nav-mobile .app-nav-link:not(.nav-whatsapp),
+.nav-signout.nav-signout-mobile {
+  font-size: clamp(0.85rem, 3vw, 1.1rem) !important;
 }
 
 /* ---------- Gold pill buttons ("Strategy Overview ▼", "Live Alerts ▼", ...)
-   Same look as the tabs (A). Buttons with their own design - green,
+   Same K4 look; hover fills gold. Buttons with their own design - green,
    mint, trial, outlined secondary, round icon buttons - are untouched. */
 .strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial) {
-  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
-  border-color: #8a6400;
-  color: #000000;
-  -webkit-text-fill-color: #000000;
+  background: #0d0d0d;
+  border-color: #ffd700;
+  color: #ffe680;
+  -webkit-text-fill-color: #ffe680;
+  text-shadow: none;
   font-weight: 800;
   letter-spacing: 0.2px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    inset 0 0 0 2px #0d0d0d,
+    inset 0 0 0 3px rgba(255, 215, 0, 0.55),
+    0 3px 8px rgba(0, 0, 0, 0.35);
 }
 
 .strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial):hover {
-  background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
-  border-color: #5c4300;
-  box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 100%);
+  color: #000000;
+  -webkit-text-fill-color: #000000;
+  box-shadow:
+    inset 0 0 0 2px #ffd700,
+    inset 0 0 0 3px rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(255, 215, 0, 0.8);
 }
 
-/* ---------- Gold text with a black outline ---------- */
-.strategy-subtitle,
+/* ---------- Containers: gold bar plates (C5) + shine sweep (E1) ----------
+   The shine is the first background layer, moved by animating --plate-shine
+   (a registered property, so it animates even though older card styles force
+   their background with !important) */
+@property --plate-shine {
+  syntax: '<percentage>';
+  inherits: false;
+  initial-value: -40%;
+}
+
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)) {
+  background-image:
+    linear-gradient(100deg,
+      transparent calc(var(--plate-shine) - 14%),
+      rgba(255, 255, 255, 0.6) var(--plate-shine),
+      transparent calc(var(--plate-shine) + 14%)),
+    linear-gradient(160deg, #fff6c9 0%, #ffd700 30%, #e0ac00 55%, #ffe680 75%, #c99a00 100%) !important;
+  background-color: #ffd700 !important;
+  border: 2px solid #8a6400 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -3px 0 rgba(90, 60, 0, 0.4),
+    0 8px 18px rgba(0, 0, 0, 0.25) !important;
+  animation: plateShine 4s ease-in-out infinite !important;
+}
+
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)):nth-child(2n) { animation-delay: 0.5s !important; }
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)):nth-child(3n) { animation-delay: 1s !important; }
+
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)):hover,
+html body .strategy-stats-grid .strategy-stat-card.strategy-stat-card:hover {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -3px 0 rgba(90, 60, 0, 0.4),
+    0 0 0 2px #ffd700,
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 0 22px rgba(255, 215, 0, 0.55) !important;
+}
+
+@keyframes plateShine {
+  0% { --plate-shine: -40%; }
+  55%, 100% { --plate-shine: 140%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)) {
+    animation: none !important;
+  }
+}
+
+/* Engraved dark text on the plates */
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card))
+  :is(.strategy-stat-value, .strategy-performance-value, .strategy-stat-label, .stat-label,
+      .strategy-rule-title, .strategy-rule-desc, .strategy-rule-highlight, .strategy-flow-content h3,
+      .strategy-flow-content p, .contact-method-value, h3, p, strong) {
+  color: #241800 !important;
+  -webkit-text-fill-color: #241800 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 0 1px 0 rgba(255, 250, 220, 0.8) !important;
+}
+
+/* Wins / losses keep their colours, deep enough for gold */
+html body .strategy-stat-card:is(.stat-card-wins, .stat-card-emphasized-wins, .stat-card-emphasized-totalWins)
+  :is(.strategy-stat-value, .strategy-performance-value) {
+  color: #0f6b30 !important;
+  -webkit-text-fill-color: #0f6b30 !important;
+}
+
+html body .strategy-stat-card:is(.stat-card-losses, .stat-card-emphasized-loss, .stat-card-emphasized-maxLossPoints)
+  :is(.strategy-stat-value, .strategy-performance-value) {
+  color: #9b1c1c !important;
+  -webkit-text-fill-color: #9b1c1c !important;
+}
+
+/* ---------- Subtitles on a black ribbon (T5) ---------- */
+.strategy-subtitle {
+  width: fit-content;
+  max-width: min(800px, 100%);
+  padding: clamp(6px, 1.4vw, 10px) clamp(14px, 3vw, 22px);
+  background: linear-gradient(180deg, #2a2a2a, #050505);
+  border: 1.5px solid #d4af37;
+  border-radius: 28px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.3);
+  color: #ffe680;
+  -webkit-text-fill-color: #ffe680;
+  -webkit-text-stroke: 0;
+  text-shadow: none;
+  font-weight: 700;
+}
+
+.strategy-subtitle a {
+  color: #ffe680;
+  -webkit-text-fill-color: #ffe680;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Other gold text: crisp full black outline ---------- */
 .strategy-stat-label,
 .stat-label,
 .strategy-principle-text,
@@ -77,4 +208,43 @@
 .strategy-rule-desc,
 .strategy-flow-content p {
   font-size: clamp(0.85rem, 2.2vw, 1.2rem);
+}
+
+/* ---------- SantaLogo - brighter liquid-gold effect ----------
+   Stronger brightness pulse + wider golden glow, and the two shine
+   bands that sweep across the logo are brighter */
+.logo-container.logo-glitter-field .app-logo {
+  animation-name: logoLiquidGoldBright;
+}
+
+@keyframes logoLiquidGoldBright {
+  0%, 100% {
+    filter: brightness(1.08) saturate(1.15) drop-shadow(0 0 8px rgba(255, 210, 60, 0.7));
+  }
+  50% {
+    filter: brightness(1.35) saturate(1.45) drop-shadow(0 0 22px rgba(255, 220, 80, 1));
+  }
+}
+
+.logo-container.logo-glitter-field .shimmer-layer--masked .shimmer-sweep {
+  background: linear-gradient(
+    110deg,
+    transparent 28%,
+    rgba(255, 245, 200, 0.45) 41%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 245, 200, 0.45) 59%,
+    transparent 72%
+  );
+  background-size: 300% 100%;
+}
+
+.logo-container.logo-glitter-field .shimmer-layer--masked .shimmer-sweep--late {
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-container.logo-glitter-field .app-logo {
+    animation: none;
+    filter: brightness(1.15) drop-shadow(0 0 10px rgba(255, 210, 60, 0.8));
+  }
 }

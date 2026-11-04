@@ -442,33 +442,38 @@ img {
   transform: scale(1.05);
 }
 
+/* Sign out - same gold + black text as the tabs, but its own shape: a
+   rounded rectangle (not a pill) with an exit icon and a darker gold edge */
 .nav-signout {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 35%, #d4a008 100%);
-  /* Flat "sign out" red like popular sites (X, Discord, Google danger text),
-     dark enough to stay readable on the gold */
-  color: #b91c1c;
-  -webkit-text-fill-color: #b91c1c;
+  gap: 0.4em;
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
+  color: #000000;
+  -webkit-text-fill-color: #000000;
   text-shadow: none;
-  border: 2px solid #ffdf5a;
-  border-radius: 999px;
-  padding: clamp(7px, 1.7vw, 11px) clamp(14px, 2.8vw, 24px);
+  border: 2px solid #8a6400;
+  border-radius: 10px;
+  padding: clamp(6px, 1.5vw, 10px) clamp(12px, 2.6vw, 20px);
   font-size: clamp(0.72rem, 1.8vw, 0.95rem);
   font-weight: 800;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.2px;
   cursor: pointer;
   transition: all 0.25s ease;
-  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.25), 0 10px 20px rgba(255, 184, 0, 0.28);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25), inset 0 -2px 0 rgba(138, 100, 0, 0.35);
   white-space: nowrap;
 }
 
+.nav-signout svg {
+  font-size: 0.95em;
+}
+
 .nav-signout:hover {
-  color: #991b1b;
-  -webkit-text-fill-color: #991b1b;
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 0 0 1px rgba(255, 215, 0, 0.4), 0 16px 26px rgba(255, 184, 0, 0.35);
+  background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
+  border-color: #5c4300;
+  transform: translateY(-2px);
+  box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Mobile Toggle */

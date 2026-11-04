@@ -69,7 +69,8 @@ export default function Login() {
 
   const { login, register, resetPassword } = useAuth();
   const navigate = useNavigate();
-  const from = location.state?.from || '/members';
+  // Back to the members-only page that sent them here, otherwise the Home page
+  const from = location.state?.from || '/';
 
   const switchMode = (next) => {
     setMode(next);
@@ -104,8 +105,8 @@ export default function Login() {
         navigate(from, { replace: true });
       } else if (mode === 'register') {
         await register({ name, phone: normalizePhone(phone), dateOfBirth, email, password });
-        // New accounts are pending - My Account shows the approval status
-        navigate('/members', { replace: true });
+        // New accounts start pending; members-only pages show the approval status
+        navigate('/', { replace: true });
       } else {
         await resetPassword(email);
         // Same message whether or not the account exists, so this

@@ -1,37 +1,57 @@
 /* =========================================================
-   VISIBILITY - small readability fixes on top of the gold design
-   (loaded last). Same colours and shapes; only what made text hard
-   to read changes:
-   - tabs: option A "Bright gold" from tabs-visibility-demo.html -
-     lighter gold pill (no dark bronze band behind the letters),
-     black 800 text, dark gold edge; the active tab stays gold with
-     a stronger edge + glow. No shrinking below ~11.5px on phones
-   - gold text: the soft yellow glow that blurred letter edges on
-     the light silk is dropped, and the black outline is drawn as a
-     full stroke under the letters, so it is even and crisp
+   VISIBILITY - design layer on top of the gold site (loaded last)
+   Chosen in gold-design-options.html:
+   - tabs, Sign out + gold pill buttons: "Y7 Sunburst shine" - bright
+     gold, black 800 text, dark gold edge, a soft gold halo and a light
+     band sweeping across now and then. WhatsApp Group keeps its green;
+     Sign out is a rounded rectangle with an exit icon
+   - containers: "C5 Gold bar plate" - metallic gold plates with engraved
+     dark text (stat, rule and step cards)
+   - gold text: crisp full black outline instead of a blurry glow
    ========================================================= */
 
-/* ---------- Nav tabs (A) ---------- */
-.app-nav-link:not(.nav-whatsapp):not(.nav-account) {
+/* ---------- Tabs + Sign out (Y7) ---------- */
+.app-nav-link:not(.nav-whatsapp),
+.nav-signout {
   background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
   border-color: #8a6400;
   color: #000000;
   -webkit-text-fill-color: #000000;
+  text-shadow: none;
   font-weight: 800;
   letter-spacing: 0.2px;
   font-size: clamp(0.72rem, 1.8vw, 0.95rem) !important;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
-.app-nav-link.active:not(.nav-whatsapp):not(.nav-account) {
+.app-nav-link.active:not(.nav-whatsapp) {
   background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
   border-color: #5c4300;
   box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* Sign out: same gold, its own shape - rounded rectangle + exit icon */
+.nav-signout {
+  gap: 0.4em;
+  border: 2px solid #8a6400;
+  border-radius: 10px;
+}
+
+.nav-signout:hover {
+  background: linear-gradient(180deg, #fff6c9 0%, #ffe24d 45%, #ffd000 100%);
+  border-color: #5c4300;
+  color: #000000;
+  -webkit-text-fill-color: #000000;
+}
+
+/* Phone menu keeps its bigger text */
+.nav-mobile .app-nav-link:not(.nav-whatsapp),
+.nav-signout.nav-signout-mobile {
+  font-size: clamp(0.85rem, 3vw, 1.1rem) !important;
+}
+
 /* ---------- Gold pill buttons ("Strategy Overview ▼", "Live Alerts ▼", ...)
-   Same look as the tabs (A). Buttons with their own design - green,
-   mint, trial, outlined secondary, round icon buttons - are untouched. */
+   Same look as the tabs. Buttons with their own design - green, mint,
+   trial, outlined secondary, round icon buttons - are untouched. */
 .strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial) {
   background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
   border-color: #8a6400;
@@ -39,7 +59,6 @@
   -webkit-text-fill-color: #000000;
   font-weight: 800;
   letter-spacing: 0.2px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial):hover {
@@ -48,7 +67,119 @@
   box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255, 215, 0, 0.8), 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-/* ---------- Gold text with a black outline ---------- */
+/* ---------- Sunburst shine: soft gold halo + a light band sweeping
+   across, staggered so they don't all flash at once ---------- */
+.app-nav-link:not(.nav-whatsapp),
+.nav-signout,
+.strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial) {
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(255, 215, 0, 0.65), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.app-nav-link:not(.nav-whatsapp)::after,
+.nav-signout::after,
+.strategy-btn.strategy-btn-primary:not(.strategy-btn-green):not(.strategy-btn-mint):not(.strategy-btn-trial)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 40%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.75), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  animation: goldTabSweep 4s ease-in-out infinite;
+}
+
+.app-nav-link:not(.nav-whatsapp):nth-child(2n)::after { animation-delay: 0.6s; }
+.app-nav-link:not(.nav-whatsapp):nth-child(3n)::after { animation-delay: 1.2s; }
+.nav-signout::after { animation-delay: 1.8s; }
+
+@keyframes goldTabSweep {
+  0% { left: -60%; }
+  45%, 100% { left: 130%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav-link::after,
+  .nav-signout::after,
+  .strategy-btn-primary::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ---------- Containers: gold bar plates (C5) ---------- */
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)) {
+  background: linear-gradient(160deg, #fff6c9 0%, #ffd700 30%, #e0ac00 55%, #ffe680 75%, #c99a00 100%) !important;
+  border: 2px solid #8a6400 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.7),
+    inset 0 -3px 0 rgba(90, 60, 0, 0.4),
+    0 8px 18px rgba(0, 0, 0, 0.25) !important;
+}
+
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card)):hover,
+html body .strategy-stats-grid .strategy-stat-card.strategy-stat-card:hover {
+  background: linear-gradient(160deg, #fffbe0 0%, #ffe24d 30%, #ebb800 55%, #fff0a0 75%, #d4a300 100%) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -3px 0 rgba(90, 60, 0, 0.4),
+    0 0 0 2px #ffd700,
+    0 12px 24px rgba(0, 0, 0, 0.3),
+    0 0 22px rgba(255, 215, 0, 0.55) !important;
+}
+
+/* Engraved dark text on the plates */
+html :is(.strategy-stat-card, .strategy-flow-item, .strategy-rule-card:not(.vip-group-card))
+  :is(.strategy-stat-value, .strategy-performance-value, .strategy-stat-label, .stat-label,
+      .strategy-rule-title, .strategy-rule-desc, .strategy-rule-highlight, .strategy-flow-content h3,
+      .strategy-flow-content p, .contact-method-value, h3, p, strong) {
+  color: #241800 !important;
+  -webkit-text-fill-color: #241800 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: 0 1px 0 rgba(255, 250, 220, 0.8) !important;
+}
+
+/* Numbers always fit their card: each stat card is a size container, and
+   the number is capped at 16% of the card's width (about 10 characters,
+   e.g. "4704.00%" or "+12345.6%"). It keeps its normal size when there is
+   room and never wraps or gets cut off */
+html .strategy-stat-card {
+  container-type: inline-size;
+  padding-left: clamp(6px, 1.2vw, 14px) !important;
+  padding-right: clamp(6px, 1.2vw, 14px) !important;
+}
+
+html .strategy-stat-card .strategy-stat-value {
+  font-size: min(clamp(1rem, 4vw, 2rem), 16cqi) !important;
+}
+
+html .strategy-stat-card .strategy-performance-value {
+  font-size: min(clamp(1.6rem, 8vw, 2.6rem), 16cqi) !important;
+}
+
+html .strategy-stat-card :is(.strategy-stat-value, .strategy-performance-value) {
+  white-space: nowrap;
+  letter-spacing: 0;
+  max-width: 100%;
+}
+
+/* Wins / losses keep their colours, deep enough for gold */
+html body .strategy-stat-card:is(.stat-card-wins, .stat-card-emphasized-wins, .stat-card-emphasized-totalWins)
+  :is(.strategy-stat-value, .strategy-performance-value) {
+  color: #0f6b30 !important;
+  -webkit-text-fill-color: #0f6b30 !important;
+}
+
+html body .strategy-stat-card:is(.stat-card-losses, .stat-card-emphasized-loss, .stat-card-emphasized-maxLossPoints)
+  :is(.strategy-stat-value, .strategy-performance-value) {
+  color: #9b1c1c !important;
+  -webkit-text-fill-color: #9b1c1c !important;
+}
+
+/* ---------- Other gold text: crisp full black outline ---------- */
 .strategy-subtitle,
 .strategy-stat-label,
 .stat-label,

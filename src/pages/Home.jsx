@@ -139,7 +139,7 @@ function Home() {
         <p className="strategy-subtitle">
           {loading
             ? '...'
-            : `${stats.tradingwinRate}% of ${stats.totalTrades} signals closed at target since ${stats.since}.`}
+            : ''}
           {' '}
           {user && <Link to="/trading">Full trade log →</Link>}
         </p>

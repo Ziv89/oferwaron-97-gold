@@ -19,7 +19,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SiGmail } from 'react-icons/si';
 import {
   FaWhatsapp, FaYoutube, FaInstagram, FaTiktok, FaHome, FaChessKnight,
-  FaMoneyBillWave, FaChartBar, FaUser, FaAddressCard, FaSignOutAlt
+  FaMoneyBillWave, FaChartBar, FaUser, FaAddressCard, FaBalanceScale, FaSignOutAlt
 } from 'react-icons/fa';
 
 // Page imports
@@ -81,7 +81,8 @@ const LOADING_PERFORMANCE = {
 };
 
 const LOADING_OWNER = {
-  contact: { email: '', whatsapp: '' },
+  // bitPrice: membership price in ILS shown with the Bit scan code (Pricing)
+  contact: { email: '', whatsapp: '', bitPrice: null },
   social: { youtube: '', tradingview: '', instagram: '', tiktok: '' },
   youTubeids: []
 };
@@ -300,15 +301,21 @@ const images = Array.isArray(data.tradeViewChartImages)
           const data = docSnap.data();
           log('Fetched owner details:', data);
 
+          // siteData/ownerDetails.bitPrice (number, ILS) - empty / not a number = no price shown
+          const bitPrice = Number(data.bitPrice ?? data.contact?.bitPrice);
+          const price = Number.isFinite(bitPrice) && bitPrice > 0 ? bitPrice : null;
+
           if (data.contact) {
             setContact({
               email: data.contact.email || '',
-              whatsapp: data.contact.whatsapp || ''
+              whatsapp: data.contact.whatsapp || '',
+              bitPrice: price
             });
           } else {
             setContact({
               email: data.email || '',
-              whatsapp: data.whatsapp || ''
+              whatsapp: data.whatsapp || '',
+              bitPrice: price
             });
           }
 
@@ -412,8 +419,8 @@ const Header = () => {
     { to: '/', label: 'Home' },
     { to: '/strategy', label: 'Strategy' },
     ...(pendingMember ? [] : [{ to: '/trading', label: 'Live Trading' }]),
-    // Pricing is for approved members only
-    ...(user && isApproved ? [{ to: '/pricing', label: 'Pricing' }] : []),
+    // Pricing for every signed-in member (pending ones pay here before approval)
+    ...(user ? [{ to: '/pricing', label: 'Pricing' }] : []),
     { to: '/youtube', label: 'YouTube' },
     { to: '/performance', label: 'Performance Report' },
     { to: '/about', label: 'About' },
@@ -508,7 +515,7 @@ const Header = () => {
 // ============================================
 // Every footer icon has its own color - links with the same text share one (e.g. both "YouTube" links)
 const FOOTER_ICON_COLORS = {
-  home: '#D4AF37',
+  home: '#4FC3F7',
   strategy: '#9B7EDE',
   pricing: '#85BB65',
   youtube: '#FF0000',
@@ -519,6 +526,7 @@ const FOOTER_ICON_COLORS = {
   instagram: '#E1306C',
   tiktok: '#25F4EE',
   about: '#B0BEC5',
+  disclaimer: '#D4AF37',
 };
 
 // Connect links open the matching scan code on the Contact page (see Contact.jsx)
@@ -529,7 +537,7 @@ const ScancodeFooterLink = ({ scan, label, Icon }) => (
 );
 
 const Footer = () => {
-  const { user, isApproved } = useAuth();
+  const { user } = useAuth();
   const { stats } = useTradingStats();
   const { performance } = usePerformanceHistory();
   const { contact } = useOwnerDetails();
@@ -555,7 +563,7 @@ const Footer = () => {
           <NavLink to="/strategy" className="footer-link">
             <FaChessKnight className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.strategy }} />Strategy
           </NavLink>
-          {user && isApproved && (
+          {user && (
             <NavLink to="/pricing" className="footer-link">
               <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
             </NavLink>
@@ -594,6 +602,10 @@ const Footer = () => {
           <NavLink to="/about" className="footer-link">
             <FaUser className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.about }} />About Me
           </NavLink>
+          {/* Disclaimer & Terms of Use section at the bottom of the Strategy page */}
+          <NavLink to="/strategy#disclaimer" className="footer-link">
+            <FaBalanceScale className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.disclaimer }} />Disclaimer
+          </NavLink>
         </div>
       </div>
 
@@ -629,7 +641,9 @@ function App() {
               <Route
                 path="/pricing"
                 element={
-                  <ProtectedRoute requireApproved>
+                  // Any signed-in member, pending ones too - new registrations land
+                  // here to pay with Bit before approval
+                  <ProtectedRoute>
                     <Pricing />
                   </ProtectedRoute>
                 }

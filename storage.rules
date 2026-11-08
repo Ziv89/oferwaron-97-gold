@@ -37,9 +37,11 @@ service firebase.storage {
       allow write: if false;
     }
 
-    // public read only for the CV documents (cv.pdf, cv.docx)
+    // public read only for the CV documents (cv.pdf, cv.docx) and the
+    // disclaimer (disclaimer.pdf - Strategy page)
     match /documents/{fileName} {
-      allow read: if fileName.matches('cv\\.(pdf|docx)$');
+      allow read: if fileName.matches('cv\\.(pdf|docx)$')
+        || fileName.matches('disclaimer(\\.pdf)?$');
       allow write: if false;
     }
 

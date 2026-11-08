@@ -5,6 +5,7 @@ import React from 'react';
 import Seo from '../components/Seo';
 import { usePerformanceHistory, useTradingStats } from '../App';
 import StrategyOverview from '../components/StrategyOverview';
+import DisclaimerSection from '../components/DisclaimerSection';
 
 // SantaLogo shimmer sweep (no glitter dots)
 const StatCardShimmer = () => (
@@ -206,6 +207,9 @@ function Strategy() {
           </div>
         </div>
       </section>
+
+      {/* Disclaimer & Terms of Use - documents/disclaimer.pdf */}
+      <DisclaimerSection />
 
       {/* CTA */}
       {/* <section className="strategy-section text-center">

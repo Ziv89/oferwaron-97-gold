@@ -18,8 +18,7 @@ const CTA = () => {
   const team = [
     {
       name: "Ofer Waron",
-      role: "Lead Strategist & Founder",
-      bio: `Investment specialist and architect of the 97% Gold strategy with 16 years of trading experience since ${experienceSince}.`,
+      // role: "Lead Strategist & Founder",
       avatar: avatarSrc,
     },
   ];

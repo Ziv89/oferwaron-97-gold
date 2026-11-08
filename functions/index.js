@@ -602,7 +602,8 @@ exports.reviewRegistration = onRequest(
  * Progress / errors are written to _debug/lastStrategyDocument.
  */
 // documents/<name>.pdf, except the CVs (cv.pdf, cvgold.pdf, ...)
-const STRATEGY_PDF = /^documents\/(?!cv)([^/]+)\.pdf$/i;
+// CVs (About page) and the disclaimer (its own Strategy section) are not overviews
+const STRATEGY_PDF = /^documents\/(?!cv|disclaimer)([^/]+)\.pdf$/i;
 const strategyDocName = (filePath) => filePath?.match(STRATEGY_PDF)?.[1] || null;
 const VISION_PAGES_PER_CALL = 5; // Cloud Vision limit for inline PDFs
 

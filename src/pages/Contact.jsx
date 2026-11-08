@@ -85,8 +85,7 @@ function Contact() {
       scancode: {
         src: whatsappScancode.url,
         missing: whatsappScancode.failed,
-        alt: 'Scan to chat with Ofer on WhatsApp',
-        caption: 'Scan with your phone camera to chat on WhatsApp'
+        alt: 'Scan to chat with Ofer on WhatsApp'
       }
     },
     {
@@ -98,8 +97,7 @@ function Contact() {
       scancode: {
         src: youtubeScancode.url,
         missing: youtubeScancode.failed,
-        alt: 'Scan to open the OferWaron97Gold YouTube channel',
-        caption: 'Scan with your phone camera to open the YouTube channel'
+        alt: 'Scan to open the OferWaron97Gold YouTube channel'
       }
     },
     {
@@ -111,8 +109,7 @@ function Contact() {
       scancode: {
         src: instagramScancode.url,
         missing: instagramScancode.failed,
-        alt: 'Scan to open Ofer on Instagram',
-        caption: 'Scan with your phone camera to open Instagram'
+        alt: 'Scan to open Ofer on Instagram'
       }
     },
     {
@@ -124,8 +121,7 @@ function Contact() {
       scancode: {
         src: tiktokScancode.url,
         missing: tiktokScancode.failed,
-        alt: 'Scan to open Ofer on TikTok',
-        caption: 'Scan with your phone camera to open TikTok'
+        alt: 'Scan to open Ofer on TikTok'
       }
     }
   ];

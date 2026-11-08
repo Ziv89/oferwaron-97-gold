@@ -19,8 +19,9 @@ export const fetchStrategyDocuments = () => {
         log('Fetched strategy documents:', snap.size);
         return snap.docs
           .map((d) => ({ id: d.id, ...d.data() }))
-          // CV PDFs (cv.pdf, cvgold.pdf) belong to the About page only
-          .filter((d) => !/^cv/i.test(d.id))
+          // CV PDFs (cv.pdf, cvgold.pdf) belong to the About page and the
+          // disclaimer to its own section on the Strategy page
+          .filter((d) => !/^(cv|disclaimer)/i.test(d.id))
           .sort((a, b) => a.id.localeCompare(b.id));
       })
       .catch((err) => {

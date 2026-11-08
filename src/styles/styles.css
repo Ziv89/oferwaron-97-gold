@@ -5739,6 +5739,22 @@ main,
   color: var(--gold-light);
 }
 
+/* Bit price under the enlarged Bit scan code (siteData/ownerDetails.bitPrice) */
+.whatsapp-qr-lightbox-caption .bit-price {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-size: clamp(1.8rem, 6vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: 0.5px;
+  background: linear-gradient(180deg, #fff6c9 0%, #ffd700 50%, #d4a008 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.45));
+}
+
 /* Scan code not uploaded to Storage yet */
 .whatsapp-qr-lightbox-missing {
   display: flex;

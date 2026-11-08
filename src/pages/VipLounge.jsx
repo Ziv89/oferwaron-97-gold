@@ -22,7 +22,6 @@ import '../styles/auth.css';
 // shown on this page only. Click to enlarge for easier scanning.
 // ============================================
 const GROUP_QR_ALT = 'Scan to join the 97% Gold WhatsApp group';
-const GROUP_QR_CAPTION = 'Scan with your phone camera to join the WhatsApp group';
 
 function WhatsAppGroupQr() {
   const { url, failed } = useScancodeImageState(SCANCODE.whatsappGroup);
@@ -50,7 +49,6 @@ function WhatsAppGroupQr() {
         <ScancodeLightbox
           src={url}
           alt={GROUP_QR_ALT}
-          caption={GROUP_QR_CAPTION}
           missing={failed}
           onClose={close}
         />

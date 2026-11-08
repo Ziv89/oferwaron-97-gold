@@ -9,14 +9,13 @@ import { useScancodeImage } from '../services/scancodeImages';
 import { LoadingImage } from './LoadingMedia';
 
 const WHATSAPP_ALT = 'Scan to chat with Ofer on WhatsApp';
-const WHATSAPP_CAPTION = 'Scan with your phone camera to chat on WhatsApp';
 
 // ============================================
 // Enlarged scan code overlay (WhatsApp, YouTube, ...)
 // Rendered into document.body so transformed parents (e.g. hovered cards) don't clip it
 // ============================================
 // `missing` = the image does not exist in Storage (yet) - shows a placeholder instead of the coin
-export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = WHATSAPP_CAPTION, missing = false }) => {
+export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = '', missing = false }) => {
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
@@ -93,7 +92,7 @@ const WhatsAppQr = ({ caption = 'Scan to chat on WhatsApp', compact = false }) =
 // ============================================
 // Button that opens the enlarged WhatsApp QR (no direct link to WhatsApp)
 // ============================================
-// caption: text under the enlarged code ('' for none; left out = the default)
+// caption: text under the enlarged code (left out = none)
 export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primary', children = 'WhatsApp Me 💬', caption }) => {
   const qrImage = useScancodeImage(0);
   const [isEnlarged, setIsEnlarged] = useState(false);

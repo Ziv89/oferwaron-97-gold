@@ -1,7 +1,8 @@
 // ============================================
 // Pricing.jsx - Pricing Page (Strategy-style golden design)
 // ============================================
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 // import { Link } from 'react-router-dom'; // re-enable with the Final CTA section
 import Seo from '../components/Seo';
 import { useOwnerDetails } from '../App';
@@ -13,7 +14,8 @@ import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
 import '../styles/auth.css';
 
 const PRICE_QR_ALT = 'Scan to pay with Bit';
-const PRICE_QR_CAPTION = 'Scan with your phone camera to pay with Bit';
+// 300 -> "₪300" (siteData/ownerDetails.bitPrice)
+const formatIls = (amount) => `₪${amount.toLocaleString('en-US', { maximumFractionDigits: 2 })}`;
 
 // Bit wordmark - white "bit" on the teal Bit button
 const BitLogo = () => (
@@ -39,8 +41,16 @@ function Pricing() {
 
   // Price scan code from Firebase Storage: scancodes/ofernewScancode1.jpg
   const priceScancode = useScancodeImageState(SCANCODE.price);
-  const [enlarged, setEnlarged] = useState(false);
+  // Just registered (Login.jsx) - open the Bit scan code straight away
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [enlarged, setEnlarged] = useState(() => Boolean(location.state?.openBitScancode));
   const close = useCallback(() => setEnlarged(false), []);
+
+  // Forget the flag, so a refresh or coming back later doesn't pop it open again
+  useEffect(() => {
+    if (location.state?.openBitScancode) navigate(location.pathname, { replace: true, state: null });
+  }, [location.state, location.pathname, navigate]);
 
   if (loading) {
     return (
@@ -121,14 +131,13 @@ function Pricing() {
           <ScancodeLightbox
             src={priceScancode.url}
             alt={PRICE_QR_ALT}
-            caption={PRICE_QR_CAPTION}
+            caption={contact.bitPrice ? <span className="bit-price">{formatIls(contact.bitPrice)}</span> : ''}
             missing={priceScancode.failed}
             onClose={close}
           />
         )}
       </section>
 
-      {/* Contact CTA */}
       <section className="strategy-section text-center">
         <div className="strategy-principle-card">
           <h2 className="strategy-card-title">Still Have Questions?</h2>
@@ -136,7 +145,6 @@ function Pricing() {
             Chat with me directly on WhatsApp or send me an email. I'm here to help!
           </p>
           <div className="strategy-btn-group" style={{ marginTop: '1.5rem' }}>
-            {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
             <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon">
               WhatsApp  <FaWhatsapp style={{ color: '#25D366' }} />
             </WhatsAppQrButton>
@@ -154,19 +162,7 @@ function Pricing() {
         </div>
       </section>
 
-      {/* Final CTA */}
-      {/* <section className="strategy-section text-center">
-        <h2 className="strategy-section-title">Ready to Start Trading?</h2>
-        <p className="strategy-subtitle">Join successful traders with proven signals</p>
-        <div className="strategy-btn-group">
-          <Link to="/strategy" className="strategy-btn strategy-btn-primary">
-            Learn About Strategy
-          </Link>
-          <Link to="/youtube" className="strategy-btn strategy-btn-primary">
-            Watch Free Content
-          </Link>
-        </div>
-      </section> */}
+
     </div>
   );
 }

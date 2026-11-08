@@ -105,8 +105,8 @@ export default function Login() {
         navigate(from, { replace: true });
       } else if (mode === 'register') {
         await register({ name, phone: normalizePhone(phone), dateOfBirth, email, password });
-        // New accounts start pending; members-only pages show the approval status
-        navigate('/', { replace: true });
+        // New accounts go straight to Pricing with the Bit payment scan code open
+        navigate('/pricing', { replace: true, state: { openBitScancode: true } });
       } else {
         await resetPassword(email);
         // Same message whether or not the account exists, so this

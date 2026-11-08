@@ -7,13 +7,10 @@ import { usePerformanceHistory } from "../App";
 import { useDocumentUrl, downloadDocument } from "../services/documents";
 
 const CTA = () => {
-  const { performance, loading: perfLoading } = usePerformanceHistory();
+  const { loading: perfLoading } = usePerformanceHistory();
   const avatarSrc = useSelfImage(2); // selfimages/ofernewSelfimage2.jpg
   // documents/cv.pdf from Firebase Storage; the bundled CV is used until/unless it loads
   const cvUrl = useDocumentUrl("cv.pdf");
-
-  const experienceSince =
-    performance?.experienceSince ?? "2009"; // fallback if not loaded
 
   const team = [
     {

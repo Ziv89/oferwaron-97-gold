@@ -220,10 +220,7 @@ const EmptyState = () => (
     </svg>
     <h2 className="report-empty-title">Fresh Reports Coming Soon</h2>
     <span className="report-empty-divider" aria-hidden="true" />
-    {/* <div className="strategy-btn-group">
-      <Link to="/" className="strategy-btn strategy-btn-primary">View Live Stats</Link>
-      <Link to="/youtube" className="strategy-btn strategy-btn-primary">Watch on YouTube</Link>
-    </div> */}
+
   </div>
 );
 

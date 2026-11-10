@@ -10,7 +10,6 @@ import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
 import { WhatsAppQrButton, ScancodeLightbox } from '../components/WhatsAppQr';
 import { SiGmail } from 'react-icons/si';
 import { FaWhatsapp } from 'react-icons/fa';
-import questionMarkCoin from '../assets/images/questionMarkCoin.webp';
 import '../styles/auth.css';
 
 const PRICE_QR_ALT = 'Scan to pay with Bit';
@@ -33,6 +32,13 @@ const BitLogo = () => (
       bit
     </text>
   </svg>
+);
+
+// Gold-rimmed WhatsApp coin beside the "Access to the WhatsApp Group" title
+const WhatsAppCoin = () => (
+  <span className="faq-coin wa-coin" aria-hidden="true">
+    <FaWhatsapp />
+  </span>
 );
 
 function Pricing() {
@@ -89,21 +95,16 @@ function Pricing() {
             <div className="faq-header">
               <h2 className="strategy-section-title text-center get-in-touch-title get-in-touch-title--shimmer">
                 <span className="get-in-touch-shimmer">
-                  Membership Pricing
+                  Access to the WhatsApp Group and Live Trading Signals
                   <span className="sparkle sparkle-1">✦</span>
                   <span className="sparkle sparkle-2">✦</span>
                 </span>
 
-                <img
-                  src={questionMarkCoin}
-                  alt=""
-                  className="faq-coin"
-                  loading="lazy"
-                />
+                <WhatsAppCoin />
               </h2>
 
               <p className="strategy-subtitle text-center">
-                Your plan and price are below — have a question? I'm one message away
+                Your live trading and WhatsApp alerts are below — only one <span className="gold-glow-word">tap</span> away
               </p>
             </div>
           </div>
@@ -126,6 +127,31 @@ function Pricing() {
             <BitLogo />
           </button>
         </div>
+
+        {/* Access price under the Bit button (siteData/ownerDetails.bitPrice) */}
+        <p className="strategy-subtitle text-center bit-access-price">
+          {contact.bitPrice ? (
+            <>
+              WhatsApp group and Live trading  access price: <span className="bit-access-price-amount">{formatIls(contact.bitPrice)}</span>
+            </>
+          ) : (
+            <>
+              <span className="gold-glow-word">Tap</span> the Bit button to scan and pay for WhatsApp group access
+            </>
+          )}
+        </p>
+
+        {/* What the payment unlocks (siteData/ownerDetails.bitPrice) */}
+        <p className="strategy-subtitle text-center bit-access-note">
+          {contact.bitPrice ? (
+            <>
+              Once your Bit payment
+              comes through, you'll be added to the WhatsApp group and start receiving live trading signals
+            </>
+          ) : (
+            "Once your Bit payment comes through, you'll be added to the WhatsApp group and start receiving live trading signals"
+          )}
+        </p>
 
         {enlarged && (
           <ScancodeLightbox

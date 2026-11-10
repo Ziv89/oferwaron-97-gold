@@ -1538,3 +1538,90 @@
   overflow: visible;
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.18));
 }
+
+/* ---------- WhatsApp coin beside the Pricing title (WhatsAppCoin in Pricing.jsx) ----------
+   Takes .faq-coin sizing + float: green WhatsApp face, gold rim, green glow */
+.faq-coin.wa-coin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  aspect-ratio: 1;
+  box-sizing: border-box;
+  border-radius: 50%;
+  border: 0.12em solid #ffd700;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.08) 45%, rgba(255, 255, 255, 0) 50%),
+    linear-gradient(180deg, #5af08a 0%, #25d366 50%, #128c4a 100%);
+  box-shadow: inset 0 -0.08em 0.15em rgba(0, 60, 25, 0.4);
+  color: #fff;
+  -webkit-text-fill-color: #fff;
+  filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.65));
+}
+
+.faq-coin.wa-coin svg {
+  width: 62%;
+  height: 62%;
+  filter: drop-shadow(0 1px 1px rgba(0, 60, 25, 0.45));
+}
+
+/* ---------- WhatsApp group access price under the Bit button ---------- */
+.bit-access-price {
+  margin-top: clamp(0.75rem, 2.5vw, 1.25rem);
+}
+
+/* Same moving gold shimmer + glow as the page title (.get-in-touch-shimmer).
+   The subtitle's black text-stroke and text-shadow are inherited and would paint
+   over the see-through text (it showed black), so both are cleared here. */
+.bit-access-price-amount,
+.gold-glow-word {
+  display: inline-block;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  background: linear-gradient(
+    90deg,
+    #B8860B 0%,
+    #FFD700 20%,
+    #FFF8DC 40%,
+    #FFD700 60%,
+    #B8860B 80%,
+    #FFD700 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+  animation: shimmer 2.5s linear infinite;
+  filter:
+    drop-shadow(1px 0 0 rgba(0, 0, 0, 0.9))
+    drop-shadow(-1px 0 0 rgba(0, 0, 0, 0.9))
+    drop-shadow(0 1px 0 rgba(0, 0, 0, 0.9))
+    drop-shadow(0 -1px 0 rgba(0, 0, 0, 0.9))
+    drop-shadow(0 0 10px rgba(255, 215, 0, 0.45));
+}
+
+/* The price reads a size up; the glowing word (e.g. "tap") stays the line's size */
+.bit-access-price-amount {
+  font-size: 1.35em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bit-access-price-amount,
+  .gold-glow-word {
+    animation: none;
+  }
+}
+
+/* ---------- What the Bit payment unlocks (second line under the Bit button) ----------
+   Sits close under the price line, a touch smaller so the price leads */
+.strategy-subtitle.bit-access-price {
+  margin-bottom: clamp(4px, 1vw, 10px);
+}
+
+.strategy-subtitle.bit-access-note {
+  max-width: 640px;
+  font-size: clamp(0.8rem, 2.2vw, 1.05rem);
+}

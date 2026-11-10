@@ -80,116 +80,12 @@ export default function VipLounge() {
         <p className="strategy-subtitle">
           Welcome, {getUserName(profile, user)} — your members-only benefits are below. 
         </p>
+              <WhatsAppGroupQr />
+
       </section>
 
-      {/* ---------- WhatsApp group scanner: add form + my groups ---------- */}
+ 
 
-
-      {/* ---------- WhatsApp group scan code (members only) ---------- */}
-      <WhatsAppGroupQr />
-
-
-      {/* ---------- Roadmap ---------- */}
-      {/* <section className="strategy-section">
-        <div className="strategy-principle-card vip-card">
-          <h2 className="strategy-card-title vip-card-title">Coming Soon</h2>
-          <ul className="vip-chips">
-            {COMING_SOON.map((item) => (
-              <li key={item} className="vip-chip">{item}</li>
-            ))}
-          </ul>
-        </div>
-      </section> */}
-            {/* <section className="strategy-section">
-        <div className="strategy-principle-card vip-card">
-          <h2 className="strategy-card-title vip-card-title">
-            <FaWhatsapp style={{ color: '#25D366' }} /> Group Scanner
-          </h2>
-          <p className="member-hint vip-card-intro">
-            Save the groups you want scanned. Your list is private to your account —
-            groups you add now will be ready the moment scanning launches.
-          </p>
-
-          <form className="auth-form vip-add-form" onSubmit={handleAdd}>
-            <div className="vip-add-fields">
-              <input
-                type="text"
-                className="contact-input"
-                placeholder="Group name"
-                aria-label="Group name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                maxLength={80}
-              />
-              <input
-                type="url"
-                className="contact-input"
-                placeholder="https://chat.whatsapp.com/..."
-                aria-label="Group invite link"
-                value={inviteLink}
-                onChange={(e) => setInviteLink(e.target.value)}
-                autoCapitalize="none"
-                autoCorrect="off"
-              />
-            </div>
-
-            {inviteLink.trim() && !linkIsValid && (
-              <p className="member-hint">
-                Paste the group invite link — it starts with https://chat.whatsapp.com/
-              </p>
-            )}
-            {error && <p className="auth-error">{error}</p>}
-
-            <button
-              type="submit"
-              className="strategy-btn strategy-btn-primary"
-              disabled={saving || !name.trim() || !linkIsValid}
-            >
-              <FaPlus /> {saving ? 'Saving…' : 'Add Group'}
-            </button>
-          </form>
-
-          <div className="vip-subheading">
-            <h3>My Groups</h3>
-            {!groupsLoading && <span className="vip-count">{groups.length}</span>}
-          </div>
-
-          {groupsLoading ? (
-            <p className="member-hint">Loading…</p>
-          ) : groups.length === 0 ? (
-            <p className="vip-empty">No groups yet — add your first one above.</p>
-          ) : (
-            <ul className="vip-group-list">
-              {groups.map((group) => {
-                const status = SCAN_STATUS[group.status] ? group.status : 'pending';
-                return (
-                  <li key={group.id} className="vip-group-item">
-                    <span className="vip-group-avatar" aria-hidden="true"><FaWhatsapp /></span>
-                    <div className="vip-group-info">
-                      <strong>{group.name}</strong>
-                      <span className={`vip-status vip-status--${status}`}>{SCAN_STATUS[status]}</span>
-                    </div>
-                    <div className="vip-group-actions">
-                      <button type="button" className="strategy-btn" disabled title="Coming soon">
-                        <FaSearch /> Scan
-                      </button>
-                      <button
-                        type="button"
-                        className="strategy-btn vip-remove-btn"
-                        onClick={() => handleRemove(group)}
-                        aria-label={`Remove ${group.name}`}
-                        title="Remove"
-                      >
-                        <FaTrashAlt />
-                      </button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          )}
-        </div>
-      </section> */}
     </div>
     
   );

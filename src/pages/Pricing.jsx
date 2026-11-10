@@ -34,13 +34,6 @@ const BitLogo = () => (
   </svg>
 );
 
-// Gold-rimmed WhatsApp coin beside the "Access to the WhatsApp Group" title
-const WhatsAppCoin = () => (
-  <span className="faq-coin wa-coin" aria-hidden="true">
-    <FaWhatsapp />
-  </span>
-);
-
 function Pricing() {
   // Get contact data from Firebase
   const { contact, loading } = useOwnerDetails();
@@ -81,39 +74,8 @@ function Pricing() {
         path="/pricing"
       />
 
-      {/* Option 3: Free Trial Banner */}
-      <section className="strategy-section">
+    
 
-      </section>
-
-      {/* Pricing Card + FAQ Side by Side */}
-      <section className="strategy-section">
-        <div className="pricing-faq-layout">
-          {/* FAQ Section - Left Side */}
-          <div className="pricing-faq-column">
-            {/* Header stays on its own row so the pricing card can align with the FAQ list */}
-            <div className="faq-header">
-              <h2 className="strategy-section-title text-center get-in-touch-title get-in-touch-title--shimmer">
-                <span className="get-in-touch-shimmer">
-                  Access to the WhatsApp Group and Live Trading Signals
-                  <span className="sparkle sparkle-1">✦</span>
-                  <span className="sparkle sparkle-2">✦</span>
-                </span>
-
-                <WhatsAppCoin />
-              </h2>
-
-              <p className="strategy-subtitle text-center">
-                Your live trading and WhatsApp alerts are below — only one <span className="gold-glow-word">tap</span> away
-              </p>
-            </div>
-          </div>
-
-          {/* Pricing Cards - Right Side */}
-          <div className="pricing-card-column">
-          </div>
-        </div>
-      </section>
 
       {/* Price scan code - only the Bit logo opens it enlarged (scancodes/ofernewScancode1) */}
       <section className="strategy-section text-center">
@@ -128,6 +90,8 @@ function Pricing() {
           </button>
         </div>
 
+        {/* Golden panel holding the access price + what the payment unlocks */}
+        <div className="bit-access-panel">
         {/* Access price under the Bit button (siteData/ownerDetails.bitPrice) */}
         <p className="strategy-subtitle text-center bit-access-price">
           {contact.bitPrice ? (
@@ -152,6 +116,7 @@ function Pricing() {
             "Once your Bit payment comes through, you'll be added to the WhatsApp group and start receiving live trading signals"
           )}
         </p>
+        </div>
 
         {enlarged && (
           <ScancodeLightbox

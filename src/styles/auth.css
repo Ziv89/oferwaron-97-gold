@@ -1625,3 +1625,48 @@
   max-width: 640px;
   font-size: clamp(0.8rem, 2.2vw, 1.05rem);
 }
+
+/* ---------- Yellowish-gold panel behind the price + unlock lines ----------
+   The subtitle's yellow text with black stroke/shadow would vanish on gold,
+   so text inside the panel is dark brown with no stroke or shadow. */
+.bit-access-panel {
+  max-width: 700px;
+  margin: clamp(0.75rem, 2.5vw, 1.25rem) auto 0;
+  padding: clamp(14px, 3vw, 24px) clamp(14px, 3.5vw, 32px);
+  border-radius: 16px;
+  background: linear-gradient(135deg, #FFE98A 0%, #F7D154 45%, #E8B931 100%);
+  border: 2px solid #B8860B;
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.35),
+    0 0 18px rgba(255, 215, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.bit-access-panel .strategy-subtitle {
+  color: #2B1A00;
+  -webkit-text-stroke: 0;
+  text-stroke: 0;
+  text-shadow: none;
+  padding: 0;
+}
+
+.bit-access-panel .strategy-subtitle.bit-access-price {
+  margin-top: 0;
+  font-weight: 800;
+}
+
+.bit-access-panel .strategy-subtitle.bit-access-note {
+  margin-bottom: 0;
+  font-weight: 600;
+  color: #3A2600;
+}
+
+/* Gold shimmer text would blend into the gold panel, so the price is solid dark here */
+.bit-access-panel .bit-access-price-amount,
+.bit-access-panel .gold-glow-word {
+  background: none;
+  color: #1A0F00;
+  -webkit-text-fill-color: #1A0F00 !important;
+  animation: none;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+}

@@ -14,7 +14,8 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useStorageImage } from '../services/storageImages';
 import {
-  subscribeToAlerts, subscribeToChatSettings, isAlertExpired, isNoMarketDay, msUntilIsraelMidnight, israelTime,
+  subscribeToAlerts, subscribeToChatSettings, isAlertExpired, israelTime,
+  subscribeToTradingTiming, isMarketClosed, formatMarketOpen,
   ALERT_SOUND_PREF_KEY,
   setAlertChatVisible, areAlertPopupsEnabled, setAlertPopupsEnabled,
 } from '../services/alertMessages';
@@ -105,9 +106,10 @@ function GoldBell({ ringKey }) {
 }
 
 // ============================================
-// MARKET CLOCK - Sunday "No market today" icon. A live gold clock showing the
-// current Israel time; 12 is marked (midnight = trading resumes) and a glowing
-// arc runs from the hour hand to 12, shrinking as Monday gets closer.
+// MARKET CLOCK - "No market today" icon. A live gold clock showing the
+// current Israel time; the hour the market opens again (resumeHour, e.g. 1 =
+// 01:00) is marked with a gold coin and a glowing arc runs from the hour
+// hand to it, shrinking as the opening gets closer.
 // ============================================
 const CLOCK_C = 32;
 // Point on the clock face at `deg` (0 = 12 o'clock, clockwise)
@@ -116,7 +118,7 @@ const clockPoint = (deg, r) => {
   return [CLOCK_C + r * Math.cos(rad), CLOCK_C + r * Math.sin(rad)];
 };
 
-function MarketClock() {
+function MarketClock({ resumeHour = 0, resumeLabel = '' }) {
   const [time, setTime] = useState(israelTime);
 
   useEffect(() => {
@@ -129,11 +131,16 @@ function MarketClock() {
   const minuteDeg = (m + s / 60) * 6;
   const secondDeg = s * 6;
 
-  // Remaining-time arc: hour hand -> 12 (clockwise)
+  // Coin at the opening hour; remaining-time arc: hour hand -> coin (clockwise)
+  const resumeIndex = ((resumeHour % 12) + 12) % 12;
+  const resumeDeg = resumeIndex * 30;
+  const [coinX, coinY] = clockPoint(resumeDeg, 22.5);
+  const coinShift = `translate(${coinX - CLOCK_C} ${coinY - 9.5})`;
   const ARC_R = 25;
+  const sweep = (resumeDeg - hourDeg + 360) % 360;
   const [ax, ay] = clockPoint(hourDeg, ARC_R);
-  const largeArc = 360 - hourDeg > 180 ? 1 : 0;
-  const arc = `M ${ax} ${ay} A ${ARC_R} ${ARC_R} 0 ${largeArc} 1 ${CLOCK_C} ${CLOCK_C - ARC_R}`;
+  const [bx, by] = clockPoint(resumeDeg, ARC_R);
+  const arc = `M ${ax} ${ay} A ${ARC_R} ${ARC_R} 0 ${sweep > 180 ? 1 : 0} 1 ${bx} ${by}`;
 
   const pad = (n) => String(n).padStart(2, '0');
 
@@ -144,7 +151,7 @@ function MarketClock() {
       width="1em"
       height="1em"
       role="img"
-      aria-label={`Israel time ${pad(h)}:${pad(m)} - trading resumes at 00:00`}
+      aria-label={`Israel time ${pad(h)}:${pad(m)}${resumeLabel ? ` - trading resumes ${resumeLabel}` : ''}`}
     >
       <defs>
         <radialGradient id="marketClockFace" cx="40%" cy="35%" r="70%">
@@ -177,18 +184,18 @@ function MarketClock() {
       <circle cx="32" cy="32" r="27" fill="url(#marketClockFace)" />
 
       {/* Time left until trading resumes */}
-      {hourDeg > 0 && <path className="market-clock-arc" d={arc} fill="none" />}
+      {sweep > 0.5 && <path className="market-clock-arc" d={arc} fill="none" />}
 
       {/* Hour ticks */}
       {Array.from({ length: 12 }, (_, i) => {
-        if (i === 0) return null;
+        if (i === resumeIndex) return null;
         const [x1, y1] = clockPoint(i * 30, 23);
         const [x2, y2] = clockPoint(i * 30, i % 3 === 0 ? 19 : 21);
         return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#6B3F00" strokeWidth={i % 3 === 0 ? 2 : 1.2} strokeLinecap="round" />;
       })}
 
-      {/* 12 = trading resumes: a sparkling gold coin with the site's gold aura */}
-      <g className="market-clock-coin">
+      {/* Opening hour: a sparkling gold coin with the site's gold aura */}
+      <g className="market-clock-coin" transform={coinShift}>
         <circle className="market-clock-coin-aura" cx="32" cy="9.5" r="7" fill="url(#marketClockCoinAura)" />
         <circle cx="32" cy="9.5" r="4.6" fill="url(#marketClockCoinRim)" stroke="#7a5605" strokeWidth="0.6" />
         <circle cx="32" cy="9.5" r="3.3" fill="url(#marketClockCoinFace)" stroke="#a87a0a" strokeWidth="0.4" />
@@ -346,19 +353,31 @@ export default function LiveAlertsFeed() {
     return () => clearInterval(timer);
   }, []);
 
-  // Re-render exactly at midnight (Israel), so the Sunday "No market today"
-  // notice appears / disappears the moment the day changes. Re-armed each day.
-  const [dayTick, setDayTick] = useState(0);
+  // Weekly market close from siteData/tradingTiming (tradingEnd -> tradingStart),
+  // live - the rollTradingTiming Cloud Function moves it a week ahead each Monday
+  const [timing, setTiming] = useState(null);
+  useEffect(() => subscribeToTradingTiming(setTiming, () => setTiming(null)), []);
+
+  // Re-render the moment the market closes or opens, so "No market today"
+  // appears / disappears right on time. Re-armed after every boundary.
+  const [boundaryTick, setBoundaryTick] = useState(0);
   useEffect(() => {
+    if (!timing) return undefined;
+    const current = Date.now();
+    const next = [timing.end, timing.start].filter((t) => t > current).sort((a, b) => a - b)[0];
+    if (!next) return undefined;
+    // setTimeout caps at ~24.8 days; a longer wait just re-arms
     const timer = setTimeout(() => {
       setNow(Date.now());
-      setDayTick((n) => n + 1);
-    }, msUntilIsraelMidnight());
+      setBoundaryTick((n) => n + 1);
+    }, Math.min(next - current + 250, 2 ** 31 - 1));
     return () => clearTimeout(timer);
-  }, [dayTick]);
+  }, [timing, boundaryTick]);
 
-  // Sunday in Israel - no trading, so no alerts
-  const noMarket = isNoMarketDay(now);
+  // Market closed (tradingEnd <= now < tradingStart) - no trading, so no alerts
+  const noMarket = isMarketClosed(timing, now);
+  const resumeLabel = noMarket ? formatMarketOpen(timing.start) : '';
+  const resumeHour = noMarket ? israelTime(timing.start).h : 0;
 
   // Live alerts + deleted placeholders, oldest first, newest at the bottom - like a chat
   const messages = [...alerts, ...deletedAlerts.map((a) => ({ ...a, deleted: true }))]
@@ -518,7 +537,7 @@ export default function LiveAlertsFeed() {
           <div className="wa-chat-system">Loading…</div>
         ) : messages.length === 0 ? (
           <div className="wa-chat-system">
-            {noMarket ? 'No market today - trading resumes at 00:00' : 'No alerts today'}
+            {noMarket ? `No market today - trading resumes ${resumeLabel}` : 'No alerts today'}
           </div>
         ) : (
           messages.map((msg, i) => {
@@ -619,10 +638,11 @@ export default function LiveAlertsFeed() {
           </div>
         </div>
 
-        {/* Sunday: no market - gone by itself at midnight */}
+        {/* Market closed (siteData/tradingTiming) - gone by itself when it opens */}
         {noMarket && (
           <div className="no-market-notice" role="status">
-            <MarketClock /> No market today - trading resumes at 00:00
+            <MarketClock resumeHour={resumeHour} resumeLabel={resumeLabel} />
+            No market today - trading resumes {resumeLabel}
           </div>
         )}
 

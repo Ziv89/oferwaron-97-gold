@@ -367,6 +367,68 @@ exports.deleteDailyAlerts = onSchedule(
 );
 
 /**
+ * Weekly market close - siteData/tradingTiming
+ *
+ *   tradingEnd   = when the market closes (Sunday 00:00 Israel)
+ *   tradingStart = when it opens again   (Monday 01:00 Israel)
+ *
+ * The site shows "No market today" between the two. Once tradingStart has
+ * passed, this moves both a week ahead (e.g. 15/16 Nov -> 22/23 Nov), keeping
+ * the same Israel clock time across a summer / winter time change. Runs daily;
+ * a missed week (or several) is caught up in one go. Edit the two dates in the
+ * Firebase console at any time - the next run carries on from them.
+ */
+const WEEK_DAYS = 7;
+
+// Same Israel wall-clock time, `days` later (DST-safe)
+const israelAddDays = (ms, days) => {
+  const offsetAt = (t) => {
+    const p = Object.fromEntries(
+      new Intl.DateTimeFormat("en-US", {
+        timeZone: ALERT_TIME_ZONE, hourCycle: "h23",
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+      }).formatToParts(t).map(({ type, value }) => [type, Number(value)])
+    );
+    return Date.UTC(p.year, p.month - 1, p.day, p.hour, p.minute, p.second) - Math.floor(t / 1000) * 1000;
+  };
+  const naive = ms + days * 24 * 60 * 60 * 1000;
+  return naive + (offsetAt(ms) - offsetAt(naive));
+};
+
+exports.rollTradingTiming = onSchedule(
+  { schedule: "5 1 * * *", timeZone: ALERT_TIME_ZONE },
+  async () => {
+    const ref = admin.firestore().collection("siteData").doc("tradingTiming");
+    const snap = await ref.get();
+    const start = snap.get("tradingStart")?.toMillis?.();
+    const end = snap.get("tradingEnd")?.toMillis?.();
+    if (!start || !end) {
+      logger.warn("rollTradingTiming: siteData/tradingTiming needs tradingStart and tradingEnd timestamps");
+      return;
+    }
+
+    const now = Date.now();
+    let nextStart = start;
+    let nextEnd = end;
+    while (nextStart <= now) {
+      nextStart = israelAddDays(nextStart, WEEK_DAYS);
+      nextEnd = israelAddDays(nextEnd, WEEK_DAYS);
+    }
+    if (nextStart === start) {
+      logger.info(`rollTradingTiming: market opens ${new Date(start).toISOString()} - nothing to do`);
+      return;
+    }
+
+    await ref.update({
+      tradingStart: admin.firestore.Timestamp.fromMillis(nextStart),
+      tradingEnd: admin.firestore.Timestamp.fromMillis(nextEnd),
+    });
+    logger.info(`rollTradingTiming: next close ${new Date(nextEnd).toISOString()}, open ${new Date(nextStart).toISOString()}`);
+  }
+);
+
+/**
  * New registration -> WhatsApp message to the owner, with Approve / Reject links
  *
  * Fires when users/{uid} is created as approval 'pending' (the site's

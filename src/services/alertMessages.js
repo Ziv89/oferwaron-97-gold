@@ -78,24 +78,43 @@ const MAX_ALERTS = 50;
 export const ALERT_TIME_ZONE = 'Asia/Jerusalem';
 const israelDay = new Intl.DateTimeFormat('en-CA', { timeZone: ALERT_TIME_ZONE });
 
-// No trading on Sunday (Israel time) - the market runs Monday until Sunday starts
-const israelWeekday = new Intl.DateTimeFormat('en-US', { timeZone: ALERT_TIME_ZONE, weekday: 'short' });
-export const isNoMarketDay = (now = Date.now()) => israelWeekday.format(now) === 'Sun';
+// Weekly market close - siteData/tradingTiming in Firestore:
+//   tradingEnd   = market closes (Sunday 00:00 Israel)
+//   tradingStart = market opens again (Monday 01:00 Israel)
+// The rollTradingTiming Cloud Function moves both a week ahead once the
+// market has opened. Live, so a change in the console shows at once.
+// onChange gets { end, start } in millis, or null if the doc is missing / incomplete.
+export const subscribeToTradingTiming = (onChange, onError) =>
+  onSnapshot(
+    doc(db, 'siteData', 'tradingTiming'),
+    (snap) => {
+      const end = snap.get('tradingEnd')?.toMillis?.();
+      const start = snap.get('tradingStart')?.toMillis?.();
+      onChange(end && start ? { end, start } : null);
+    },
+    onError
+  );
 
-// Milliseconds until the next midnight in Israel (+1s so the new day has begun)
+// Market closed right now: tradingEnd <= now < tradingStart
+export const isMarketClosed = (timing, now = Date.now()) =>
+  Boolean(timing && now >= timing.end && now < timing.start);
+
+// "Monday 01:00" (Israel time)
+const israelWeekdayTime = new Intl.DateTimeFormat('en-GB', {
+  timeZone: ALERT_TIME_ZONE, weekday: 'long', hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+});
+export const formatMarketOpen = (ms) => israelWeekdayTime.format(ms).replace(',', '').replace(' at ', ' ');
+
 const israelClock = new Intl.DateTimeFormat('en-GB', {
   timeZone: ALERT_TIME_ZONE, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
 });
+
 // Current time in Israel as { h, m, s } (24-hour)
 export const israelTime = (now = Date.now()) => {
   const [h, m, s] = israelClock.format(now).split(':').map(Number);
   return { h, m, s };
 };
 
-export const msUntilIsraelMidnight = (now = Date.now()) => {
-  const { h, m, s } = israelTime(now);
-  return (24 * 3600 - (h * 3600 + m * 60 + s)) * 1000 + 1000;
-};
 
 // The scheduled delete may take a moment, so callers should hide expired
 // ones with this (re-checked as time passes): expired once it is no longer

@@ -10,6 +10,7 @@ import { FaWhatsapp, FaYoutube, FaInstagram, FaTiktok } from 'react-icons/fa';
 import { useSelfImage } from '../services/selfImages';
 import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
 import { ScancodeLightbox } from '../components/WhatsAppQr';
+import { useIsSmallScreen, useSocialLinks } from '../utils/socialLinks';
 import { LoadingImage } from '../components/LoadingMedia';
 
 function Contact() {
@@ -65,6 +66,11 @@ function Contact() {
   const [openScancodeKey, setOpenScancodeKey] = useState(null);
   const closeScancode = useCallback(() => setOpenScancodeKey(null), []);
 
+  // Account links from Firebase (siteData/ownerDetails) - used as link targets only, never displayed.
+  // Smartphone: the cards open the account directly. Larger screens: the scan code, with a button to open it.
+  const socialLinks = useSocialLinks();
+  const isSmallScreen = useIsSmallScreen();
+
   // Contact methods using Firebase data
   // Cards with a `scancode` open it enlarged instead of linking out
   const contactMethods = [
@@ -80,8 +86,10 @@ function Contact() {
       icon: <FaWhatsapp style={{ color: '#25D366' }} />,
       title: 'WhatsApp',
       desc: 'Fastest response',
-      value: 'Scan QR code',
+      value: isSmallScreen && socialLinks.whatsapp ? 'Tap to chat' : 'Scan QR code',
       colorClass: 'whatsapp',
+      directLink: socialLinks.whatsapp,
+      linkLabel: 'Open WhatsApp',
       scancode: {
         src: whatsappScancode.url,
         missing: whatsappScancode.failed,
@@ -92,8 +100,10 @@ function Contact() {
       icon: <FaYoutube style={{ color: '#FF0000' }} />,
       title: 'YouTube',
       desc: 'Free education',
-      value: 'Scan QR code',
+      value: isSmallScreen && socialLinks.youtube ? 'Tap to open' : 'Scan QR code',
       colorClass: 'youtube',
+      directLink: socialLinks.youtube,
+      linkLabel: 'Open YouTube',
       scancode: {
         src: youtubeScancode.url,
         missing: youtubeScancode.failed,
@@ -104,8 +114,10 @@ function Contact() {
       icon: <FaInstagram style={{ color: '#E4405F' }} />,
       title: 'Instagram',
       desc: 'Daily updates',
-      value: 'Scan QR code',
+      value: isSmallScreen && socialLinks.instagram ? 'Tap to open' : 'Scan QR code',
       colorClass: 'instagram',
+      directLink: socialLinks.instagram,
+      linkLabel: 'Open Instagram',
       scancode: {
         src: instagramScancode.url,
         missing: instagramScancode.failed,
@@ -116,8 +128,10 @@ function Contact() {
       icon: <FaTiktok style={{ color: '#000000' }} />,
       title: 'TikTok',
       desc: 'Short clips',
-      value: 'Scan QR code',
+      value: isSmallScreen && socialLinks.tiktok ? 'Tap to open' : 'Scan QR code',
       colorClass: 'tiktok',
+      directLink: socialLinks.tiktok,
+      linkLabel: 'Open TikTok',
       scancode: {
         src: tiktokScancode.url,
         missing: tiktokScancode.failed,
@@ -126,7 +140,8 @@ function Contact() {
     }
   ];
 
-  const openScancode = contactMethods.find((m) => m.colorClass === openScancodeKey)?.scancode;
+  const openMethod = contactMethods.find((m) => m.colorClass === openScancodeKey);
+  const openScancode = openMethod?.scancode;
 
   // Footer "Connect" links land here as /contact?scan=<whatsapp|youtube|instagram|tiktok>:
   // open that scan code window (the coin shows until the image loads), then drop the param
@@ -276,7 +291,24 @@ function Contact() {
             );
             const className = `strategy-rule-card contact-method-card contact-method-${method.colorClass}`;
 
-            // Cards with a loaded scan code (WhatsApp / YouTube / Instagram / TikTok) open it - the card opens the scan code enlarged
+            // Smartphone: WhatsApp / YouTube / Instagram / TikTok link straight to the account
+            if (isSmallScreen && method.directLink) {
+              return (
+                <a
+                  key={i}
+                  href={method.directLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={className}
+                  style={{ textDecoration: 'none', cursor: 'pointer' }}
+                  aria-label={method.linkLabel}
+                >
+                  {cardContent}
+                </a>
+              );
+            }
+
+            // Larger screens: the card opens the scan code enlarged (with a button to open the account)
             if (method.scancode) {
               const openCard = () => setOpenScancodeKey(method.colorClass);
 
@@ -331,6 +363,8 @@ function Contact() {
           alt={openScancode.alt}
           caption={openScancode.caption}
           missing={openScancode.missing}
+          link={openMethod.directLink}
+          linkLabel={openMethod.linkLabel}
           onClose={closeScancode}
         />
       )}

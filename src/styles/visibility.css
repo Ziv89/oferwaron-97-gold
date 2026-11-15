@@ -209,3 +209,119 @@ html body .strategy-stat-card:is(.stat-card-losses, .stat-card-emphasized-loss, 
 .strategy-flow-content p {
   font-size: clamp(0.85rem, 2.2vw, 1.2rem);
 }
+
+/* ---------- Yellow-gold panels (Strategy: hero text under the title + Core Principle) ----------
+   Gold text with a black outline is hard to read on the silk background, so these
+   sit on a solid yellow-gold panel (same look as the Pricing access-price panel)
+   with dark brown text and no outline. The shimmering page title is not affected. */
+html body .strategy-gold-panel {
+  background: linear-gradient(135deg, #FFF3B0 0%, #FFE07A 40%, #F5CC4A 75%, #E8B931 100%) !important;
+  border: 2px solid #B8860B !important;
+  border-radius: clamp(12px, 3vw, 16px);
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, 0.25),
+    0 0 18px rgba(255, 215, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Hero paragraph under the Strategy title */
+html body .strategy-subtitle.strategy-gold-panel {
+  padding: clamp(12px, 3vw, 20px) clamp(14px, 3.5vw, 28px);
+}
+
+/* All text inside the panels: dark brown, no outline / glow */
+html body .strategy-gold-panel,
+html body .strategy-gold-panel :is(.strategy-card-title, .strategy-principle-text, .strategy-rule-highlight, p, strong, span) {
+  color: #2B1A00 !important;
+  -webkit-text-fill-color: #2B1A00 !important;
+  -webkit-text-stroke: 0 !important;
+  text-stroke: 0 !important;
+  text-shadow: 0 1px 0 rgba(255, 250, 220, 0.6) !important;
+}
+
+/* Key phrases stand out in a deeper bronze */
+html body .strategy-gold-panel strong {
+  color: #6B3F00 !important;
+  -webkit-text-fill-color: #6B3F00 !important;
+  font-weight: 800;
+}
+
+/* "Smart Exit Engine" box inside Core Principle: lighter cream inset */
+html body .strategy-gold-panel .strategy-rule-highlight {
+  background: rgba(255, 252, 235, 0.6) !important;
+  border-color: #B8860B !important;
+}
+
+/* Outlined "View PDF" button on a gold panel: cream fill, dark brown text */
+html body .strategy-gold-panel .strategy-btn.strategy-btn-secondary {
+  background: rgba(255, 252, 235, 0.75) !important;
+  border: 2px solid #8a6400 !important;
+  color: #2B1A00 !important;
+  -webkit-text-fill-color: #2B1A00 !important;
+  -webkit-text-stroke: 0 !important;
+  text-shadow: none !important;
+  font-weight: 800;
+}
+
+html body .strategy-gold-panel .strategy-btn.strategy-btn-secondary svg {
+  color: #6B3F00 !important;
+  fill: #6B3F00 !important;
+}
+
+html body .strategy-gold-panel .strategy-btn.strategy-btn-secondary:hover {
+  background: #fffbe0 !important;
+  border-color: #5c4300 !important;
+}
+
+/* ---------- Shine on every yellow-gold panel (Strategy hero, Core Principle,
+   Disclaimer, Pricing access price) - the same light band that sweeps
+   across the nav tabs, slower since the panels are much wider ---------- */
+html body .strategy-gold-panel,
+.bit-access-panel {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+html body .strategy-gold-panel::after,
+.bit-access-panel::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 35%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+  z-index: 1;
+  animation: goldTabSweep 6s ease-in-out infinite;
+}
+
+/* Stagger so panels on the same page don't flash together */
+html body .strategy-principle-card.strategy-gold-panel::after { animation-delay: 1.5s; }
+html body #disclaimer .strategy-gold-panel::after { animation-delay: 3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  html body .strategy-gold-panel::after,
+  .bit-access-panel::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* "Open WhatsApp / YouTube / ..." button under an enlarged scan code */
+.scancode-lightbox-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 1rem auto 0;
+  text-decoration: none;
+}
+
+.whatsapp-qr-lightbox .scancode-lightbox-link {
+  align-self: center;
+}

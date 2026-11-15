@@ -1,0 +1,11 @@
+{
+  "appId": "com.oferwaron.gold",
+  "appName": "97% Gold",
+  "webDir": "build",
+  "android": {
+    "backgroundColor": "#0a0a0a"
+  },
+  "server": {
+    "androidScheme": "https"
+  }
+}

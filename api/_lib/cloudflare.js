@@ -5,9 +5,11 @@ const TOKEN_TTL_SECONDS = 60 * 60;
 const STATUS_CACHE_MS = 5 * 1000;
 
 function env(name) {
-  const value = process.env[name];
+  // Values pasted into the Vercel dashboard sometimes keep their quotes ("abc") -
+  // Cloudflare then rejects the token/ids, so strip them along with whitespace
+  const value = (process.env[name] || '').trim().replace(/^(['"])(.*)$/s, '$2').trim();
   if (!value) throw new HttpError(500, `Server is missing ${name}.`);
-  return value.trim();
+  return value;
 }
 
 const base64url = (input) =>
@@ -65,16 +67,20 @@ async function getLiveInputOverview() {
     videosResponse.json().catch(() => ({})),
   ]);
 
-  if (!inputResponse.ok || !inputBody.success) {
-    throw new HttpError(502, `Cloudflare API error: ${inputBody.errors?.[0]?.message || inputResponse.status}`);
-  }
-  if (!videosResponse.ok || !videosBody.success) {
-    throw new HttpError(502, `Cloudflare API error: ${videosBody.errors?.[0]?.message || videosResponse.status}`);
-  }
+  const inputOk = inputResponse.ok && inputBody.success;
+  const videosOk = videosResponse.ok && videosBody.success;
+  const cloudflareError = (body, response) =>
+    `Cloudflare API error: ${body.errors?.[0]?.message || response.status} (${body.errors?.[0]?.code || 'no code'})`;
 
-  const videos = Array.isArray(videosBody.result) ? videosBody.result : [];
-  const currentStatus = inputBody.result?.status?.current || {};
-  const live = currentStatus.state === 'connected' ||
+  // Live can be read from either call - only fail when both are down, so one
+  // rejected request no longer pins the page to "Offline"
+  if (!inputOk && !videosOk) throw new HttpError(502, cloudflareError(inputBody, inputResponse));
+  if (!inputOk) console.error('[stream api] live input:', cloudflareError(inputBody, inputResponse));
+  if (!videosOk) console.error('[stream api] videos:', cloudflareError(videosBody, videosResponse));
+
+  const videos = videosOk && Array.isArray(videosBody.result) ? videosBody.result : [];
+  const currentStatus = (inputOk && inputBody.result?.status?.current) || {};
+  const live = ['connected', 'reconnected'].includes(currentStatus.state) ||
     videos.some((video) => video.status?.state === 'live-inprogress');
   const replays = videos
     .filter((video) => video.status?.state === 'ready' && video.readyToStream)

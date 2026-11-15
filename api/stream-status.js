@@ -1,8 +1,9 @@
-const { requireSignedInUser, sendError, HttpError } = require('./_lib/auth');
+const { requireSignedInUser, sendError, HttpError, handleCors } = require('./_lib/auth');
 const { getLiveInputOverview } = require('./_lib/cloudflare');
 
 module.exports = async (req, res) => {
   res.setHeader('Cache-Control', 'private, no-store');
+  if (handleCors(req, res)) return;
 
   try {
     if (req.method !== 'GET') throw new HttpError(405, 'Method not allowed.');

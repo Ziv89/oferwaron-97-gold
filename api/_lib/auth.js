@@ -54,4 +54,26 @@ function sendError(res, error) {
   });
 }
 
-module.exports = { requireSignedInUser, sendError, HttpError };
+// The Android app (Capacitor) loads the site from https://localhost inside a
+// WebView, so its calls to these functions are cross-origin. Only those app
+// origins get CORS headers; the website itself is same-origin and unaffected.
+const APP_ORIGINS = new Set(['https://localhost', 'capacitor://localhost', 'http://localhost']);
+
+// Returns true when the request was a CORS preflight that has been answered.
+function handleCors(req, res) {
+  const origin = req.headers.origin;
+  if (origin && APP_ORIGINS.has(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Vary', 'Origin');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    res.setHeader('Access-Control-Max-Age', '600');
+  }
+  if (req.method === 'OPTIONS') {
+    res.status(204).end();
+    return true;
+  }
+  return false;
+}
+
+module.exports = { requireSignedInUser, sendError, HttpError, handleCors };

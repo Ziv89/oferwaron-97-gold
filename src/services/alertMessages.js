@@ -78,6 +78,25 @@ const MAX_ALERTS = 50;
 export const ALERT_TIME_ZONE = 'Asia/Jerusalem';
 const israelDay = new Intl.DateTimeFormat('en-CA', { timeZone: ALERT_TIME_ZONE });
 
+// No trading on Sunday (Israel time) - the market runs Monday until Sunday starts
+const israelWeekday = new Intl.DateTimeFormat('en-US', { timeZone: ALERT_TIME_ZONE, weekday: 'short' });
+export const isNoMarketDay = (now = Date.now()) => israelWeekday.format(now) === 'Sun';
+
+// Milliseconds until the next midnight in Israel (+1s so the new day has begun)
+const israelClock = new Intl.DateTimeFormat('en-GB', {
+  timeZone: ALERT_TIME_ZONE, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+});
+// Current time in Israel as { h, m, s } (24-hour)
+export const israelTime = (now = Date.now()) => {
+  const [h, m, s] = israelClock.format(now).split(':').map(Number);
+  return { h, m, s };
+};
+
+export const msUntilIsraelMidnight = (now = Date.now()) => {
+  const { h, m, s } = israelTime(now);
+  return (24 * 3600 - (h * 3600 + m * 60 + s)) * 1000 + 1000;
+};
+
 // The scheduled delete may take a moment, so callers should hide expired
 // ones with this (re-checked as time passes): expired once it is no longer
 // the alert's day in Israel, or past its expireAt (older alerts were saved

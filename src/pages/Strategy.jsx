@@ -72,7 +72,7 @@ function Strategy() {
           </span>
         </h1>
 
-        <p className="strategy-subtitle">
+        <p className="strategy-subtitle strategy-gold-panel">
           A proprietary, high-performance trading algorithm designed for
           gold trading (XAU/USD) on the 4-hour chart. Built with precision, backed
           by data since {loading ? '...' : (performance?.backtestedSince ?? performance?.experienceSince ?? 'N/A')}, and enhanced with AI-powered filters.
@@ -84,7 +84,7 @@ function Strategy() {
 
       {/* Core Principle */}
       <section className="strategy-section">
-        <div className="strategy-principle-card">
+        <div className="strategy-principle-card strategy-gold-panel">
           <h2 className="strategy-card-title">💡 Core Principle</h2>
           <p className="strategy-principle-text">
             My strategy is built on <strong>multi-layered entry filters</strong> and

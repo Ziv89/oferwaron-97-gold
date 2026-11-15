@@ -85,7 +85,7 @@ export default function DisclaimerSection() {
 
   return (
     <section className="strategy-section" id="disclaimer" ref={sectionRef}>
-      <div className="strategy-principle-card">
+      <div className="strategy-principle-card strategy-gold-panel">
         <h2 className="strategy-card-title">⚖️ Disclaimer &amp; Terms of Use</h2>
         <p className="strategy-principle-text">
           All content, signals and analyses in the gold trading group reflect my

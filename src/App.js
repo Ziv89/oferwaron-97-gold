@@ -46,6 +46,8 @@ import LiveAlertNotifier from './components/LiveAlertNotifier';
 import { doc, getDoc, onSnapshot } from 'firebase/firestore';
 import { db } from './services/firebase';
 import { log } from './utils/logger';
+import { isNativeApp } from './utils/apiUrl';
+import { useIsSmallScreen, useSocialLinks } from './utils/socialLinks';
 
 const SantaLogo = SantaLogoNew; 
 const LOADING_STATS = {
@@ -327,11 +329,12 @@ const images = Array.isArray(data.tradeViewChartImages)
               tiktok: data.social.tiktok || ''
             });
           } else {
+            // Field names in Firestore are not consistently cased ("TikTok", "Instagram")
             setSocial({
-              youtube: data.youtube || '',
-              tradingview: data.tradingview || '',
-              instagram: data.instagram || '',
-              tiktok: data.tiktok || ''
+              youtube: data.youtube || data.YouTube || '',
+              tradingview: data.tradingview || data.TradingView || '',
+              instagram: data.instagram || data.Instagram || '',
+              tiktok: data.tiktok || data.TikTok || ''
             });
           }
 
@@ -529,12 +532,27 @@ const FOOTER_ICON_COLORS = {
   disclaimer: '#D4AF37',
 };
 
-// Connect links open the matching scan code on the Contact page (see Contact.jsx)
-const ScancodeFooterLink = ({ scan, label, Icon }) => (
-  <NavLink to={`/contact?scan=${scan}`} className="footer-link">
-    <Icon className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS[scan] }} />{label}
-  </NavLink>
-);
+// Connect links: on a smartphone they open the account directly (link from Firebase);
+// on larger screens they open the matching scan code on the Contact page (see Contact.jsx)
+const ScancodeFooterLink = ({ scan, label, Icon }) => {
+  const isSmallScreen = useIsSmallScreen();
+  const links = useSocialLinks();
+  const icon = <Icon className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS[scan] }} />;
+
+  if (isSmallScreen && links[scan]) {
+    return (
+      <a href={links[scan]} target="_blank" rel="noopener noreferrer" className="footer-link">
+        {icon}{label}
+      </a>
+    );
+  }
+
+  return (
+    <NavLink to={`/contact?scan=${scan}`} className="footer-link">
+      {icon}{label}
+    </NavLink>
+  );
+};
 
 const Footer = () => {
   const { user } = useAuth();
@@ -691,7 +709,8 @@ function App() {
           <Footer />
           <LiveAlertNotifier />
         </div>
-        <Analytics />
+        {/* Vercel Analytics only works on the website, not inside the Android app */}
+        {!isNativeApp() && <Analytics />}
       </BrowserRouter>
       </AuthProvider>
     </FirebaseDataProvider>

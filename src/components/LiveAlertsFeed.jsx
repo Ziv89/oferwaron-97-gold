@@ -14,7 +14,8 @@ import { createPortal } from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useStorageImage } from '../services/storageImages';
 import {
-  subscribeToAlerts, subscribeToChatSettings, isAlertExpired, ALERT_SOUND_PREF_KEY,
+  subscribeToAlerts, subscribeToChatSettings, isAlertExpired, isNoMarketDay, msUntilIsraelMidnight, israelTime,
+  ALERT_SOUND_PREF_KEY,
   setAlertChatVisible, areAlertPopupsEnabled, setAlertPopupsEnabled,
 } from '../services/alertMessages';
 import { useSoundEffect, ALERT_SOUND } from '../services/soundEffects';
@@ -100,6 +101,114 @@ function GoldBell({ ringKey }) {
         </g>
       </svg>
     </span>
+  );
+}
+
+// ============================================
+// MARKET CLOCK - Sunday "No market today" icon. A live gold clock showing the
+// current Israel time; 12 is marked (midnight = trading resumes) and a glowing
+// arc runs from the hour hand to 12, shrinking as Monday gets closer.
+// ============================================
+const CLOCK_C = 32;
+// Point on the clock face at `deg` (0 = 12 o'clock, clockwise)
+const clockPoint = (deg, r) => {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return [CLOCK_C + r * Math.cos(rad), CLOCK_C + r * Math.sin(rad)];
+};
+
+function MarketClock() {
+  const [time, setTime] = useState(israelTime);
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(israelTime()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const { h, m, s } = time;
+  const hourDeg = ((h % 12) + m / 60) * 30;
+  const minuteDeg = (m + s / 60) * 6;
+  const secondDeg = s * 6;
+
+  // Remaining-time arc: hour hand -> 12 (clockwise)
+  const ARC_R = 25;
+  const [ax, ay] = clockPoint(hourDeg, ARC_R);
+  const largeArc = 360 - hourDeg > 180 ? 1 : 0;
+  const arc = `M ${ax} ${ay} A ${ARC_R} ${ARC_R} 0 ${largeArc} 1 ${CLOCK_C} ${CLOCK_C - ARC_R}`;
+
+  const pad = (n) => String(n).padStart(2, '0');
+
+  return (
+    <svg
+      className="market-clock"
+      viewBox="0 0 64 64"
+      width="1em"
+      height="1em"
+      role="img"
+      aria-label={`Israel time ${pad(h)}:${pad(m)} - trading resumes at 00:00`}
+    >
+      <defs>
+        <radialGradient id="marketClockFace" cx="40%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#fffbe6" />
+          <stop offset="70%" stopColor="#ffe9a0" />
+          <stop offset="100%" stopColor="#f2c230" />
+        </radialGradient>
+        <linearGradient id="marketClockRim" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fff1a8" />
+          <stop offset="50%" stopColor="#d4a017" />
+          <stop offset="100%" stopColor="#7a5605" />
+        </linearGradient>
+        <radialGradient id="marketClockCoinFace" cx="35%" cy="35%" r="70%">
+          <stop offset="0%" stopColor="#fffbe6" />
+          <stop offset="45%" stopColor="#ffd84d" />
+          <stop offset="100%" stopColor="#c99a00" />
+        </radialGradient>
+        <linearGradient id="marketClockCoinRim" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#fff1a8" />
+          <stop offset="50%" stopColor="#e0a915" />
+          <stop offset="100%" stopColor="#8a6207" />
+        </linearGradient>
+        <radialGradient id="marketClockCoinAura">
+          <stop offset="40%" stopColor="#ffd700" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#ffd700" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+
+      <circle cx="32" cy="32" r="30" fill="url(#marketClockRim)" />
+      <circle cx="32" cy="32" r="27" fill="url(#marketClockFace)" />
+
+      {/* Time left until trading resumes */}
+      {hourDeg > 0 && <path className="market-clock-arc" d={arc} fill="none" />}
+
+      {/* Hour ticks */}
+      {Array.from({ length: 12 }, (_, i) => {
+        if (i === 0) return null;
+        const [x1, y1] = clockPoint(i * 30, 23);
+        const [x2, y2] = clockPoint(i * 30, i % 3 === 0 ? 19 : 21);
+        return <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#6B3F00" strokeWidth={i % 3 === 0 ? 2 : 1.2} strokeLinecap="round" />;
+      })}
+
+      {/* 12 = trading resumes: a sparkling gold coin with the site's gold aura */}
+      <g className="market-clock-coin">
+        <circle className="market-clock-coin-aura" cx="32" cy="9.5" r="7" fill="url(#marketClockCoinAura)" />
+        <circle cx="32" cy="9.5" r="4.6" fill="url(#marketClockCoinRim)" stroke="#7a5605" strokeWidth="0.6" />
+        <circle cx="32" cy="9.5" r="3.3" fill="url(#marketClockCoinFace)" stroke="#a87a0a" strokeWidth="0.4" />
+        <path d="M30.4 8.2a2.2 2.2 0 0 1 2.6-0.9" fill="none" stroke="#fffdf0" strokeWidth="0.8" strokeLinecap="round" opacity="0.9" />
+        <path
+          className="market-clock-coin-sparkle"
+          d="M35.6 5.2l0.55 1.35 1.35 0.55-1.35 0.55-0.55 1.35-0.55-1.35-1.35-0.55 1.35-0.55z"
+          fill="#ffffff"
+        />
+      </g>
+
+      {/* Hands */}
+      <line x1="32" y1="32" x2="32" y2="18" stroke="#2B1A00" strokeWidth="3.4" strokeLinecap="round"
+        transform={`rotate(${hourDeg} 32 32)`} />
+      <line x1="32" y1="32" x2="32" y2="12" stroke="#2B1A00" strokeWidth="2.2" strokeLinecap="round"
+        transform={`rotate(${minuteDeg} 32 32)`} />
+      <line x1="32" y1="36" x2="32" y2="10" stroke="#c0392b" strokeWidth="1" strokeLinecap="round"
+        transform={`rotate(${secondDeg} 32 32)`} />
+      <circle cx="32" cy="32" r="2.4" fill="#c0392b" stroke="#2B1A00" strokeWidth="0.8" />
+    </svg>
   );
 }
 
@@ -236,6 +345,20 @@ export default function LiveAlertsFeed() {
     const timer = setInterval(() => setNow(Date.now()), EXPIRY_RECHECK_MS);
     return () => clearInterval(timer);
   }, []);
+
+  // Re-render exactly at midnight (Israel), so the Sunday "No market today"
+  // notice appears / disappears the moment the day changes. Re-armed each day.
+  const [dayTick, setDayTick] = useState(0);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setNow(Date.now());
+      setDayTick((n) => n + 1);
+    }, msUntilIsraelMidnight());
+    return () => clearTimeout(timer);
+  }, [dayTick]);
+
+  // Sunday in Israel - no trading, so no alerts
+  const noMarket = isNoMarketDay(now);
 
   // Live alerts + deleted placeholders, oldest first, newest at the bottom - like a chat
   const messages = [...alerts, ...deletedAlerts.map((a) => ({ ...a, deleted: true }))]
@@ -394,7 +517,9 @@ export default function LiveAlertsFeed() {
         ) : loading ? (
           <div className="wa-chat-system">Loading…</div>
         ) : messages.length === 0 ? (
-          <div className="wa-chat-system">No alerts today</div>
+          <div className="wa-chat-system">
+            {noMarket ? 'No market today - trading resumes at 00:00' : 'No alerts today'}
+          </div>
         ) : (
           messages.map((msg, i) => {
             const day = formatAlertDay(msg.when);
@@ -494,7 +619,13 @@ export default function LiveAlertsFeed() {
           </div>
         </div>
 
-  
+        {/* Sunday: no market - gone by itself at midnight */}
+        {noMarket && (
+          <div className="no-market-notice" role="status">
+            <MarketClock /> No market today - trading resumes at 00:00
+          </div>
+        )}
+
         {open && !fullscreen && chatPanel}
         {open && fullscreen &&
           createPortal(

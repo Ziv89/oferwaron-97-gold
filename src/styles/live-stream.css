@@ -358,3 +358,50 @@
     align-items: flex-start;
   }
 }
+/* Player row: Live / Offline in the middle, Full screen (+ Close) on the right.
+   Equal side columns keep the status exactly centred over the stream. */
+.live-player-heading.live-player-heading--status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.live-player-heading--status .live-player-status {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.live-player-heading--status .live-player-status p {
+  margin: 0;
+  color: #555;
+}
+
+.live-player-heading--status .live-player-actions {
+  grid-column: 3;
+  justify-self: end;
+  justify-content: flex-end;
+}
+
+@media (max-width: 640px) {
+  .live-player-heading.live-player-heading--status {
+    align-items: center;
+    gap: 8px;
+  }
+}
+
+/* Stream card: the Live / Offline + Full screen row and the player sit in one
+   light frosted card with a gold border - same look as the Live Alerts card */
+.live-player-section {
+  margin-top: clamp(14px, 3vw, 24px);
+  padding: clamp(12px, 3vw, 24px);
+  background: rgba(255, 255, 255, 0.08);
+  border: clamp(1.5px, 0.4vw, 2px) solid #FFD700;
+  border-radius: clamp(12px, 3vw, 16px);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.live-player-section .live-player-frame {
+  border-radius: clamp(8px, 2vw, 10px);
+  overflow: hidden;
+}

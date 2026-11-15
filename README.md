@@ -68,3 +68,15 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+## Android app (Capacitor)
+
+The same React code is wrapped as a native Android app in `android/`. The web/Vercel
+build is unchanged (`npm run build`, `npm start`, `npm run start:vercel`).
+
+- `npm run android` builds the web app for Android, syncs it into `android/` and opens Android Studio.
+- `npm run build:android` builds and syncs without opening Android Studio. Run it after every web change.
+- In the app, `/api/*` calls go to `https://www.oferwaron.com`. To point them at another
+  deployment, set `API_BASE_URL` (e.g. `API_BASE_URL=https://my-preview.vercel.app npm run build:android`).
+- That deployment must include the CORS handling in `api/_lib/auth.js` (`handleCors`).
+- `android/` is excluded from Vercel uploads via `.vercelignore`.

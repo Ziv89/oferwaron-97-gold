@@ -7,6 +7,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { useScancodeImage } from '../services/scancodeImages';
 import { LoadingImage } from './LoadingMedia';
+import { useIsSmallScreen, useSocialLinks } from '../utils/socialLinks';
 
 const WHATSAPP_ALT = 'Scan to chat with Ofer on WhatsApp';
 
@@ -15,7 +16,9 @@ const WHATSAPP_ALT = 'Scan to chat with Ofer on WhatsApp';
 // Rendered into document.body so transformed parents (e.g. hovered cards) don't clip it
 // ============================================
 // `missing` = the image does not exist in Storage (yet) - shows a placeholder instead of the coin
-export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = '', missing = false }) => {
+// `link` / `linkLabel` = optional button under the code that opens the account directly
+// (the address itself comes from Firebase and is never shown as text)
+export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = '', missing = false, link = '', linkLabel = 'Open link' }) => {
   useEffect(() => {
     const handleKey = (e) => {
       if (e.key === 'Escape') onClose();
@@ -49,6 +52,16 @@ export const ScancodeLightbox = ({ src, onClose, alt = WHATSAPP_ALT, caption = '
           </div>
         )}
         {caption && !missing && <p className="whatsapp-qr-lightbox-caption">{caption}</p>}
+        {link && (
+          <a
+            href={link}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="strategy-btn strategy-btn-primary scancode-lightbox-link"
+          >
+            {linkLabel} ↗
+          </a>
+        )}
       </div>
     </div>,
     document.body
@@ -90,13 +103,25 @@ const WhatsAppQr = ({ caption = 'Scan to chat on WhatsApp', compact = false }) =
 };
 
 // ============================================
-// Button that opens the enlarged WhatsApp QR (no direct link to WhatsApp)
+// WhatsApp button
+// Smartphone: opens WhatsApp directly (number from Firebase)
+// Larger screens: opens the enlarged QR, with a button to open WhatsApp too
 // ============================================
 // caption: text under the enlarged code (left out = none)
 export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primary', children = 'WhatsApp Me 💬', caption }) => {
   const qrImage = useScancodeImage(0);
   const [isEnlarged, setIsEnlarged] = useState(false);
   const closeEnlarged = useCallback(() => setIsEnlarged(false), []);
+  const isSmallScreen = useIsSmallScreen();
+  const { whatsapp: whatsappLink } = useSocialLinks();
+
+  if (isSmallScreen && whatsappLink) {
+    return (
+      <a className={className} href={whatsappLink} target="_blank" rel="noopener noreferrer">
+        {children}
+      </a>
+    );
+  }
 
   if (!qrImage) return null;
 
@@ -110,6 +135,8 @@ export const WhatsAppQrButton = ({ className = 'strategy-btn strategy-btn-primar
         <ScancodeLightbox
           src={qrImage}
           onClose={closeEnlarged}
+          link={whatsappLink}
+          linkLabel="Open WhatsApp"
           {...(caption !== undefined && { caption })}
         />
       )}

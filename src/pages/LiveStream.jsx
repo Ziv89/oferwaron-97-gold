@@ -5,6 +5,7 @@ import CoinLoader from '../components/CoinLoader';
 import { LoadingFrame } from '../components/LoadingMedia';
 import { useAuth } from '../contexts/AuthContext';
 import { db } from '../services/firebase';
+import { apiUrl } from '../utils/apiUrl';
 import '../styles/live-stream.css';
 
 // How often to re-check while the page is open - Live / Offline switches by itself
@@ -26,6 +27,8 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
   const [isLive, setIsLive] = useState(false);
   const [replays, setReplays] = useState([]);
   const [statusLoaded, setStatusLoaded] = useState(false);
+  // True while the last status check failed - the label then says so instead of a false "Offline"
+  const [statusError, setStatusError] = useState(false);
   const [selected, setSelected] = useState(autoSelectLive ? 'live' : '');
   const [embedUrl, setEmbedUrl] = useState('');
   const [playerLoading, setPlayerLoading] = useState(false);
@@ -37,7 +40,7 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
 
   const streamFetch = useCallback(async (url, options = {}) => {
     const idToken = user ? await user.getIdToken() : null;
-    const response = await fetch(url, {
+    const response = await fetch(apiUrl(url), {
       ...options,
       headers: {
         ...(options.headers || {}),
@@ -52,18 +55,26 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
 
   useEffect(() => {
     let cancelled = false;
+    // Polls can overlap (interval + focus + visibility) - only the newest answer counts,
+    // so a slow older "offline" reply can't overwrite a newer "live" one
+    let latestPoll = 0;
 
     const poll = async () => {
       if (document.hidden) return;
+      const pollId = ++latestPoll;
       try {
         const result = await streamFetch('/api/stream-status');
-        if (cancelled) return;
+        if (cancelled || pollId !== latestPoll) return;
         setIsLive(Boolean(result.live));
         setReplays(result.replays || []);
-      } catch {
-        if (!cancelled) setIsLive(false);
+        setStatusError(false);
+      } catch (error) {
+        if (cancelled || pollId !== latestPoll) return;
+        // Keep the last known Live / Offline - a failed check is not "Offline"
+        console.warn('[live] status check failed:', error.message);
+        setStatusError(true);
       } finally {
-        if (!cancelled) setStatusLoaded(true);
+        if (!cancelled && pollId === latestPoll) setStatusLoaded(true);
       }
     };
 
@@ -211,6 +222,25 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
     : selectedReplay?.title || `Session replay · ${eventDate(selectedReplay?.created)}`;
   const pageTitle = autoSelectLive ? 'Live Trading Events' : 'Live Trading Events';
 
+  // Live / Offline badge - in its own bar, or in the player's button row when a stream is open
+  const statusBadge = !statusLoaded ? (
+    <p className="live-empty-state">Checking for a live session…</p>
+  ) : (
+    <span
+      className={`live-status ${isLive ? 'live-status-live' : statusError ? 'live-status-scheduled' : 'live-status-offline'}`}
+      title={statusError ? 'Could not reach the stream server - retrying automatically' : undefined}
+    >
+      <span className="live-dot" aria-hidden="true" />
+      {isLive ? 'Live' : statusError ? 'Status unavailable' : 'Offline'}
+    </span>
+  );
+
+  const watchLiveButton = statusLoaded && isLive && selected !== 'live' && (
+    <button className="live-watch-button" type="button" onClick={() => pick('live')}>
+      Watch live
+    </button>
+  );
+
   return (
     <div className="strategy-page live-page">
       <Seo
@@ -239,28 +269,25 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
 
       {children}
 
-      <section className="live-now-bar" aria-live="polite">
-        {!statusLoaded && <p className="live-empty-state">Checking for a live session…</p>}
-        {statusLoaded && (
-          <>
-            <span className={`live-status ${isLive ? 'live-status-live' : 'live-status-offline'}`}>
-              <span className="live-dot" aria-hidden="true" />
-              {isLive ? 'Live' : 'Offline'}
-            </span>
-            {isLive && selected !== 'live' && (
-              <button className="live-watch-button" type="button" onClick={() => pick('live')}>
-                Watch live
-              </button>
-            )}
-          </>
-        )}
-      </section>
+      {/* Without a player the Live / Offline status keeps its own bar; with one
+          it moves down into the player's button row (see below) */}
+      {!selected && (
+        <section className="live-now-bar" aria-live="polite">
+          {statusBadge}
+          {watchLiveButton}
+        </section>
+      )}
 
       {selected && (
         <section className="live-player-section" aria-label="Selected stream">
-          <div className="live-player-heading">
-       
+          {/* Status centred right above the stream, Full screen on the right */}
+          <div className="live-player-heading live-player-heading--status">
+            <span className="live-player-heading-spacer" aria-hidden="true" />
+            <div className="live-player-status" aria-live="polite">
+              {statusBadge}
+            </div>
             <div className="live-player-actions">
+              {watchLiveButton}
               <button className="live-fullscreen-button" type="button" onClick={toggleFullscreen}>
                 {isFullscreen ? 'Exit full screen' : 'Full screen'}
               </button>

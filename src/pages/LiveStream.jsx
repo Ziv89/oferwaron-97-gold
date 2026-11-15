@@ -27,8 +27,6 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
   const [isLive, setIsLive] = useState(false);
   const [replays, setReplays] = useState([]);
   const [statusLoaded, setStatusLoaded] = useState(false);
-  // True while the last status check failed - the label then says so instead of a false "Offline"
-  const [statusError, setStatusError] = useState(false);
   const [selected, setSelected] = useState(autoSelectLive ? 'live' : '');
   const [embedUrl, setEmbedUrl] = useState('');
   const [playerLoading, setPlayerLoading] = useState(false);
@@ -67,12 +65,10 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
         if (cancelled || pollId !== latestPoll) return;
         setIsLive(Boolean(result.live));
         setReplays(result.replays || []);
-        setStatusError(false);
       } catch (error) {
         if (cancelled || pollId !== latestPoll) return;
-        // Keep the last known Live / Offline - a failed check is not "Offline"
+        // Keep the last known Live / Offline and retry on the next poll
         console.warn('[live] status check failed:', error.message);
-        setStatusError(true);
       } finally {
         if (!cancelled && pollId === latestPoll) setStatusLoaded(true);
       }
@@ -226,12 +222,10 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
   const statusBadge = !statusLoaded ? (
     <p className="live-empty-state">Checking for a live session…</p>
   ) : (
-    <span
-      className={`live-status ${isLive ? 'live-status-live' : statusError ? 'live-status-scheduled' : 'live-status-offline'}`}
-      title={statusError ? 'Could not reach the stream server - retrying automatically' : undefined}
-    >
+    // A failed check shows as Offline too; it keeps retrying in the background
+    <span className={`live-status ${isLive ? 'live-status-live' : 'live-status-offline'}`}>
       <span className="live-dot" aria-hidden="true" />
-      {isLive ? 'Live' : statusError ? 'Status unavailable' : 'Offline'}
+      {isLive ? 'Live' : 'Offline'}
     </span>
   );
 

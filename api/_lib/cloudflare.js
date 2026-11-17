@@ -1,7 +1,9 @@
 const crypto = require('crypto');
 const { HttpError } = require('./auth');
 
-const TOKEN_TTL_SECONDS = 60 * 60;
+// Playback token lifetime. Cloudflare allows up to 24h; 12h covers a whole
+// session, so the player never has to reload mid-stream for a fresh token
+const TOKEN_TTL_SECONDS = 12 * 60 * 60;
 const STATUS_CACHE_MS = 5 * 1000;
 
 function env(name) {
@@ -44,7 +46,10 @@ function embedUrlFor(uid) {
   const customerCode = env('CLOUDFLARE_STREAM_CUSTOMER_CODE')
     .replace(/^customer-/, '')
     .replace(/\.cloudflarestream\.com$/, '');
-  return `https://customer-${customerCode}.cloudflarestream.com/${signPlaybackToken(uid)}/iframe`;
+  // autoplay + muted: starts at once (browsers only allow muted autoplay);
+  // preload=auto: start fetching the stream immediately instead of on click
+  const params = 'autoplay=true&muted=true&preload=auto';
+  return `https://customer-${customerCode}.cloudflarestream.com/${signPlaybackToken(uid)}/iframe?${params}`;
 }
 
 let statusCache = { at: 0, value: null };

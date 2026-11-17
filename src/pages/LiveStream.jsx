@@ -120,7 +120,9 @@ export default function LiveStream({ autoSelectLive = false, pagePath = '/live',
         });
         if (!cancelled) {
           setEmbedUrl(result.embedUrl);
-          refreshTimer = window.setTimeout(loadPlayer, 50 * 60 * 1000);
+          // Token lasts 12h (api/_lib/cloudflare.js) - refresh just before, so a
+          // normal session never reloads the player (a reload = a pause + rebuffer)
+          refreshTimer = window.setTimeout(loadPlayer, 11 * 60 * 60 * 1000);
         }
       } catch (error) {
         if (!cancelled) {

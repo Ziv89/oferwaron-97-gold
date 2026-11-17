@@ -6213,6 +6213,102 @@ span.media-loading-box {
   }
 }
 
+/* Download PDF / Full screen - small gold pills above the switcher */
+.osn-actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  margin-bottom: clamp(0.5rem, 2vw, 0.75rem);
+}
+
+.osn-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #ffd700;
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--gold-light);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.osn-action-btn:hover:not(:disabled) {
+  background: linear-gradient(135deg, #ffdf3a 0%, #d4a008 48%, #a96b00 100%);
+  color: #000;
+  box-shadow: 0 0 14px rgba(255, 215, 0, 0.5);
+}
+
+.osn-action-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Full screen (like the Live Alerts chat) - the panel fills the window
+   (a centred, wide column on big screens) with larger slide text */
+.osn-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  animation: osn-overlay-in 0.2s ease-out;
+}
+
+.osn-overlay-inner {
+  display: flex;
+  width: min(1200px, 100%);
+  height: 100%;
+  padding: clamp(0px, 2vh, 20px) clamp(0px, 2vw, 20px);
+  box-sizing: border-box;
+}
+
+@keyframes osn-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.osn-panel.osn-panel--fullscreen {
+  flex: 1;
+  max-width: none;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  background: #0b0b0b;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.osn-panel--fullscreen .osn-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: none;
+  overflow-y: auto;
+}
+
+.osn-panel--fullscreen .osn-title { font-size: clamp(1.5rem, 4.5vw, 2.5rem); }
+.osn-panel--fullscreen .osn-slide--hero .osn-title { font-size: clamp(1.8rem, 5.5vw, 3rem); }
+.osn-panel--fullscreen .osn-eyebrow { font-size: clamp(0.95rem, 2.2vw, 1.15rem); }
+.osn-panel--fullscreen .osn-card-title { font-size: clamp(1.15rem, 2.8vw, 1.45rem); }
+.osn-panel--fullscreen .osn-card-text,
+.osn-panel--fullscreen .osn-points { font-size: clamp(1rem, 2.4vw, 1.2rem); }
+.osn-panel--fullscreen .osn-subtitle { font-size: clamp(1.1rem, 2.8vw, 1.35rem); max-width: 820px; }
+
+@media (max-width: 600px) {
+  .osn-panel.osn-panel--fullscreen { border-radius: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .osn-overlay { animation: none; }
+}
+
 /* Switcher between PDFs - arrows, current title, dots */
 .osn-switcher {
   display: flex;

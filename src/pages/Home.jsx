@@ -102,12 +102,6 @@ function Home() {
 
       {/* Hero Section */}
       <section className="strategy-section text-center">
-        <h1 className="strategy-main-title-main get-in-touch-title get-in-touch-title--shimmer">
-  <span className="get-in-touch-shimmer">
-    XAUUSD 4H {stats.tradingwinRate}% Profit Factor {stats.profitFactor} & DD {stats.dd}
-
-  </span>
-</h1>
         {/* Stats — with shimmer sweep */}
         <div className="strategy-stats-grid">
 
@@ -134,6 +128,13 @@ function Home() {
             <span className="strategy-stat-label">Total PnL</span>
           </div>
         </div>
+
+        {/* Headline under the stat squares */}
+        <h1 className="strategy-main-title-main get-in-touch-title get-in-touch-title--shimmer">
+          <span className="get-in-touch-shimmer">
+            XAUUSD 4H {stats.tradingwinRate}% Profit Factor {stats.profitFactor} & DD {stats.dd}
+          </span>
+        </h1>
 
         {/* Defined, sourced, dated performance claim (replaces the bare "97%") */}
         <p className="strategy-subtitle">

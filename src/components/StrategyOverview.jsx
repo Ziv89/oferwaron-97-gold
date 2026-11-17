@@ -6,10 +6,37 @@
 // extractStrategyDocument Cloud Function) and lays each PDF page out as a
 // slide in the About-style scrolling panel, styled like the PDF.
 // One PDF is shown at a time; the switcher slides between them.
+// Full screen (like the Live Alerts chat) and Download PDF for the current one.
 // ============================================
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { FaExpand, FaCompress, FaFileDownload } from 'react-icons/fa';
 import CoinLoader from './CoinLoader';
 import { fetchStrategyDocuments, buildSlide, isCreditsSlide } from '../services/strategyDocument';
+import { fetchDocumentUrl, downloadDocument } from '../services/documents';
+
+// documents/<id>.pdf in Storage (or documents/<id>, no extension). Falls back
+// to opening the file when the blob download is blocked (bucket CORS).
+const downloadOverviewPdf = async (id) => {
+  const saveAs = `Ofer_Waron_97_Gold_${id}.pdf`;
+  for (const name of [`${id}.pdf`, id]) {
+    try {
+      await downloadDocument(name, saveAs);
+      return;
+    } catch (err) {
+      console.error(`Download of documents/${name} failed:`, err);
+    }
+  }
+  for (const name of [`${id}.pdf`, id]) {
+    try {
+      window.open(await fetchDocumentUrl(name), '_blank', 'noopener,noreferrer');
+      return;
+    } catch {
+      /* try the next name */
+    }
+  }
+  window.alert('The PDF is not available right now. Please try again later.');
+};
 
 // Card colours / icons from the PDF, picked by the card heading
 const CARD_ACCENTS = [
@@ -76,9 +103,30 @@ export default function StrategyOverview() {
   const [direction, setDirection] = useState('next');
   const scrollRef = useRef(null);
 
+  const [fullscreen, setFullscreen] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+
+  const toggleFullscreen = useCallback(() => setFullscreen((f) => !f), []);
+
+  // Esc leaves full screen; the page behind doesn't scroll meanwhile
+  useEffect(() => {
+    if (!fullscreen) return undefined;
+    const handleKey = (e) => {
+      if (e.key === 'Escape') setFullscreen(false);
+    };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', handleKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', handleKey);
+    };
+  }, [fullscreen]);
+
   const toggle = () => {
     const next = !open;
     setOpen(next);
+    if (!next) setFullscreen(false);
     if (!next || state.docs || state.loading) return;
 
     setState({ loading: true, docs: null, failed: false });
@@ -108,6 +156,101 @@ export default function StrategyOverview() {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   };
 
+  const download = () => {
+    if (!doc || downloading) return;
+    setDownloading(true);
+    downloadOverviewPdf(doc.id).finally(() => setDownloading(false));
+  };
+
+  const panel = (
+    <div
+      className={`osn-panel${fullscreen ? ' osn-panel--fullscreen' : ''}`}
+      role={fullscreen ? 'dialog' : undefined}
+      aria-modal={fullscreen || undefined}
+      aria-label={fullscreen ? 'Strategy Overview full screen' : undefined}
+    >
+      <div className="osn-actions">
+        <button
+          type="button"
+          className="osn-action-btn"
+          onClick={download}
+          disabled={!doc || downloading}
+          title="Download PDF"
+        >
+          <FaFileDownload aria-hidden="true" />
+          <span>{downloading ? 'Downloading…' : 'Download PDF'}</span>
+        </button>
+        <button
+          type="button"
+          className="osn-action-btn"
+          onClick={toggleFullscreen}
+          aria-label={fullscreen ? 'Exit full screen' : 'Full screen'}
+          title={fullscreen ? 'Exit full screen (Esc)' : 'Full screen'}
+        >
+          {fullscreen ? <FaCompress aria-hidden="true" /> : <FaExpand aria-hidden="true" />}
+          <span>{fullscreen ? 'Exit full screen' : 'Full screen'}</span>
+        </button>
+      </div>
+
+      {docs.length > 1 && (
+        <div className="osn-switcher">
+          <button
+            type="button"
+            className="osn-switch-arrow"
+            onClick={() => goTo(current - 1)}
+            aria-label="Previous document"
+          >
+            &#8249;
+          </button>
+          <div className="osn-switch-center">
+            <span className="osn-switch-label" dir="auto">{doc.label}</span>
+            <div className="osn-switch-dots">
+              {docs.map((d, i) => (
+                <button
+                  key={d.id}
+                  type="button"
+                  className={`osn-switch-dot ${i === current ? 'active' : ''}`}
+                  onClick={() => goTo(i)}
+                  aria-label={d.label}
+                  aria-current={i === current}
+                />
+              ))}
+            </div>
+          </div>
+          <button
+            type="button"
+            className="osn-switch-arrow"
+            onClick={() => goTo(current + 1)}
+            aria-label="Next document"
+          >
+            &#8250;
+          </button>
+        </div>
+      )}
+
+      <div className="about-panel-scroll osn-scroll" dir="rtl" ref={scrollRef}>
+        {state.loading && <CoinLoader label="Loading overview…" />}
+
+        {state.failed && (
+          <p className="osn-message" dir="ltr">Could not load the overview. Please try again later.</p>
+        )}
+
+        {state.docs && !docs.length && (
+          <p className="osn-message" dir="ltr">The overview is coming soon.</p>
+        )}
+
+        {/* Keyed by document so each switch replays the swap animation */}
+        {doc && (
+          <div key={doc.id} className={`osn-doc osn-doc--${direction}`}>
+            {doc.slides.map((slide, i) => (
+              <Slide key={i} slide={slide} hero={slide.hero} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <section className="strategy-section text-center">
       <button
@@ -119,66 +262,17 @@ export default function StrategyOverview() {
         {open ? 'Hide Strategy Overview ▲' : 'Strategy Overview ▼'}
       </button>
 
-      {open && (
-        <div className="osn-panel">
-          {docs.length > 1 && (
-            <div className="osn-switcher">
-              <button
-                type="button"
-                className="osn-switch-arrow"
-                onClick={() => goTo(current - 1)}
-                aria-label="Previous document"
-              >
-                &#8249;
-              </button>
-              <div className="osn-switch-center">
-                <span className="osn-switch-label" dir="auto">{doc.label}</span>
-                <div className="osn-switch-dots">
-                  {docs.map((d, i) => (
-                    <button
-                      key={d.id}
-                      type="button"
-                      className={`osn-switch-dot ${i === current ? 'active' : ''}`}
-                      onClick={() => goTo(i)}
-                      aria-label={d.label}
-                      aria-current={i === current}
-                    />
-                  ))}
-                </div>
-              </div>
-              <button
-                type="button"
-                className="osn-switch-arrow"
-                onClick={() => goTo(current + 1)}
-                aria-label="Next document"
-              >
-                &#8250;
-              </button>
+      {open && !fullscreen && panel}
+      {open && fullscreen &&
+        createPortal(
+          // Click on the dimmed area around the panel leaves full screen
+          <div className="osn-overlay" onClick={toggleFullscreen}>
+            <div className="osn-overlay-inner" onClick={(e) => e.stopPropagation()}>
+              {panel}
             </div>
-          )}
-
-          <div className="about-panel-scroll osn-scroll" dir="rtl" ref={scrollRef}>
-            {state.loading && <CoinLoader label="Loading overview…" />}
-
-            {state.failed && (
-              <p className="osn-message" dir="ltr">Could not load the overview. Please try again later.</p>
-            )}
-
-            {state.docs && !docs.length && (
-              <p className="osn-message" dir="ltr">The overview is coming soon.</p>
-            )}
-
-            {/* Keyed by document so each switch replays the swap animation */}
-            {doc && (
-              <div key={doc.id} className={`osn-doc osn-doc--${direction}`}>
-                {doc.slides.map((slide, i) => (
-                  <Slide key={i} slide={slide} hero={slide.hero} />
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+          </div>,
+          document.body
+        )}
     </section>
   );
 }

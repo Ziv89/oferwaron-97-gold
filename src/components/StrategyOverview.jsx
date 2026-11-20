@@ -6,37 +6,13 @@
 // extractStrategyDocument Cloud Function) and lays each PDF page out as a
 // slide in the About-style scrolling panel, styled like the PDF.
 // One PDF is shown at a time; the switcher slides between them.
-// Full screen (like the Live Alerts chat) and Download PDF for the current one.
+// Full screen (like the Live Alerts chat).
 // ============================================
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { FaExpand, FaCompress, FaFileDownload } from 'react-icons/fa';
+import { FaExpand, FaCompress } from 'react-icons/fa';
 import CoinLoader from './CoinLoader';
 import { fetchStrategyDocuments, buildSlide, isCreditsSlide } from '../services/strategyDocument';
-import { fetchDocumentUrl, downloadDocument } from '../services/documents';
-
-// documents/<id>.pdf in Storage (or documents/<id>, no extension). Falls back
-// to opening the file when the blob download is blocked (bucket CORS).
-const downloadOverviewPdf = async (id) => {
-  const saveAs = `Ofer_Waron_97_Gold_${id}.pdf`;
-  for (const name of [`${id}.pdf`, id]) {
-    try {
-      await downloadDocument(name, saveAs);
-      return;
-    } catch (err) {
-      console.error(`Download of documents/${name} failed:`, err);
-    }
-  }
-  for (const name of [`${id}.pdf`, id]) {
-    try {
-      window.open(await fetchDocumentUrl(name), '_blank', 'noopener,noreferrer');
-      return;
-    } catch {
-      /* try the next name */
-    }
-  }
-  window.alert('The PDF is not available right now. Please try again later.');
-};
 
 // Card colours / icons from the PDF, picked by the card heading
 const CARD_ACCENTS = [
@@ -104,7 +80,6 @@ export default function StrategyOverview() {
   const scrollRef = useRef(null);
 
   const [fullscreen, setFullscreen] = useState(false);
-  const [downloading, setDownloading] = useState(false);
 
   const toggleFullscreen = useCallback(() => setFullscreen((f) => !f), []);
 
@@ -156,12 +131,6 @@ export default function StrategyOverview() {
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   };
 
-  const download = () => {
-    if (!doc || downloading) return;
-    setDownloading(true);
-    downloadOverviewPdf(doc.id).finally(() => setDownloading(false));
-  };
-
   const panel = (
     <div
       className={`osn-panel${fullscreen ? ' osn-panel--fullscreen' : ''}`}
@@ -170,16 +139,6 @@ export default function StrategyOverview() {
       aria-label={fullscreen ? 'Strategy Overview full screen' : undefined}
     >
       <div className="osn-actions">
-        <button
-          type="button"
-          className="osn-action-btn"
-          onClick={download}
-          disabled={!doc || downloading}
-          title="Download PDF"
-        >
-          <FaFileDownload aria-hidden="true" />
-          <span>{downloading ? 'Downloading…' : 'Download PDF'}</span>
-        </button>
         <button
           type="button"
           className="osn-action-btn"

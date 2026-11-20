@@ -129,6 +129,34 @@ function Home() {
           </div>
         </div>
 
+        <div className="strategy-stats-grid strategy-stats-grid-performance">
+          <div className="strategy-stat-card stat-card-emphasized stat-card-wins">
+            <StatCardShimmer />
+            <span className="strategy-performance-value">
+              {loading ? '...' : stats.totalWiningTrading}
+            </span>
+            <span className="strategy-stat-label">
+              Wins ({loading ? '...' : `${stats.tradingwinRate}%`})
+            </span>
+          </div>
+          <div className="strategy-stat-card stat-card-emphasized stat-card-losses">
+            <StatCardShimmer />
+            <span className="strategy-performance-value">
+              {loading ? '...' : stats.totalLosestrading}
+            </span>
+            <span className="strategy-stat-label">
+              Losses ({loading ? '...' : `${stats.tradingloseRate}%`})
+            </span>
+          </div>
+          <div className="strategy-stat-card stat-card-emphasized stat-card-streak">
+            <StatCardShimmer />
+            <span className="strategy-performance-value">
+              {loading ? '...' : performance.maxConsecutiveWins}
+            </span>
+            <span className="strategy-stat-label">Max Consecutive Wins</span>
+          </div>
+        </div>
+
         {/* Headline under the stat squares */}
         <h1 className="strategy-main-title-main get-in-touch-title get-in-touch-title--shimmer">
           <span className="get-in-touch-shimmer">
@@ -163,46 +191,6 @@ function Home() {
 
       <section className="strategy-section">
         <StrategyChart />
-        
-        <div className="strategy-stats-grid strategy-stats-grid-performance">
-          <div className="strategy-stat-card stat-card-emphasized stat-card-wins">
-            <StatCardShimmer />
-            <span className="strategy-performance-value">
-              {loading ? '...' : stats.totalWiningTrading}
-            </span>
-            <span className="strategy-stat-label">
-              Wins ({loading ? '...' : `${stats.tradingwinRate}%`})
-            </span>
-          </div>
-          <div className="strategy-stat-card stat-card-emphasized stat-card-losses">
-            <StatCardShimmer />
-            <span className="strategy-performance-value">
-              {loading ? '...' : stats.totalLosestrading}
-            </span>
-            <span className="strategy-stat-label">
-              Losses ({loading ? '...' : `${stats.tradingloseRate}%`})
-            </span>
-          </div>
-          <div className="strategy-stat-card stat-card-emphasized stat-card-streak">
-            <StatCardShimmer />
-            <span className="strategy-performance-value">
-              {loading ? '...' : performance.maxConsecutiveWins}
-            </span>
-            <span className="strategy-stat-label">Max Consecutive Wins</span>
-          </div>
-          {/* <div className="strategy-stat-card stat-card-emphasized stat-card-pf">
-            <span className="strategy-stat-value">
-              {loading ? '...' : stats.profitFactor}
-            </span>
-            <span className="strategy-stat-label">PF (Profit Factor)</span>
-          </div> */}
-          {/* <div className="strategy-stat-card stat-card-emphasized stat-card-dd">
-            <span className="strategy-stat-value">
-              {loading ? '...' : stats.dd}
-            </span>
-            <span className="strategy-stat-label">DD (Max Drawdown)</span>
-          </div> */}
-        </div>
       </section>
 
       {/* How It Works */}

@@ -222,6 +222,13 @@ const tvAlertsDoc = () => admin.firestore().collection("tradingview").doc("alert
 const UNFILLED_PLACEHOLDER = /\{\{[^{}]*\}\}/;
 const hasUnfilledPlaceholder = (text) => UNFILLED_PLACEHOLDER.test(String(text || ""));
 
+// Live Alerts format: 3 icons (any emoji) then "(text)", e.g. "🟨🟨🟨 (V5-1M)",
+// "💥🚀💫 (V4-2H)", "⛔⛔⛔ (V5-5M)". Anything else is not saved to Firestore.
+// Keep in sync with src/services/alertMessages.js and admin/clean-alerts.js.
+const ALERT_ICON = String.raw`(?:\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}][️\p{EMod}]?(?:‍\p{Extended_Pictographic}[️\p{EMod}]?)*)`;
+const ALERT_FORMAT = new RegExp(String.raw`^\s*${ALERT_ICON}\s*${ALERT_ICON}\s*${ALERT_ICON}\s*\([^()\n]*[^()\s][^()\n]*\)`, "u");
+const isAlertFormat = (text) => ALERT_FORMAT.test(String(text || ""));
+
 // Millis of 00:00 Israel time on the day of `ms`, plus `addDays` days
 // (addDays = 1 -> the coming midnight). DST in Israel switches at 02:00,
 // so the current UTC offset is the one at midnight too.
@@ -292,18 +299,24 @@ exports.tvAlertMessage = onRequest(
 
     const symbol = String(body.symbol || req.query.symbol || DEFAULT_ALERT_SYMBOL).slice(0, 20);
     const date = admin.firestore.Timestamp.now();
+    const tasks = {};
 
-    // Latest + 12h history written together, so they never disagree
-    const batch = admin.firestore().batch();
-    batch.create(tvAlertsDoc().collection("tvMessages").doc(), {
-      messagecontent: message,
-      symbol,
-      date,
-      expireAt: admin.firestore.Timestamp.fromMillis(israelMidnight(date.toMillis(), 1)),
-    });
-    // merge: keep fields set by hand on this doc (e.g. groupName)
-    batch.set(tvAlertsDoc(), { messagecontent: message, symbol, date }, { merge: true });
-    const tasks = { firestore: batch.commit() };
+    // Only "icon icon icon (text)" alerts go to Firestore / the Live Alerts chat
+    if (isAlertFormat(message)) {
+      // Latest + 12h history written together, so they never disagree
+      const batch = admin.firestore().batch();
+      batch.create(tvAlertsDoc().collection("tvMessages").doc(), {
+        messagecontent: message,
+        symbol,
+        date,
+        expireAt: admin.firestore.Timestamp.fromMillis(israelMidnight(date.toMillis(), 1)),
+      });
+      // merge: keep fields set by hand on this doc (e.g. groupName)
+      batch.set(tvAlertsDoc(), { messagecontent: message, symbol, date }, { merge: true });
+      tasks.firestore = batch.commit();
+    } else {
+      logger.warn("tvAlertMessage: not saved - not in the 3 icons + (text) format", { message: message.slice(0, 200) });
+    }
 
     // Forward to Wassenger only when the payload names a WhatsApp target
     const channel = typeof body.channel === "string" && body.channel.endsWith("@newsletter") ? body.channel : "";
@@ -322,6 +335,10 @@ exports.tvAlertMessage = onRequest(
     }
 
     const names = Object.keys(tasks);
+    if (!names.length) {
+      res.status(200).json({ ignored: "not in the 3 icons + (text) format" });
+      return;
+    }
     const results = await Promise.allSettled(Object.values(tasks));
     const report = {};
     results.forEach((r, i) => {
@@ -349,7 +366,7 @@ exports.deleteDailyAlerts = onSchedule(
     const all = await tvAlertsDoc().collection("tvMessages").get();
     all.forEach((doc) => {
       const sent = doc.get("date")?.toMillis?.() ?? doc.createTime.toMillis();
-      if (sent < startOfToday.toMillis() || hasUnfilledPlaceholder(doc.get("messagecontent"))) {
+      if (sent < startOfToday.toMillis() || !isAlertFormat(doc.get("messagecontent"))) {
         writer.delete(doc.ref);
         deleted++;
       }

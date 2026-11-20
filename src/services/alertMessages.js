@@ -129,8 +129,15 @@ export const isAlertExpired = (alert, now = Date.now()) =>
 // An unfilled TradingView placeholder ("{{strategy.order.alert_message}}")
 // is not a real alert - the Cloud Function refuses them; hide any left over
 const UNFILLED_PLACEHOLDER = /\{\{[^{}]*\}\}/;
+
+// Alert format: 3 icons (any emoji) then "(text)", e.g. "🟨🟨🟨 (V5-1M)".
+// The Cloud Function doesn't save anything else; hide any left over.
+// Keep in sync with functions/index.js and admin/clean-alerts.js.
+const ALERT_ICON = String.raw`(?:\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}][️\p{EMod}]?(?:‍\p{Extended_Pictographic}[️\p{EMod}]?)*)`;
+const ALERT_FORMAT = new RegExp(String.raw`^\s*${ALERT_ICON}\s*${ALERT_ICON}\s*${ALERT_ICON}\s*\([^()\n]*[^()\s][^()\n]*\)`, 'u');
+
 export const isProperAlert = (alert) =>
-  Boolean(String(alert.messagecontent || '').trim()) && !UNFILLED_PLACEHOLDER.test(alert.messagecontent);
+  ALERT_FORMAT.test(String(alert.messagecontent || '')) && !UNFILLED_PLACEHOLDER.test(alert.messagecontent);
 
 const dateOf = (a) => (a.date?.toMillis ? a.date.toMillis() : 0);
 

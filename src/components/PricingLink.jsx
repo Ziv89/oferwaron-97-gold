@@ -1,8 +1,9 @@
 // ============================================
 // PricingLink.jsx - "View Pricing" call to action
 //
-// Pricing is public, so this always links to /pricing (also for signed-out
-// visitors and members waiting for approval).
+// Always links to /pricing. Pricing is members-only, so the route sends
+// signed-out visitors to Member Login and members waiting for approval to
+// My Account.
 // ============================================
 import React from 'react';
 import { Link } from 'react-router-dom';

@@ -105,8 +105,9 @@ export default function Login() {
         navigate(from, { replace: true });
       } else if (mode === 'register') {
         await register({ name, phone: normalizePhone(phone), dateOfBirth, email, password });
-        // New accounts go straight to Pricing with the Bit payment scan code open
-        navigate('/pricing', { replace: true, state: { openBitScancode: true } });
+        // New accounts wait for approval (Pricing is members-only) - My Account
+        // shows the approval status and a WhatsApp button to reach Ofer
+        navigate('/members', { replace: true });
       } else {
         await resetPassword(email);
         // Same message whether or not the account exists, so this

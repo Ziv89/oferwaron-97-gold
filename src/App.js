@@ -415,10 +415,10 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, isApproved, logout } = useAuth();
-  // Major features (Strategy, Live Trading, Performance Report, About,
-  // WhatsApp Group, full Home) are for signed-in, approved members only;
-  // everyone else sees Home (pricing call to action only), Pricing,
-  // YouTube and Contact.
+  // Major features (Strategy, Live Trading, Pricing, YouTube, Performance
+  // Report, About, WhatsApp Group, full Home) are for signed-in, approved
+  // members only; everyone else sees Home (pricing call to action only),
+  // Contact and Member Login.
   const approvedMember = Boolean(user && isApproved);
 
   const navLinks = [
@@ -426,9 +426,9 @@ const Header = () => {
     ...(approvedMember ? [
       { to: '/strategy', label: 'Strategy' },
       { to: '/trading', label: 'Live Trading' },
+      { to: '/pricing', label: 'Pricing' },
+      { to: '/youtube', label: 'YouTube' },
     ] : []),
-    { to: '/pricing', label: 'Pricing' },
-    { to: '/youtube', label: 'YouTube' },
     ...(approvedMember ? [
       { to: '/performance', label: 'Performance Report' },
       { to: '/about', label: 'About' },
@@ -589,12 +589,16 @@ const Footer = () => {
               <FaChessKnight className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.strategy }} />Strategy
             </NavLink>
           )}
-          <NavLink to="/pricing" className="footer-link">
-            <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
-          </NavLink>
-          <NavLink to="/youtube" className="footer-link">
-            <FaYoutube className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.youtube }} />YouTube
-          </NavLink>
+          {approvedMember && (
+            <NavLink to="/pricing" className="footer-link">
+              <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
+            </NavLink>
+          )}
+          {approvedMember && (
+            <NavLink to="/youtube" className="footer-link">
+              <FaYoutube className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.youtube }} />YouTube
+            </NavLink>
+          )}
           {approvedMember && (
             <NavLink to="/performance" className="footer-link">
               <FaChartBar className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.performance }} />Performance Report
@@ -623,19 +627,19 @@ const Footer = () => {
           <ScancodeFooterLink scan="tiktok" label="TikTok" Icon={FaTiktok} />
         </div>
 
-        <div className="footer-section">
-          <h4 className="footer-section-heading">Legal</h4>
-          {approvedMember && (
+        {/* About + Disclaimer are members-only, so the whole column is too */}
+        {approvedMember && (
+          <div className="footer-section">
+            <h4 className="footer-section-heading">Legal</h4>
             <NavLink to="/about" className="footer-link">
               <FaUser className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.about }} />About Me
             </NavLink>
-          )}
-          {/* Disclaimer & Terms of Use section at the bottom of the Strategy page
-              (members) or the public Pricing page (everyone else) */}
-          <NavLink to={approvedMember ? '/strategy#disclaimer' : '/pricing#disclaimer'} className="footer-link">
-            <FaBalanceScale className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.disclaimer }} />Disclaimer
-          </NavLink>
-        </div>
+            {/* Disclaimer & Terms of Use section at the bottom of the Strategy page */}
+            <NavLink to="/strategy#disclaimer" className="footer-link">
+              <FaBalanceScale className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.disclaimer }} />Disclaimer
+            </NavLink>
+          </div>
+        )}
       </div>
 
       <div className="footer-bottom">
@@ -658,7 +662,7 @@ function App() {
           <main className="main">
             <Routes>
               <Route path="/" element={<Home />} />
-              {/* Public: Home (pricing call to action only), Pricing, YouTube, Contact, Login.
+              {/* Public: Home (pricing call to action only), Contact, Login.
                   Everything else needs a signed-in, approved member. */}
               <Route
                 path="/strategy"
@@ -676,9 +680,22 @@ function App() {
                   </ProtectedRoute>
                 }
               />
-              {/* Public - new registrations also land here to pay with Bit */}
-              <Route path="/pricing" element={<Pricing />} />
-              <Route path="/youtube" element={<YouTube />} />
+              <Route
+                path="/pricing"
+                element={
+                  <ProtectedRoute requireApproved>
+                    <Pricing />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/youtube"
+                element={
+                  <ProtectedRoute requireApproved>
+                    <YouTube />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/performance"
                 element={

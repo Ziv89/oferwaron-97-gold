@@ -415,9 +415,10 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, isApproved, logout } = useAuth();
-  // Major features (Strategy, Live Trading, Performance Report, WhatsApp
-  // Group) are for signed-in, approved members only; everyone else sees
-  // Home, Pricing, YouTube, About and Contact.
+  // Major features (Strategy, Live Trading, Performance Report, About,
+  // WhatsApp Group, full Home) are for signed-in, approved members only;
+  // everyone else sees Home (pricing call to action only), Pricing,
+  // YouTube and Contact.
   const approvedMember = Boolean(user && isApproved);
 
   const navLinks = [
@@ -428,8 +429,10 @@ const Header = () => {
     ] : []),
     { to: '/pricing', label: 'Pricing' },
     { to: '/youtube', label: 'YouTube' },
-    ...(approvedMember ? [{ to: '/performance', label: 'Performance Report' }] : []),
-    { to: '/about', label: 'About' },
+    ...(approvedMember ? [
+      { to: '/performance', label: 'Performance Report' },
+      { to: '/about', label: 'About' },
+    ] : []),
     { to: '/contact', label: 'Contact' },
     ...(approvedMember ? [{ to: '/vip', label: 'WhatsApp Group', member: true, whatsapp: true }] : []),
     // Signed in: no My Account tab (the Sign out button stays); signed out: Member Login
@@ -622,9 +625,11 @@ const Footer = () => {
 
         <div className="footer-section">
           <h4 className="footer-section-heading">Legal</h4>
-          <NavLink to="/about" className="footer-link">
-            <FaUser className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.about }} />About Me
-          </NavLink>
+          {approvedMember && (
+            <NavLink to="/about" className="footer-link">
+              <FaUser className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.about }} />About Me
+            </NavLink>
+          )}
           {/* Disclaimer & Terms of Use section at the bottom of the Strategy page
               (members) or the public Pricing page (everyone else) */}
           <NavLink to={approvedMember ? '/strategy#disclaimer' : '/pricing#disclaimer'} className="footer-link">
@@ -653,7 +658,7 @@ function App() {
           <main className="main">
             <Routes>
               <Route path="/" element={<Home />} />
-              {/* Public: Home, Pricing, YouTube, About, Contact, Login.
+              {/* Public: Home (pricing call to action only), Pricing, YouTube, Contact, Login.
                   Everything else needs a signed-in, approved member. */}
               <Route
                 path="/strategy"
@@ -683,7 +688,14 @@ function App() {
                 }
               />
               <Route path="/contact" element={<Contact />} />
-              <Route path="/about" element={<About />} />
+              <Route
+                path="/about"
+                element={
+                  <ProtectedRoute requireApproved>
+                    <About />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/members"

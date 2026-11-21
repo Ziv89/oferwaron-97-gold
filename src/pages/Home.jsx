@@ -91,14 +91,39 @@ function Home() {
 
   const loading = statsLoading || configLoading || perfLoading;
 
+  const seo = (
+    <Seo
+      title="97% Gold — Professional XAUUSD Gold Trading Signals"
+      description="Gold (XAUUSD) trading signals with proven live results. Real-time WhatsApp alerts with clear entry, exit and stop-loss levels."
+      path="/"
+      ogType="website"
+    />
+  );
+
+  const pricingCta = (
+    <section className="strategy-section text-center">
+      <h2 className="strategy-section-title">Ready to Start Trading?</h2>
+      <p className="strategy-subtitle">Join to successful traders today</p>
+      <div className="strategy-btn-group">
+        <PricingLink>View Pricing Plan</PricingLink>
+      </div>
+    </section>
+  );
+
+  // Signed-out visitors and members waiting for approval: only the
+  // pricing call to action - the rest of Home is for approved members
+  if (!(user && isApproved)) {
+    return (
+      <div className="strategy-page">
+        {seo}
+        {pricingCta}
+      </div>
+    );
+  }
+
   return (
     <div className="strategy-page">
-      <Seo
-        title="97% Gold — Professional XAUUSD Gold Trading Signals"
-        description="Gold (XAUUSD) trading signals with proven live results. Real-time WhatsApp alerts with clear entry, exit and stop-loss levels."
-        path="/"
-        ogType="website"
-      />
+      {seo}
 
       {/* Hero Section */}
       <section className="strategy-section text-center">
@@ -170,15 +195,10 @@ function Home() {
             ? '...'
             : ''}
           {' '}
-          {user && isApproved && <Link to="/trading">Full trade log →</Link>}
+          <Link to="/trading">Full trade log →</Link>
         </p>
-        {/* CTAs - Register (signed-out visitors) + WhatsApp scan code */}
+        {/* CTA - WhatsApp scan code */}
         <div className="strategy-btn-group">
-          {!user && (
-            <Link to="/login" state={{ mode: 'register' }} className="strategy-btn strategy-btn-mint">
-              Register
-            </Link>
-          )}
           {/* Opens the WhatsApp QR code to scan - no direct link to WhatsApp */}
           <WhatsAppQrButton className="strategy-btn strategy-btn-primary strategy-btn-with-icon" caption="">
             WhatsApp  <FaWhatsapp style={{ color: '#128C7E' }} />
@@ -211,13 +231,7 @@ function Home() {
         </div>
       </section>
 
-      <section className="strategy-section text-center">
-        <h2 className="strategy-section-title">Ready to Start Trading?</h2>
-        <p className="strategy-subtitle">Join to successful traders today</p>
-        <div className="strategy-btn-group">
-          <PricingLink>View Pricing Plan</PricingLink>
-        </div>
-      </section>
+      {pricingCta}
     </div>
   );
 }

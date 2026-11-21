@@ -1,5 +1,6 @@
 // ============================================
 // DisclaimerSection.jsx - "Disclaimer & Terms of Use" on the Strategy page
+// (members) and the Pricing page (public)
 //
 // Short summary of the terms + View / Download of documents/disclaimer.pdf
 // from Firebase Storage (like the CV on the About page). The bundled copy
@@ -33,8 +34,8 @@ export default function DisclaimerSection() {
   const sectionRef = useRef(null);
   const location = useLocation();
 
-  // Footer "Disclaimer" link (/strategy#disclaimer) - scroll here, also when
-  // it is clicked again while already on the Strategy page. Short delay so
+  // Footer "Disclaimer" link (/strategy#disclaimer or /pricing#disclaimer) -
+  // scroll here, also when it is clicked again on the same page. Short delay so
   // the stats above have rendered and the position is final.
   useEffect(() => {
     if (location.hash !== '#disclaimer') return undefined;

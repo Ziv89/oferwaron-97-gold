@@ -83,7 +83,7 @@ const steps = [
 ];
 
 function Home() {
-  const { user } = useAuth();
+  const { user, isApproved } = useAuth();
   // Use hooks to get dynamic data from Firebase
   const { stats, loading: statsLoading } = useTradingStats();
   const { loading: configLoading } = useSiteConfig();
@@ -170,7 +170,7 @@ function Home() {
             ? '...'
             : ''}
           {' '}
-          {user && <Link to="/trading">Full trade log →</Link>}
+          {user && isApproved && <Link to="/trading">Full trade log →</Link>}
         </p>
         {/* CTAs - Register (signed-out visitors) + WhatsApp scan code */}
         <div className="strategy-btn-group">

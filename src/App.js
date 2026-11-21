@@ -415,21 +415,23 @@ const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const { user, isApproved, logout } = useAuth();
-  // Registered but not yet approved: hide the member-only tabs
-  const pendingMember = user && !isApproved;
+  // Major features (Strategy, Live Trading, Performance Report, WhatsApp
+  // Group) are for signed-in, approved members only; everyone else sees
+  // Home, Pricing, YouTube, About and Contact.
+  const approvedMember = Boolean(user && isApproved);
 
   const navLinks = [
     { to: '/', label: 'Home' },
-    { to: '/strategy', label: 'Strategy' },
-    ...(pendingMember ? [] : [{ to: '/trading', label: 'Live Trading' }]),
-    // Pricing for every signed-in member (pending ones pay here before approval)
-    ...(user ? [{ to: '/pricing', label: 'Pricing' }] : []),
+    ...(approvedMember ? [
+      { to: '/strategy', label: 'Strategy' },
+      { to: '/trading', label: 'Live Trading' },
+    ] : []),
+    { to: '/pricing', label: 'Pricing' },
     { to: '/youtube', label: 'YouTube' },
-    { to: '/performance', label: 'Performance Report' },
+    ...(approvedMember ? [{ to: '/performance', label: 'Performance Report' }] : []),
     { to: '/about', label: 'About' },
     { to: '/contact', label: 'Contact' },
-    // Signed-in members only
-    ...(user && isApproved ? [{ to: '/vip', label: 'WhatsApp Group', member: true, whatsapp: true }] : []),
+    ...(approvedMember ? [{ to: '/vip', label: 'WhatsApp Group', member: true, whatsapp: true }] : []),
     // Signed in: no My Account tab (the Sign out button stays); signed out: Member Login
     ...(user ? [] : [{ to: '/login', label: 'Member Login', member: true }]),
   ];
@@ -555,7 +557,8 @@ const ScancodeFooterLink = ({ scan, label, Icon }) => {
 };
 
 const Footer = () => {
-  const { user } = useAuth();
+  const { user, isApproved } = useAuth();
+  const approvedMember = Boolean(user && isApproved);
   const { stats } = useTradingStats();
   const { performance } = usePerformanceHistory();
   const { contact } = useOwnerDetails();
@@ -578,20 +581,22 @@ const Footer = () => {
           <NavLink to="/" className="footer-link">
             <FaHome className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.home }} />Home
           </NavLink>
-          <NavLink to="/strategy" className="footer-link">
-            <FaChessKnight className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.strategy }} />Strategy
-          </NavLink>
-          {user && (
-            <NavLink to="/pricing" className="footer-link">
-              <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
+          {approvedMember && (
+            <NavLink to="/strategy" className="footer-link">
+              <FaChessKnight className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.strategy }} />Strategy
             </NavLink>
           )}
+          <NavLink to="/pricing" className="footer-link">
+            <FaMoneyBillWave className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.pricing }} />Pricing
+          </NavLink>
           <NavLink to="/youtube" className="footer-link">
             <FaYoutube className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.youtube }} />YouTube
           </NavLink>
-          <NavLink to="/performance" className="footer-link">
-            <FaChartBar className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.performance }} />Performance Report
-          </NavLink>
+          {approvedMember && (
+            <NavLink to="/performance" className="footer-link">
+              <FaChartBar className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.performance }} />Performance Report
+            </NavLink>
+          )}
           <NavLink to="/contact" className="footer-link">
             <FaAddressCard className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.contact }} />Contact
           </NavLink>
@@ -620,8 +625,9 @@ const Footer = () => {
           <NavLink to="/about" className="footer-link">
             <FaUser className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.about }} />About Me
           </NavLink>
-          {/* Disclaimer & Terms of Use section at the bottom of the Strategy page */}
-          <NavLink to="/strategy#disclaimer" className="footer-link">
+          {/* Disclaimer & Terms of Use section at the bottom of the Strategy page
+              (members) or the public Pricing page (everyone else) */}
+          <NavLink to={approvedMember ? '/strategy#disclaimer' : '/pricing#disclaimer'} className="footer-link">
             <FaBalanceScale className="footer-link-icon" style={{ color: FOOTER_ICON_COLORS.disclaimer }} />Disclaimer
           </NavLink>
         </div>
@@ -647,7 +653,16 @@ function App() {
           <main className="main">
             <Routes>
               <Route path="/" element={<Home />} />
-              <Route path="/strategy" element={<Strategy />} />
+              {/* Public: Home, Pricing, YouTube, About, Contact, Login.
+                  Everything else needs a signed-in, approved member. */}
+              <Route
+                path="/strategy"
+                element={
+                  <ProtectedRoute requireApproved>
+                    <Strategy />
+                  </ProtectedRoute>
+                }
+              />
               <Route
                 path="/trading"
                 element={
@@ -656,18 +671,17 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              {/* Public - new registrations also land here to pay with Bit */}
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/youtube" element={<YouTube />} />
               <Route
-                path="/pricing"
+                path="/performance"
                 element={
-                  // Any signed-in member, pending ones too - new registrations land
-                  // here to pay with Bit before approval
-                  <ProtectedRoute>
-                    <Pricing />
+                  <ProtectedRoute requireApproved>
+                    <PerformanceReport />
                   </ProtectedRoute>
                 }
               />
-              <Route path="/youtube" element={<YouTube />} />
-              <Route path="/performance" element={<PerformanceReport />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/about" element={<About />} />
               <Route path="/login" element={<Login />} />

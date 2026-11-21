@@ -10,6 +10,7 @@ import { useScancodeImageState, SCANCODE } from '../services/scancodeImages';
 import { WhatsAppQrButton, ScancodeLightbox } from '../components/WhatsAppQr';
 import { SiGmail } from 'react-icons/si';
 import { FaWhatsapp } from 'react-icons/fa';
+import DisclaimerSection from '../components/DisclaimerSection';
 import '../styles/auth.css';
 
 const PRICE_QR_ALT = 'Scan to pay with Bit';
@@ -153,7 +154,9 @@ function Pricing() {
         </div>
       </section>
 
-
+      {/* Disclaimer & Terms of Use - public here, since Strategy is members-only
+          (footer "Disclaimer" link for visitors: /pricing#disclaimer) */}
+      <DisclaimerSection />
     </div>
   );
 }

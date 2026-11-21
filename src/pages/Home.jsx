@@ -4,7 +4,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
-import PricingLink from '../components/PricingLink';
 import { useTradingStats, useSiteConfig, usePerformanceHistory } from '../App';
 import { useAuth } from '../contexts/AuthContext';
 import CoinLoader from '../components/CoinLoader';
@@ -216,7 +215,14 @@ function Home() {
         <h2 className="strategy-section-title">Ready to Start Trading?</h2>
         <p className="strategy-subtitle">Join to successful traders today</p>
         <div className="strategy-btn-group">
-          <PricingLink>View Pricing Plan</PricingLink>
+          {/* Signed out: opens the register form; signed in: My Account */}
+          <Link
+            to={user ? '/members' : '/login'}
+            state={user ? undefined : { mode: 'register' }}
+            className="strategy-btn strategy-btn-primary"
+          >
+            Register for More Info
+          </Link>
         </div>
       </section>
     </div>

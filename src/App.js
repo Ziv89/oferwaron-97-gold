@@ -416,9 +416,8 @@ const Header = () => {
 
   const { user, isApproved, logout } = useAuth();
   // Major features (Strategy, Live Trading, Pricing, YouTube, Performance
-  // Report, About, WhatsApp Group, full Home) are for signed-in, approved
-  // members only; everyone else sees Home (pricing call to action only),
-  // Contact and Member Login.
+  // Report, About, WhatsApp Group) are for signed-in, approved members
+  // only; everyone else sees Home, Contact and Member Login.
   const approvedMember = Boolean(user && isApproved);
 
   const navLinks = [
@@ -662,7 +661,7 @@ function App() {
           <main className="main">
             <Routes>
               <Route path="/" element={<Home />} />
-              {/* Public: Home (pricing call to action only), Contact, Login.
+              {/* Public: Home, Contact, Login.
                   Everything else needs a signed-in, approved member. */}
               <Route
                 path="/strategy"

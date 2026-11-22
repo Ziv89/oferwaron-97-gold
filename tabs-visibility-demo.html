@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>97% Gold — Tabs &amp; Text Visibility Options</title>
+<style>
+/* =========================================================
+   Gold design (live site, data-hybrid="classic") + options that
+   make the nav tabs and the text easier to read. No emerald.
+   ========================================================= */
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #15120a; color: #f3ecd6; }
+
+/* ---------- Control bar (not part of the site) ---------- */
+.panel { position: sticky; top: 0; z-index: 50; background: #15120a; border-bottom: 2px solid #ffd700; padding: 10px 16px; font-size: 14px; }
+.panel-row { display: flex; flex-wrap: wrap; gap: 6px 8px; align-items: center; margin: 3px 0; }
+.panel .group { color: #ffd700; font-weight: 700; min-width: 52px; }
+.panel button { font: inherit; border-radius: 999px; border: 1px solid #ffd700; background: #2a2412; color: #ffe680; padding: 5px 12px; cursor: pointer; }
+.panel button.on { background: #ffd700; color: #000; font-weight: 700; }
+.panel .copy { margin-left: auto; }
+.desc { margin: 4px 0 0; font-size: 13px; color: #d9cfae; line-height: 1.5; }
+.desc b { color: #ffe680; }
+.score { margin-top: 4px; font-size: 12.5px; color: #b3a77f; }
+.good { color: #6ee7a8; } .ok { color: #ffe680; } .bad { color: #ff8a80; }
+
+.frames { display: grid; grid-template-columns: 375px 1fr; gap: 14px; padding: 14px 16px 40px; max-width: 1500px; margin: 0 auto; }
+.frame { min-width: 0; border-radius: 14px; overflow: hidden; border: 2px solid #3a3218; }
+.frame-label { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #b3a77f; padding: 5px 10px; background: #221d0e; }
+@media (max-width: 900px) { .frames { grid-template-columns: 1fr; } .frame.phone { max-width: 375px; } }
+
+/* =========================================================
+   SITE (simplified copy of styles.css)
+   ========================================================= */
+.site {
+  background: url('src/assets/images/whiteBackground.jpg') center / cover, linear-gradient(160deg, #fff, #e6e6e6);
+  padding: 14px 10px 26px; text-align: center; line-height: 1.5;
+}
+.logo { height: 96px; display: block; margin: 0 auto 6px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.18)); }
+.desktop .logo { height: 140px; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; padding: 6px 0; margin: 0 auto 14px; }
+.desktop .tabs { gap: 10px; }
+.tab { display: inline-block; text-decoration: none; white-space: nowrap; border-radius: 30px; font-size: var(--tab-fs); padding: var(--tab-pad); transition: transform .2s, background .2s; }
+.tab:hover { transform: scale(1.05); }
+.tab.wa {
+  background: linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.15) 45%, rgba(255,255,255,0) 50%), linear-gradient(180deg, #7dff6b, #2ee82a 50%, #12b812) !important;
+  border: 2px solid #b6ff9e !important; color: #000 !important; font-weight: 700 !important; text-shadow: none !important;
+  box-shadow: 0 0 12px rgba(57,255,20,.85), 0 0 26px rgba(37,211,102,.6) !important;
+}
+.swipe-hint { display: none; font-size: 11px; font-weight: 700; color: #6b4f00; margin: -8px 0 10px; }
+
+.main-title { font-size: var(--title-fs); font-weight: 800; margin: 4px 0 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 1px; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 900px; margin: 0 auto; }
+.phone .grid { grid-template-columns: repeat(2, 1fr); }
+.card { border: 1.5px solid rgba(255,215,0,.6); border-radius: 14px; padding: 12px 6px; background: rgba(255,255,255,.06); backdrop-filter: blur(5px); }
+.value { display: block; font-size: var(--value-fs); font-weight: 800; line-height: 1.15; }
+.label { display: block; font-size: var(--label-fs); font-weight: 600; margin-top: 4px; }
+.subtitle { display: inline-block; max-width: 760px; margin: 14px auto 0; font-size: var(--sub-fs); font-weight: 600; padding: 0 8px; }
+.subtitle a { color: inherit; }
+
+/* Sizes - "now" mirrors the live clamps at 375px / desktop */
+.phone   { --tab-fs: 0.6rem;  --tab-pad: 5px 10px; --title-fs: 0.66rem; --value-fs: 1.25rem; --label-fs: 0.65rem; --sub-fs: 0.85rem; }
+.desktop { --tab-fs: 0.95rem; --tab-pad: 9px 20px; --title-fs: 2.2rem;  --value-fs: 2.1rem;  --label-fs: 1rem;    --sub-fs: 1.15rem; }
+
+/* =========================================================
+   TABS
+   ========================================================= */
+/* now - gold gradient with a dark bronze middle */
+[data-tabs="now"] .tab {
+  background: linear-gradient(180deg, #FFD700 0%, #B8860B 50%, #D4AF37 100%);
+  border: 2px solid #FFD700; color: #000; font-weight: 700; letter-spacing: .5px;
+  box-shadow: 0 0 10px rgba(255,215,0,.3), 0 4px 8px rgba(0,0,0,.2);
+}
+[data-tabs="now"] .tab.active { transform: scale(1.1); box-shadow: 0 0 25px rgba(255,215,0,.8), 0 0 40px rgba(255,165,0,.5), 0 4px 15px rgba(0,0,0,.4); }
+
+/* every new tab option: bigger phone text, heavier weight */
+[data-tabs]:not([data-tabs="now"]) .phone   { --tab-fs: 0.82rem; --tab-pad: 7px 13px; }
+[data-tabs]:not([data-tabs="now"]) .desktop { --tab-fs: 1rem; }
+
+/* A - bright gold, crisp: lighter gold (no dark bronze band behind the letters), black 800, dark edge */
+:is([data-tabs="a"], [data-tabs="e"]) .tab {
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 45%, #f2c200 100%);
+  border: 2px solid #8a6400; color: #000; font-weight: 800; letter-spacing: .2px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.25);
+}
+:is([data-tabs="a"], [data-tabs="e"]) .tab.active {
+  background: #111; border-color: #ffd700; color: #ffd700;
+  box-shadow: 0 0 0 2px #ffd700, 0 0 18px rgba(255,215,0,.75);
+}
+
+/* B - black & gold: black pills with gold text (like the logo plate), active = gold */
+[data-tabs="b"] .tab {
+  background: linear-gradient(180deg, #2b2b2b, #0a0a0a); border: 2px solid #d4af37;
+  color: #ffd700; font-weight: 800; letter-spacing: .2px; box-shadow: 0 3px 8px rgba(0,0,0,.35);
+}
+[data-tabs="b"] .tab:hover { background: #222; }
+[data-tabs="b"] .tab.active {
+  background: linear-gradient(180deg, #fff1a8, #ffd700 45%, #f2c200); border-color: #000; color: #000;
+  box-shadow: 0 0 0 2px #ffd700, 0 0 20px rgba(255,215,0,.8);
+}
+
+/* C - ivory & gold: white pill, gold border, black text, active = gold */
+[data-tabs="c"] .tab {
+  background: #fffdf5; border: 2px solid #d4a800; color: #111; font-weight: 800; letter-spacing: .2px;
+  box-shadow: 0 2px 6px rgba(120,90,0,.3);
+}
+[data-tabs="c"] .tab:hover { background: #fff3c4; }
+[data-tabs="c"] .tab.active {
+  background: linear-gradient(180deg, #fff1a8, #ffd700 45%, #f2c200); border-color: #8a6400; color: #000;
+  box-shadow: 0 0 18px rgba(255,215,0,.8);
+}
+
+/* D - black bar: every tab sits in one black strip with a gold frame; active = gold chip */
+[data-tabs="d"] .tabs {
+  background: linear-gradient(180deg, #2a2a2a, #050505); border: 2px solid #d4af37; border-radius: 22px;
+  padding: 6px; gap: 4px; box-shadow: 0 6px 16px rgba(0,0,0,.35);
+}
+[data-tabs="d"] .desktop .tabs { display: inline-flex; max-width: 100%; }
+[data-tabs="d"] .tab { background: transparent; border: 2px solid transparent; color: #fff4c2; font-weight: 700; letter-spacing: .2px; }
+[data-tabs="d"] .tab:hover { background: rgba(255,215,0,.15); transform: none; }
+[data-tabs="d"] .tab.active { background: linear-gradient(180deg, #fff1a8, #ffd700 45%, #f2c200); color: #000; font-weight: 800; }
+[data-tabs="d"] .tab.wa { box-shadow: 0 0 8px rgba(57,255,20,.6) !important; }
+
+/* E - A + phone swipe row: tabs keep full size in one swipeable line on phones */
+[data-tabs="e"] .phone { --tab-fs: 0.95rem; --tab-pad: 8px 16px; }
+[data-tabs="e"] .phone .tabs {
+  flex-wrap: nowrap; justify-content: flex-start; overflow-x: auto; scroll-snap-type: x proximity; padding: 8px 10px; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 28px), transparent);
+          mask-image: linear-gradient(90deg, transparent 0, #000 14px, #000 calc(100% - 28px), transparent);
+}
+[data-tabs="e"] .phone .tabs::-webkit-scrollbar { display: none; }
+[data-tabs="e"] .phone .tab { flex: 0 0 auto; scroll-snap-align: start; }
+[data-tabs="e"] .phone .tab:hover { transform: none; }
+[data-tabs="e"] .phone .swipe-hint { display: block; }
+
+/* =========================================================
+   TEXT
+   ========================================================= */
+/* now - gold fill, thin black stroke + 1px black shadows */
+[data-text="now"] :is(.main-title, .value, .label, .subtitle) {
+  color: #FFD700; -webkit-text-stroke: 0.5px #000; paint-order: stroke fill;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 10px rgba(255,215,0,.4);
+}
+[data-text="now"] .main-title { -webkit-text-stroke-width: 1.2px; }
+
+/* every new text option: small text gets bigger on phones */
+[data-text]:not([data-text="now"]) .phone { --title-fs: 0.95rem; --label-fs: 0.8rem; --sub-fs: 0.95rem; }
+
+/* titles + numbers in T1-T3: gold with a solid, crisp outline (stroke drawn
+   under the fill, so letters stay full-width), no blurry glow */
+:is([data-text="t1"], [data-text="t2"], [data-text="t3"]) :is(.main-title, .value) {
+  color: #ffd700; -webkit-text-stroke: 3px #1a1200; paint-order: stroke fill; text-shadow: 0 2px 3px rgba(0,0,0,.35);
+}
+[data-text="t1"] .phone .main-title, [data-text="t2"] .phone .main-title, [data-text="t3"] .phone .main-title { -webkit-text-stroke-width: 2px; }
+
+/* T1 - bold outline everywhere: same gold, but a real 2-3px outline instead of the thin one */
+[data-text="t1"] :is(.label, .subtitle) {
+  color: #ffd700; -webkit-text-stroke: 2.5px #1a1200; paint-order: stroke fill; font-weight: 700; text-shadow: none;
+}
+
+/* T2 - dark bronze ink: small text in deep bronze-black on a soft white halo; titles/numbers stay gold */
+[data-text="t2"] :is(.label, .subtitle) {
+  color: #2e2100; -webkit-text-stroke: 0; font-weight: 700;
+  text-shadow: 0 0 2px rgba(255,255,255,.95), 0 0 8px rgba(255,255,255,.85);
+}
+[data-text="t2"] .subtitle a { text-decoration: underline; text-decoration-color: #c99a00; text-underline-offset: 3px; }
+
+/* T3 - black glass: cards and the subtitle get a dark backdrop, gold text needs no outline */
+[data-text="t3"] .card { background: rgba(12,10,4,.82); border-color: #d4af37; }
+[data-text="t3"] .subtitle { background: rgba(12,10,4,.82); border: 1.5px solid #d4af37; border-radius: 999px; padding: 6px 16px; }
+[data-text="t3"] :is(.label, .subtitle) { color: #ffe680; -webkit-text-stroke: 0; font-weight: 700; text-shadow: none; }
+[data-text="t3"] .value { -webkit-text-stroke: 0; text-shadow: 0 0 12px rgba(255,215,0,.35); }
+
+/* T4 - gold shimmer title (like the logo) with a clean dark edge; small text black */
+[data-text="t4"] .main-title {
+  background: linear-gradient(180deg, #fff6c9 0%, #ffd700 45%, #b8860b 100%); -webkit-background-clip: text; background-clip: text;
+  color: transparent; filter: drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 2px 2px rgba(0,0,0,.35));
+}
+[data-text="t4"] .value { color: #ffd700; -webkit-text-stroke: 3px #1a1200; paint-order: stroke fill; text-shadow: none; }
+[data-text="t4"] .phone .value { -webkit-text-stroke-width: 2.4px; }
+[data-text="t4"] :is(.label, .subtitle) { color: #111; -webkit-text-stroke: 0; font-weight: 700; text-shadow: 0 0 6px rgba(255,255,255,.9); }
+[data-text="t4"] .subtitle a { color: #8a6400; }
+
+.toast { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); background: #ffd700; color: #000; padding: 8px 16px; border-radius: 999px; font-weight: 700; display: none; z-index: 60; }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <div class="panel-row"><span class="group">Tabs</span><span class="panel-row" id="tabBtns"></span>
+    <button type="button" class="copy on" id="copyBtn">📋 Copy choice</button></div>
+  <div class="panel-row"><span class="group">Text</span><span class="panel-row" id="textBtns"></span></div>
+  <p class="desc" id="desc"></p>
+  <div class="score" id="score"></div>
+</div>
+
+<div id="preview" class="frames" data-tabs="e" data-text="t1">
+  <div class="frame phone"><div class="frame-label">Phone · 375px</div></div>
+  <div class="frame desktop"><div class="frame-label">Desktop</div></div>
+</div>
+<div class="toast" id="toast"></div>
+
+<template id="siteTpl">
+  <div class="site">
+    <img class="logo" src="src/assets/images/OferNewLogo.png" alt="OferWaron logo">
+    <nav class="tabs">
+      <a class="tab active" href="#">Home</a><a class="tab" href="#">Strategy</a><a class="tab" href="#">Live Trading</a>
+      <a class="tab" href="#">Pricing</a><a class="tab" href="#">YouTube</a><a class="tab" href="#">Performance Report</a>
+      <a class="tab" href="#">About</a><a class="tab" href="#">Contact</a><a class="tab wa" href="#">WhatsApp Group</a>
+      <a class="tab" href="#">My Account</a><a class="tab" href="#">Sign out</a>
+    </nav>
+    <div class="swipe-hint">← swipe for more →</div>
+    <h1 class="main-title">XAUUSD 4H 65.91% Profit Factor 1.84 &amp; DD 16.81%</h1>
+    <div class="grid">
+      <div class="card"><span class="value">65.91%</span><span class="label">Win Rate</span></div>
+      <div class="card"><span class="value">176</span><span class="label">Total Trades</span></div>
+      <div class="card"><span class="value">2020</span><span class="label">Since</span></div>
+      <div class="card"><span class="value">4704.00%</span><span class="label">Total PnL</span></div>
+    </div>
+    <p class="subtitle">65.91% of 176 signals closed at target since 2020. <a href="#">Full trade log →</a></p>
+  </div>
+</template>
+
+<script>
+const TABS = {
+  now: ['Now', 'Live tabs: gold with a dark bronze band behind black text; on phones the text shrinks to <b>0.6rem (~9.6px)</b>.'],
+  a: ['A · Bright gold', 'Same gold pill, but brighter (no dark bronze band), <b>black 800</b> text, dark gold edge. Active tab = black with gold text. Smallest change.'],
+  b: ['B · Black & gold', 'Black pills with gold text, like a logo plate. Active tab = gold. Very strong on the white silk.'],
+  c: ['C · Ivory & gold', 'White pills, gold border, black text: the cleanest to read. Active tab = gold.'],
+  d: ['D · Black bar', 'All tabs inside one black strip with a gold frame; the active one is a gold chip. The silk behind never hurts readability.'],
+  e: ['E · Bright gold + phone swipe ★', 'Like A, but on phones the tabs keep full size in <b>one swipeable row</b> instead of shrinking and wrapping into 3-4 lines. <b>Recommended</b>.'],
+};
+const TEXT = {
+  now: ['Now', 'Live text: gold with a thin black outline - on light silk the small labels and subtitle look fuzzy, and on phones the title drops to ~10px.'],
+  t1: ['T1 · Bold outline ★', 'Same gold look, but a <b>solid 2-3px dark outline</b> drawn under the letters instead of the thin one + glow. Bigger small text on phones. <b>Recommended</b>: keeps the brand, much crisper.'],
+  t2: ['T2 · Bronze ink', 'Titles and numbers stay outlined gold; labels and the subtitle become <b>dark bronze</b> on a soft white halo, like printed text.'],
+  t3: ['T3 · Black glass', 'Cards and the subtitle get a <b>dark glass backdrop</b>, so gold text glows with no outline needed. Most contrast.'],
+  t4: ['T4 · Shimmer + black', 'Title in the logo\'s gold shimmer with a clean dark edge, numbers outlined gold, labels and subtitle <b>black</b>.'],
+};
+const preview = document.getElementById('preview');
+const tpl = document.getElementById('siteTpl');
+preview.querySelectorAll('.frame').forEach((f) => f.appendChild(tpl.content.cloneNode(true)));
+const STORE = 'goldVisibilityChoice';
+
+function buttons(id, map, attr) {
+  const box = document.getElementById(id);
+  Object.entries(map).forEach(([k, [name]]) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.k = k; b.textContent = name;
+    b.onclick = () => { preview.dataset[attr] = k; update(); };
+    box.appendChild(b);
+  });
+}
+buttons('tabBtns', TABS, 'tabs');
+buttons('textBtns', TEXT, 'text');
+
+// WCAG contrast
+const rgb = (c) => c.match(/[\d.]+/g).slice(0, 3).map(Number);
+const lum = (c) => rgb(c).map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
+  .reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+const ratio = (a, b) => { const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p); return (x + 0.05) / (y + 0.05); };
+const grade = (r) => (r >= 7 ? 'good' : r >= 4.5 ? 'ok' : 'bad');
+// Color behind a tab's text: its own fill (middle gradient stop), else its parent's
+function bgOf(el) {
+  const cs = getComputedStyle(el);
+  if (cs.backgroundImage !== 'none') { const s = cs.backgroundImage.match(/rgba?\([^)]+\)/g); return s[Math.floor((s.length - 1) / 2)]; }
+  const alpha = cs.backgroundColor.match(/[\d.]+/g)[3];
+  return alpha === '0' || (alpha && +alpha < 0.5) ? (el.parentElement.classList.contains('site') ? 'rgb(232,232,232)' : bgOf(el.parentElement)) : cs.backgroundColor;
+}
+
+function update() {
+  const { tabs, text } = preview.dataset;
+  document.querySelectorAll('#tabBtns button').forEach((b) => b.classList.toggle('on', b.dataset.k === tabs));
+  document.querySelectorAll('#textBtns button').forEach((b) => b.classList.toggle('on', b.dataset.k === text));
+  document.getElementById('desc').innerHTML = `<b>Tabs ${TABS[tabs][0]}:</b> ${TABS[tabs][1]}<br><b>Text ${TEXT[text][0]}:</b> ${TEXT[text][1]}`;
+  localStorage.setItem(STORE, JSON.stringify({ tabs, text }));
+
+  requestAnimationFrame(() => {
+    const tab = preview.querySelector('.desktop .tab:not(.active):not(.wa)');
+    const label = preview.querySelector('.phone .label');
+    const r = ratio(getComputedStyle(tab).color, bgOf(tab));
+    const tabPx = parseFloat(getComputedStyle(preview.querySelector('.phone .tab')).fontSize);
+    const labelPx = parseFloat(getComputedStyle(label).fontSize);
+    const titlePx = parseFloat(getComputedStyle(preview.querySelector('.phone .main-title')).fontSize);
+    const px = (v) => `<b class="${v < 12 ? 'bad' : v < 13 ? 'ok' : 'good'}">${v.toFixed(1)}px</b>`;
+    document.getElementById('score').innerHTML =
+      `Tab text contrast <b class="${grade(r)}">${r.toFixed(1)}:1</b> · On phone: tabs ${px(tabPx)}, title ${px(titlePx)}, labels ${px(labelPx)}`;
+  });
+}
+
+try {
+  const saved = JSON.parse(localStorage.getItem(STORE));
+  if (saved && TABS[saved.tabs] && TEXT[saved.text]) Object.assign(preview.dataset, saved);
+} catch { /* first visit */ }
+update();
+
+const toast = document.getElementById('toast');
+document.getElementById('copyBtn').onclick = async () => {
+  const { tabs, text } = preview.dataset;
+  const msg = `Visibility choice: tabs ${tabs.toUpperCase()} (${TABS[tabs][0]}), text ${text.toUpperCase()} (${TEXT[text][0]})`;
+  try { await navigator.clipboard.writeText(msg); toast.textContent = 'Copied! Paste it to Claude'; }
+  catch { toast.textContent = 'Copy failed'; }
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 2200);
+};
+</script>
+</body>
+</html>

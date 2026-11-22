@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>97% Gold — Emerald Hybrid Options</title>
+<style>
+/* =========================================================
+   Emerald shades - the same variables as src/styles/hybrid-theme.css
+   ========================================================= */
+:root {
+  --em-deep: #04211a; --em-dark: #073328; --em: #0b3a2e; --em-light: #10483a;
+  --em-mint: #effaf5; --em-gold: #f0c85a; --em-gold-light: #f6d77f;
+  --panel-alpha: 0.82;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ddd; }
+
+/* =========================================================
+   TODAY'S DESIGN (simplified copy of styles.css)
+   ========================================================= */
+.site {
+  background: url('src/assets/images/whiteBackground.jpg') center / cover, linear-gradient(160deg, #fff, #e9e5dc);
+  padding: 18px 12px 28px; text-align: center; line-height: 1.6;
+}
+.logo { height: clamp(110px, 26vmin, 220px); display: block; margin: 0 auto 8px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.18)); }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 4px auto 18px; max-width: 980px; }
+.tab {
+  background: linear-gradient(180deg, #FFD700 0%, #B8860B 50%, #D4AF37 100%);
+  color: #000; -webkit-text-fill-color: #000; border: 2px solid #FFD700; border-radius: 30px;
+  padding: 7px 16px; font-weight: 700; font-size: clamp(0.68rem, 1.8vw, 0.95rem); text-decoration: none; white-space: nowrap;
+  box-shadow: 0 0 10px rgba(255,215,0,.3), 0 4px 8px rgba(0,0,0,.2); transition: transform .2s;
+}
+.tab:hover { transform: scale(1.05); }
+.tab.active { transform: scale(1.1); box-shadow: 0 0 25px rgba(255,215,0,.8), 0 0 40px rgba(255,165,0,.5), 0 4px 15px rgba(0,0,0,.4); }
+.tab.wa {
+  background: linear-gradient(180deg, rgba(255,255,255,.55) 0%, rgba(255,255,255,.15) 45%, rgba(255,255,255,0) 50%), linear-gradient(180deg, #7dff6b, #2ee82a 50%, #12b812);
+  border-color: #b6ff9e; box-shadow: 0 0 12px rgba(57,255,20,.85), 0 0 26px rgba(37,211,102,.6);
+}
+.shimmer-title {
+  font-size: clamp(1.3rem, 5vw, 2.4rem); font-weight: 800; margin: 6px 0 14px;
+  background: linear-gradient(90deg, #b8860b, #ffd700, #fff6c9, #ffd700, #b8860b); -webkit-background-clip: text; background-clip: text; color: transparent;
+  filter: drop-shadow(0 1px 0 #000) drop-shadow(0 0 1px #000);
+}
+.gold-text {
+  color: #FFD700; -webkit-text-stroke: 0.5px #000; paint-order: stroke fill; font-weight: 600;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 10px rgba(255,215,0,.4);
+}
+.gold-title {
+  color: #FFD700; -webkit-text-stroke: 0.8px #000; paint-order: stroke fill; font-weight: 700;
+  text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 0 0 10px rgba(255,215,0,.3);
+}
+.section-title { font-size: clamp(1.1rem, 3.5vw, 1.8rem); margin: 22px 0 10px; }
+.subtitle { max-width: 720px; margin: 10px auto; font-size: clamp(0.85rem, 2.5vw, 1.1rem); }
+.grid { display: grid; gap: 10px; max-width: 860px; margin: 0 auto; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.card { background: rgba(255,255,255,.06); border: 1.5px solid rgba(255,215,0,.6); border-radius: 14px; padding: 12px 8px; backdrop-filter: blur(5px); }
+.value { display: block; font-size: clamp(1.3rem, 5vw, 2.2rem); line-height: 1.15; }
+.label { display: block; font-size: clamp(0.62rem, 2.2vw, 0.95rem); }
+.win { color: #22c55e !important; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 0 0 12px #22c55e !important; }
+.loss { color: #ef4444 !important; text-shadow: 1px 1px 0 #000, -1px -1px 0 #000, 0 0 12px #ef4444 !important; }
+.btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 14px 0; }
+.btn { border-radius: 999px; padding: 10px 26px; font-weight: 700; border: none; font: inherit; font-weight: 700; cursor: pointer; }
+.btn-mint { background: linear-gradient(180deg, #b5f5dc, #5fd3a6); color: #0b3a2e; box-shadow: 0 0 14px rgba(95,211,166,.5); }
+.btn-gold { background: linear-gradient(180deg, #fff1a8, #ffd700 40%, #d4a008); color: #000; box-shadow: 0 0 14px rgba(255,215,0,.5); }
+.steps { display: grid; gap: 10px; max-width: 760px; margin: 0 auto; text-align: left; }
+.step { display: flex; gap: 14px; align-items: center; border: 2px solid #FFD700; border-radius: 12px; padding: 12px 14px; background: rgba(255,255,255,.06); }
+.step-num { flex: 0 0 auto; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; background: linear-gradient(180deg, #ffe680, #d4a008); color: #000; }
+.step h3 { margin: 0 0 2px; font-size: clamp(0.95rem, 2.8vw, 1.25rem); }
+.step p { margin: 0; font-size: clamp(0.78rem, 2.2vw, 1.05rem); }
+.footer-links { display: flex; gap: 6px 16px; justify-content: center; flex-wrap: wrap; margin-top: 22px; }
+@media (max-width: 560px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+
+/* =========================================================
+   HYBRID VARIANTS - mirror of src/styles/hybrid-theme.css
+   ========================================================= */
+/* Emerald tabs (tabs / ink / panels) */
+:is([data-hybrid="tabs"], [data-hybrid="ink"], [data-hybrid="panels"]) .tab:not(.wa) {
+  background: linear-gradient(180deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 50%), linear-gradient(180deg, var(--em-light), var(--em-dark));
+  border-color: var(--em-gold); color: var(--em-gold-light); -webkit-text-fill-color: var(--em-gold-light);
+  box-shadow: 0 0 8px rgba(240,200,90,.35), 0 4px 8px rgba(0,0,0,.25), inset 0 -2px 4px rgba(0,0,0,.3);
+}
+:is([data-hybrid="tabs"], [data-hybrid="ink"], [data-hybrid="panels"]) .tab.active:not(.wa) {
+  background: linear-gradient(180deg, #fff1a8 0%, #ffd700 40%, #d4a008 100%); border-color: #fff1a8;
+  color: var(--em-deep); -webkit-text-fill-color: var(--em-deep);
+  box-shadow: 0 0 22px rgba(255,215,0,.8), 0 0 36px rgba(11,58,46,.45), 0 4px 12px rgba(0,0,0,.35);
+}
+/* outline: gold tabs with emerald text + border */
+[data-hybrid="outline"] .tab:not(.wa) { border-color: var(--em-dark); color: var(--em-deep); -webkit-text-fill-color: var(--em-deep); }
+[data-hybrid="outline"] .tab.active:not(.wa) { border-color: var(--em-gold-light); box-shadow: 0 0 0 2px var(--em-dark), 0 0 24px rgba(255,215,0,.8); }
+
+/* Body text in dark emerald ink with a white halo (ink / panels) */
+[data-hybrid="ink"] .gold-text,
+[data-hybrid="panels"] .subtitle.gold-text,
+[data-hybrid="panels"] .footer-links .gold-text {
+  color: var(--em-dark); -webkit-text-fill-color: var(--em-dark); -webkit-text-stroke: 0;
+  text-shadow: 0 0 2px rgba(255,255,255,.95), 0 0 8px rgba(255,255,255,.8);
+}
+/* Gold titles with an emerald outline instead of black (ink / panels / outline) */
+:is([data-hybrid="ink"], [data-hybrid="panels"], [data-hybrid="outline"]) .gold-title,
+[data-hybrid="outline"] .gold-text {
+  -webkit-text-stroke-color: var(--em-deep);
+  text-shadow: 1px 1px 0 var(--em-deep), -1px -1px 0 var(--em-deep), 1px -1px 0 var(--em-deep), -1px 1px 0 var(--em-deep), 0 2px 8px rgba(4,33,26,.35);
+}
+/* Panels: cards become emerald, text inside is light */
+[data-hybrid="panels"] :is(.card, .step) {
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,0)), rgba(4, 33, 26, var(--panel-alpha));
+  border-color: var(--em-gold);
+}
+[data-hybrid="panels"] :is(.card, .step) .gold-title { color: var(--em-gold); -webkit-text-stroke: 0; text-shadow: 0 0 12px rgba(240,200,90,.35); }
+[data-hybrid="panels"] :is(.card, .step) .gold-text { color: var(--em-mint); -webkit-text-fill-color: var(--em-mint); -webkit-text-stroke: 0; text-shadow: none; }
+
+/* =========================================================
+   CONTROL BAR (not part of the site)
+   ========================================================= */
+.panel { position: sticky; top: 0; z-index: 50; background: #04211a; color: #effaf5; border-bottom: 2px solid #f0c85a; padding: 10px 14px; font-size: 14px; }
+.panel-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.panel strong { color: #f0c85a; margin-right: auto; }
+.panel button, .panel select { font: inherit; border-radius: 999px; border: 1px solid #f0c85a; background: #0b3a2e; color: #f6d77f; padding: 6px 12px; cursor: pointer; }
+.panel button.on { background: #f0c85a; color: #04211a; font-weight: 700; }
+.panel label { display: inline-flex; gap: 6px; align-items: center; color: #a7cbbd; }
+.panel input[type="color"] { width: 34px; height: 26px; border: 1px solid #f0c85a; border-radius: 6px; background: none; padding: 0; }
+.panel input[type="range"] { width: 90px; }
+.panel .desc { margin-top: 6px; color: #a7cbbd; font-size: 13px; }
+.panel .more { margin-top: 8px; display: none; gap: 10px 16px; flex-wrap: wrap; }
+.panel.open .more { display: flex; }
+.toast { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%); background: #f0c85a; color: #04211a; padding: 8px 16px; border-radius: 999px; font-weight: 700; display: none; z-index: 60; }
+
+/* Side-by-side gallery */
+.gallery-wrap { background: #04211a; padding: 24px 12px 40px; }
+.gallery-wrap h2 { color: #f0c85a; text-align: center; margin: 0 0 4px; }
+.gallery-wrap > p { color: #a7cbbd; text-align: center; margin: 0 0 16px; }
+.gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; max-width: 1200px; margin: 0 auto; }
+.mini { border-radius: 14px; overflow: hidden; border: 2px solid transparent; cursor: pointer; background: none; padding: 0; font: inherit; text-align: center; }
+.mini:hover, .mini.current { border-color: #f0c85a; }
+.mini .site { padding: 12px 8px 16px; }
+.mini .name { background: #0b3a2e; color: #f6d77f; font-weight: 700; padding: 6px; }
+.mini .tabs { gap: 5px; margin-bottom: 10px; }
+.mini .tab { font-size: 0.68rem; padding: 4px 9px; }
+.mini .value { font-size: 1.3rem; }
+.mini .label { font-size: 0.65rem; }
+.mini .subtitle { font-size: 0.8rem; }
+</style>
+</head>
+<body>
+
+<!-- ================= CONTROL BAR ================= -->
+<div class="panel" id="panel">
+  <div class="panel-row">
+    <strong>✦ Emerald Hybrid — pick a variant</strong>
+    <span id="variantButtons" class="panel-row"></span>
+    <button type="button" id="moreBtn">🎨 Shades</button>
+    <button type="button" id="copyBtn" class="on">📋 Copy choice</button>
+  </div>
+  <div class="desc" id="desc"></div>
+  <div class="more">
+    <label>Tab top <input type="color" data-var="--em-light" value="#10483a"></label>
+    <label>Tab bottom / text ink <input type="color" data-var="--em-dark" value="#073328"></label>
+    <label>Outline <input type="color" data-var="--em-deep" value="#04211a"></label>
+    <label>Tab text / gold <input type="color" data-var="--em-gold-light" value="#f6d77f"></label>
+    <label>Tab border <input type="color" data-var="--em-gold" value="#f0c85a"></label>
+    <label>Panel strength <input type="range" id="alpha" min="0.4" max="0.95" step="0.01" value="0.82"></label>
+    <span class="panel-row" id="shadeButtons"></span>
+    <button type="button" id="resetShades">↺ Reset shades</button>
+  </div>
+</div>
+
+<!-- ================= MAIN PREVIEW ================= -->
+<div id="main" data-hybrid="ink"></div>
+
+<!-- ================= ALL VARIANTS SIDE BY SIDE ================= -->
+<div class="gallery-wrap">
+  <h2>All variants side by side</h2>
+  <p>Tap one to preview it full size above.</p>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<template id="siteTpl">
+  <div class="site">
+    <img class="logo" src="src/assets/images/OferNewLogo.png" alt="OferWaron logo">
+    <nav class="tabs">
+      <a class="tab active" href="#">Home</a><a class="tab" href="#">Strategy</a><a class="tab" href="#">Live Trading</a>
+      <a class="tab" href="#">Pricing</a><a class="tab" href="#">YouTube</a><a class="tab" href="#">Performance Report</a>
+      <a class="tab" href="#">About</a><a class="tab" href="#">Contact</a><a class="tab wa" href="#">WhatsApp Group</a><a class="tab" href="#">My Account</a>
+    </nav>
+    <h1 class="shimmer-title">XAUUSD 4H 65.91% Win Rate</h1>
+    <div class="grid grid-4">
+      <div class="card"><span class="value gold-title">65.91%</span><span class="label gold-text">Win Rate</span></div>
+      <div class="card"><span class="value gold-title">176</span><span class="label gold-text">Total Trades</span></div>
+      <div class="card"><span class="value gold-title">2020</span><span class="label gold-text">Since</span></div>
+      <div class="card"><span class="value gold-title">+$—</span><span class="label gold-text">Total PnL</span></div>
+    </div>
+    <p class="subtitle gold-text">65.91% of 176 signals closed at target since 2020.</p>
+    <div class="btns"><button class="btn btn-mint" type="button">Register</button><button class="btn btn-gold" type="button">WhatsApp 💬</button></div>
+    <div class="grid grid-3">
+      <div class="card"><span class="value win">116</span><span class="label gold-text">Wins (65.91%)</span></div>
+      <div class="card"><span class="value loss">60</span><span class="label gold-text">Losses (34.09%)</span></div>
+      <div class="card"><span class="value gold-title">8</span><span class="label gold-text">Max Consecutive Wins</span></div>
+    </div>
+    <h2 class="section-title gold-title">How It Works</h2>
+    <div class="steps">
+      <div class="step"><span class="step-num">1</span><div><h3 class="gold-title">Subscribe</h3><p class="gold-text">Subscribe to a dedicated plan and get instant access to my trading signals.</p></div></div>
+      <div class="step"><span class="step-num">2</span><div><h3 class="gold-title">Receive Signals</h3><p class="gold-text">Get real-time alerts via WhatsApp.</p></div></div>
+      <div class="step"><span class="step-num">3</span><div><h3 class="gold-title">Execute &amp; Profit</h3><p class="gold-text">Follow the signals with your broker. Clear entry, exit &amp; stop-loss.</p></div></div>
+    </div>
+    <nav class="footer-links"><a class="gold-text" href="#">Strategy</a><a class="gold-text" href="#">Pricing</a><a class="gold-text" href="#">Contact</a><a class="gold-text" href="#">Performance Report</a></nav>
+  </div>
+</template>
+
+<script>
+const VARIANTS = {
+  classic: 'Today’s design - nothing changed (for comparison).',
+  tabs: 'Only the tabs turn emerald with gold text; the active tab stays gold so you always see where you are. Text unchanged.',
+  ink: 'Recommended (live on the site now): emerald tabs + body text in dark emerald with a white halo; titles stay gold with an emerald outline.',
+  panels: 'Like Ink, plus the cards become emerald glass panels with light text. Page background stays silk.',
+  outline: 'Closest to today: gold tabs and gold text, but the black outline becomes deep emerald.',
+};
+const SHADES = {
+  Emerald: { '--em-light': '#10483a', '--em-dark': '#073328', '--em-deep': '#04211a', '--em-gold-light': '#f6d77f', '--em-gold': '#f0c85a' },
+  Forest:  { '--em-light': '#1f5130', '--em-dark': '#12341e', '--em-deep': '#0a1f12', '--em-gold-light': '#f3d98b', '--em-gold': '#e3be5a' },
+  Teal:    { '--em-light': '#0f5257', '--em-dark': '#08363a', '--em-deep': '#052326', '--em-gold-light': '#f6dc8a', '--em-gold': '#e8c35e' },
+  Jade:    { '--em-light': '#1a7a5a', '--em-dark': '#0e5140', '--em-deep': '#07302a', '--em-gold-light': '#fff0b3', '--em-gold': '#f5cf5f' },
+};
+const tpl = document.getElementById('siteTpl');
+const main = document.getElementById('main');
+main.appendChild(tpl.content.cloneNode(true));
+const STORE = 'goldHybridChoice';
+
+function setVariant(v) {
+  main.dataset.hybrid = v;
+  document.getElementById('desc').textContent = `${v}: ${VARIANTS[v]}`;
+  document.querySelectorAll('#variantButtons button').forEach((b) => b.classList.toggle('on', b.dataset.v === v));
+  document.querySelectorAll('.mini').forEach((m) => m.classList.toggle('current', m.dataset.v === v));
+  save();
+}
+function setShade(vars) {
+  Object.entries(vars).forEach(([k, val]) => {
+    document.documentElement.style.setProperty(k, val);
+    const input = document.querySelector(`input[data-var="${k}"]`);
+    if (input) input.value = val;
+  });
+  save();
+}
+function currentVars() {
+  const vars = {};
+  document.querySelectorAll('input[data-var]').forEach((i) => { vars[i.dataset.var] = i.value; });
+  vars['--panel-alpha'] = document.getElementById('alpha').value;
+  return vars;
+}
+function save() { localStorage.setItem(STORE, JSON.stringify({ variant: main.dataset.hybrid, vars: currentVars() })); }
+
+// Variant buttons + gallery
+const vb = document.getElementById('variantButtons');
+const gallery = document.getElementById('gallery');
+Object.keys(VARIANTS).forEach((v) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.dataset.v = v; b.textContent = v[0].toUpperCase() + v.slice(1);
+  b.onclick = () => setVariant(v);
+  vb.appendChild(b);
+
+  const mini = document.createElement('button');
+  mini.type = 'button'; mini.className = 'mini'; mini.dataset.v = v; mini.dataset.hybrid = v;
+  mini.innerHTML = `<div class="name">${b.textContent}</div>`;
+  const clone = tpl.content.cloneNode(true);
+  clone.querySelector('.steps').remove();
+  clone.querySelector('.footer-links').remove();
+  clone.querySelector('.section-title').remove();
+  mini.appendChild(clone);
+  mini.onclick = () => { setVariant(v); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  gallery.appendChild(mini);
+});
+
+// Shades
+const sb = document.getElementById('shadeButtons');
+Object.entries(SHADES).forEach(([name, vars]) => {
+  const b = document.createElement('button');
+  b.type = 'button'; b.textContent = name; b.onclick = () => setShade(vars);
+  sb.appendChild(b);
+});
+document.querySelectorAll('input[data-var]').forEach((i) => i.addEventListener('input', () => setShade({ [i.dataset.var]: i.value })));
+document.getElementById('alpha').addEventListener('input', (e) => { document.documentElement.style.setProperty('--panel-alpha', e.target.value); save(); });
+document.getElementById('resetShades').onclick = () => { setShade(SHADES.Emerald); document.getElementById('alpha').value = 0.82; document.documentElement.style.setProperty('--panel-alpha', 0.82); save(); };
+document.getElementById('moreBtn').onclick = () => document.getElementById('panel').classList.toggle('open');
+
+// Copy the choice in the form the real site uses
+const toast = document.getElementById('toast');
+document.getElementById('copyBtn').onclick = async () => {
+  const vars = currentVars();
+  const text = `Hybrid choice: data-hybrid="${main.dataset.hybrid}"\n` +
+    Object.entries(vars).map(([k, v]) => `${k}: ${v};`).join('\n');
+  try { await navigator.clipboard.writeText(text); toast.textContent = 'Copied! Paste it to Claude'; }
+  catch { toast.textContent = 'Copy failed'; }
+  toast.style.display = 'block';
+  setTimeout(() => { toast.style.display = 'none'; }, 2200);
+};
+
+// Restore last choice
+try {
+  const saved = JSON.parse(localStorage.getItem(STORE));
+  if (saved?.vars) {
+    const { '--panel-alpha': alpha, ...colors } = saved.vars;
+    setShade(colors);
+    if (alpha) { document.getElementById('alpha').value = alpha; document.documentElement.style.setProperty('--panel-alpha', alpha); }
+  }
+  setVariant(saved?.variant && VARIANTS[saved.variant] ? saved.variant : 'ink');
+} catch { setVariant('ink'); }
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">97% Gold</string>
+    <string name="title_activity_main">97% Gold</string>
+    <string name="package_name">com.oferwaron.gold</string>
+    <string name="custom_url_scheme">com.oferwaron.gold</string>
+</resources>

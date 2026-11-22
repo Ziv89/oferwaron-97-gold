@@ -72,3 +72,65 @@ export const useStorageImageState = (folder, baseName, index) => {
 // Returns the download URL for the image, or null while loading / on error
 export const useStorageImage = (folder, baseName, index) =>
   useStorageImageState(folder, baseName, index).url;
+
+// ============================================
+// Numbered image sequences: {baseName}, {baseName}1, {baseName}2 ...
+// Probed in order until the first missing index, so any number of images
+// works - upload the next number to add one. Cached per session.
+// ============================================
+const MAX_SEQUENCE_IMAGES = 50;
+const cachedSequences = {};
+
+const loadImageSequence = async (folder, baseName) => {
+  const urls = [];
+  for (let i = 0; i < MAX_SEQUENCE_IMAGES; i++) {
+    try {
+      urls.push(await fetchStorageImage(folder, baseName, i));
+    } catch (err) {
+      // object-not-found = end of the sequence; anything else is a real error
+      if (err?.code !== 'storage/object-not-found') throw err;
+      break;
+    }
+  }
+  log(`Fetched ${folder}/${baseName} images:`, urls);
+  return urls;
+};
+
+export const fetchStorageImageSequence = (folder, baseName) => {
+  const key = `${folder}/${baseName}`;
+  if (!cachedSequences[key]) {
+    cachedSequences[key] = loadImageSequence(folder, baseName).catch((err) => {
+      delete cachedSequences[key];
+      throw err;
+    });
+  }
+  return cachedSequences[key];
+};
+
+// { images, loading } for a numbered image sequence
+export const useStorageImageSequence = (folder, baseName) => {
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+
+    fetchStorageImageSequence(folder, baseName)
+      .then((urls) => {
+        if (!cancelled) setImages(urls);
+      })
+      .catch((err) => {
+        console.error(`Error fetching ${folder}/${baseName} images:`, err);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [folder, baseName]);
+
+  return { images, loading };
+};

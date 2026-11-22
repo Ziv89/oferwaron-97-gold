@@ -1,12 +1,14 @@
 // ============================================
 // Home.jsx - Landing Page (Strategy-style golden design)
 // ============================================
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import Seo from '../components/Seo';
 import { useTradingStats, useSiteConfig, usePerformanceHistory } from '../App';
 import { useAuth } from '../contexts/AuthContext';
 import CoinLoader from '../components/CoinLoader';
+import ImageCarousel from '../components/ImageCarousel';
+import { useChartImages } from '../services/chartImages';
 import { WhatsAppQrButton } from '../components/WhatsAppQr';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -17,17 +19,32 @@ const StatCardShimmer = () => (
   </span>
 );
 
-// Strategy Chart Component - Static image showcase
+// Strategy Chart Component - swipeable chart carousel (same as Performance Report)
+// Images: Firebase Storage charts/ofernewChart.jpg, ofernewChart1.jpg, ... (any number).
+// Falls back to the Firestore tradeViewChartImages list when Storage has none.
+const ChartFallback = () => (
+  <div className="chart-container chart-wrapper">
+    <div className="chart-error">
+      <div className="chart-error-content">
+        <p>Chart image is not set yet.</p>
+        <a
+          href="https://www.tradingview.com/u/oferwv/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="chart-link"
+        >
+          View Live on TradingView
+        </a>
+      </div>
+    </div>
+  </div>
+);
+
 const StrategyChart = () => {
-  const [isLoaded, setIsLoaded] = useState(false);
-  const { stats, loading } = useTradingStats();
+  const { stats, loading: statsLoading } = useTradingStats();
+  const { images: storageImages, loading: chartsLoading } = useChartImages();
 
-   const src = stats?.tradeViewChartImage;
-
-  //  const src = ofernewChart;
-
-  // If still loading, show loader
-  if (loading) {
+  if (chartsLoading || (statsLoading && storageImages.length === 0)) {
     return (
       <div className="chart-container chart-wrapper">
         <div className="chart-loading"><CoinLoader label="Loading chart…" /></div>
@@ -35,41 +52,19 @@ const StrategyChart = () => {
     );
   }
 
-  // If missing URL in Firebase, show a helpful fallback
-  if (!src) {
-    return (
-      <div className="chart-container chart-wrapper">
-        <div className="chart-error">
-          <div className="chart-error-content">
-            <p>Chart image is not set yet.</p>
-            <a
-              href="https://www.tradingview.com/u/oferwv/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="chart-link"
-            >
-              View Live on TradingView
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const images = storageImages.length
+    ? storageImages
+    : (stats?.tradeViewChartImages?.length
+      ? stats.tradeViewChartImages
+      : [stats?.tradeViewChartImage].filter(Boolean));
 
   return (
-    // Container shrinks to the image once loaded so the chart fills its border edge to edge
-    <div className={`chart-container chart-wrapper strategy-chart-container ${isLoaded ? 'loaded' : ''}`}>
-      {!isLoaded && <div className="chart-loading"><CoinLoader label="Loading chart…" /></div>}
-
-      <div className="strategy-chart-showcase">
-        <img
-          src={src}
-          alt="OferWaron97% Gold Trading Strategy - Live Performance"
-          className={`strategy-chart-image ${isLoaded ? 'loaded' : ''}`}
-          onLoad={() => setIsLoaded(true)}
-        />
-      </div>
-    </div>
+    <ImageCarousel
+      images={images}
+      label="Strategy charts"
+      itemName="strategy chart"
+      renderEmpty={() => <ChartFallback />}
+    />
   );
 };
 

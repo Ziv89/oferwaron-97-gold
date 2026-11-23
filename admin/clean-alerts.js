@@ -2,7 +2,8 @@
 /**
  * clean-alerts.js - delete Live Alerts that don't follow the alert format.
  *
- * A valid alert is 3 icons followed by "(text)", e.g. "🟨🟨🟨 (V5-1M)" or
+ * A valid alert includes 3 icons and "(text)", with any other text around
+ * them, e.g. "🟨🟨🟨 (V5-1M)", "LONG 🟨🟨🟨 (V5-1M) | text" or
  * "💥🚀💫 (V4-2H)" (same rule as functions/index.js isAlertFormat).
  * Anything else in tradingview/alerts/tvMessages is removed.
  *
@@ -30,8 +31,12 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
 
 // Keep in sync with functions/index.js and src/services/alertMessages.js
 const ICON = String.raw`(?:\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}][️\p{EMod}]?(?:‍\p{Extended_Pictographic}[️\p{EMod}]?)*)`;
-const ALERT_FORMAT = new RegExp(String.raw`^\s*${ICON}\s*${ICON}\s*${ICON}\s*\([^()\n]*[^()\s][^()\n]*\)`, 'u');
-const isAlertFormat = (text) => ALERT_FORMAT.test(String(text || ''));
+const ALERT_ICONS = new RegExp(ICON, 'gu');
+const ALERT_PARENS = /\([^()\n]*[^()\s][^()\n]*\)/;
+const isAlertFormat = (value) => {
+  const text = String(value || '');
+  return (text.match(ALERT_ICONS) || []).length >= 3 && ALERT_PARENS.test(text);
+};
 
 (async () => {
   const doDelete = process.argv.includes('--delete');

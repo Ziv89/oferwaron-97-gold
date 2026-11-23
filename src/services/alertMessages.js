@@ -130,14 +130,20 @@ export const isAlertExpired = (alert, now = Date.now()) =>
 // is not a real alert - the Cloud Function refuses them; hide any left over
 const UNFILLED_PLACEHOLDER = /\{\{[^{}]*\}\}/;
 
-// Alert format: 3 icons (any emoji) then "(text)", e.g. "🟨🟨🟨 (V5-1M)".
+// Alert format: includes 3 icons (any emoji) and "(text)", with any other text
+// around them, e.g. "🟨🟨🟨 (V5-1M)" or "LONG 🟨🟨🟨 (V5-1M) | text".
 // The Cloud Function doesn't save anything else; hide any left over.
 // Keep in sync with functions/index.js and admin/clean-alerts.js.
 const ALERT_ICON = String.raw`(?:\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}][️\p{EMod}]?(?:‍\p{Extended_Pictographic}[️\p{EMod}]?)*)`;
-const ALERT_FORMAT = new RegExp(String.raw`^\s*${ALERT_ICON}\s*${ALERT_ICON}\s*${ALERT_ICON}\s*\([^()\n]*[^()\s][^()\n]*\)`, 'u');
+const ALERT_ICONS = new RegExp(ALERT_ICON, 'gu');
+const ALERT_PARENS = /\([^()\n]*[^()\s][^()\n]*\)/;
+const isAlertFormat = (value) => {
+  const text = String(value || '');
+  return (text.match(ALERT_ICONS) || []).length >= 3 && ALERT_PARENS.test(text);
+};
 
 export const isProperAlert = (alert) =>
-  ALERT_FORMAT.test(String(alert.messagecontent || '')) && !UNFILLED_PLACEHOLDER.test(alert.messagecontent);
+  isAlertFormat(alert.messagecontent) && !UNFILLED_PLACEHOLDER.test(alert.messagecontent);
 
 const dateOf = (a) => (a.date?.toMillis ? a.date.toMillis() : 0);
 

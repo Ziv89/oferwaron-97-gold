@@ -222,12 +222,17 @@ const tvAlertsDoc = () => admin.firestore().collection("tradingview").doc("alert
 const UNFILLED_PLACEHOLDER = /\{\{[^{}]*\}\}/;
 const hasUnfilledPlaceholder = (text) => UNFILLED_PLACEHOLDER.test(String(text || ""));
 
-// Live Alerts format: 3 icons (any emoji) then "(text)", e.g. "🟨🟨🟨 (V5-1M)",
+// Live Alerts format: includes 3 icons (any emoji) and "(text)", with any other
+// text around them, e.g. "LONG 🟨🟨🟨 (V5-1M) | text", "🟨🟨🟨 (V5-1M)",
 // "💥🚀💫 (V4-2H)", "⛔⛔⛔ (V5-5M)". Anything else is not saved to Firestore.
 // Keep in sync with src/services/alertMessages.js and admin/clean-alerts.js.
 const ALERT_ICON = String.raw`(?:\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}][️\p{EMod}]?(?:‍\p{Extended_Pictographic}[️\p{EMod}]?)*)`;
-const ALERT_FORMAT = new RegExp(String.raw`^\s*${ALERT_ICON}\s*${ALERT_ICON}\s*${ALERT_ICON}\s*\([^()\n]*[^()\s][^()\n]*\)`, "u");
-const isAlertFormat = (text) => ALERT_FORMAT.test(String(text || ""));
+const ALERT_ICONS = new RegExp(ALERT_ICON, "gu");
+const ALERT_PARENS = /\([^()\n]*[^()\s][^()\n]*\)/;
+const isAlertFormat = (value) => {
+  const text = String(value || "");
+  return (text.match(ALERT_ICONS) || []).length >= 3 && ALERT_PARENS.test(text);
+};
 
 // Millis of 00:00 Israel time on the day of `ms`, plus `addDays` days
 // (addDays = 1 -> the coming midnight). DST in Israel switches at 02:00,
@@ -301,7 +306,7 @@ exports.tvAlertMessage = onRequest(
     const date = admin.firestore.Timestamp.now();
     const tasks = {};
 
-    // Only "icon icon icon (text)" alerts go to Firestore / the Live Alerts chat
+    // Only alerts with 3 icons and "(text)" go to Firestore / the Live Alerts chat
     if (isAlertFormat(message)) {
       // Latest + 12h history written together, so they never disagree
       const batch = admin.firestore().batch();

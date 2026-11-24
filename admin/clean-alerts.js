@@ -33,9 +33,12 @@ if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
 const ICON = String.raw`(?:\p{RI}\p{RI}|[\p{Extended_Pictographic}\p{Emoji_Presentation}][️\p{EMod}]?(?:‍\p{Extended_Pictographic}[️\p{EMod}]?)*)`;
 const ALERT_ICONS = new RegExp(ICON, 'gu');
 const ALERT_PARENS = /\([^()\n]*[^()\s][^()\n]*\)/;
+// Raw JSON (starts with "{" or has "key": in it) is a broken webhook payload,
+// not an alert - rejected even when it contains 3 icons and "(text)"
+const RAW_JSON = /^[\s"'“”]*\{|["“”][\w.-]+\\*["“”]\s*:/;
 const isAlertFormat = (value) => {
   const text = String(value || '');
-  return (text.match(ALERT_ICONS) || []).length >= 3 && ALERT_PARENS.test(text);
+  return !RAW_JSON.test(text) && (text.match(ALERT_ICONS) || []).length >= 3 && ALERT_PARENS.test(text);
 };
 
 (async () => {
